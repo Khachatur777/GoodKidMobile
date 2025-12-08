@@ -2,8 +2,10 @@ import {IScreens} from 'navigation';
 import {
   Error404,
   Home,
+  Search,
+  PlayVideoList
 } from 'screens';
-import Search from 'screens/search/Search.tsx';
+import i18n from "i18next";
 
 export const homeScreens: IScreens[] = [
   {
@@ -12,6 +14,15 @@ export const homeScreens: IScreens[] = [
     options: () => ({
       headerShown: true,
       headerTransparent: false,
+      backgroundColor: 'red_500',
+    }),
+  },
+  {
+    name: 'PlayVideoListScreen',
+    component: PlayVideoList,
+    options: () => ({
+      title: i18n.t('youtube_video_title'),
+      showBackIcon: true,
       backgroundColor: 'red_500',
     }),
   },

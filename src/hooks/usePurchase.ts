@@ -23,14 +23,6 @@ export const checkUserSubscription = async (): Promise<UserSubscription> => {
   }
 };
 
-const checkOfferings = async () => {
-  try {
-    const offerings = await Purchases.getOfferings();
-    console.log('RC offerings =', JSON.stringify(offerings, null, 2));
-  } catch (e) {
-    console.log('RC getOfferings error', e);
-  }
-};
 
 export const purchaseUser = async () => {
   try {
@@ -41,19 +33,15 @@ export const purchaseUser = async () => {
       case PAYWALL_RESULT.PURCHASED:
         return { isSubscribed: true };
       case PAYWALL_RESULT.CANCELLED:
-        console.log('❌ Пользователь закрыл paywall (cancel)');
         break;
 
       case PAYWALL_RESULT.ERROR:
-        console.log('⚠️ Произошла ошибка при покупке');
         break;
 
       case PAYWALL_RESULT.RESTORED:
-        console.log('♻️ Восстановлена предыдущая подписка');
         break;
 
       default:
-        console.log('Неизвестный результат paywall:', paywallResult);
         break;
     }
   } catch (e) {

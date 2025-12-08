@@ -19,6 +19,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {NoSignIn} from 'organisms';
 import {usePinAction} from 'hooks';
 import {purchaseUser} from "hooks/usePurchase.ts";
+import AlertModal from "../../molecules/alert-modal/AlertModal.tsx";
 
 export interface FilterProps {
   navigation: NavigationProp<any>;
@@ -33,6 +34,7 @@ interface IFilterData {
 
 
 const Filter: FC<FilterProps> = () => {
+  const [subscriptionAskModalVisible, setSubscriptionAskModalVisible] = useState<boolean>(false)
   const [language, setLanguage] = useState<string>('')
   const [ages, setAges] = useState<number | null>(null)
   const [categories, setCategories] = useState<number[]>([])
@@ -155,18 +157,6 @@ const Filter: FC<FilterProps> = () => {
       })
   }, [])
 
-  const askPurchase = useCallback(() => {
-
-    Alert.alert(t('subscription'), t('open_subscription'), [
-      {
-        text: 'Cancel',
-        onPress: () => console.log('Cancel Pressed'),
-        style: 'cancel',
-      },
-      {text: 'OK', onPress: () => purchase()},
-    ]);
-
-  }, [])
 
   return (
     <BackgroundWrapper>
@@ -181,7 +171,7 @@ const Filter: FC<FilterProps> = () => {
             <View style={filterStyles().filterItemsContainer}>
 
               {languageOptions.map((lng, index) => {
-                if(lng.key !== 'hy' && Platform.OS === 'ios') return
+
                 const isSelected = language === (lng.key || lng.name);
                 return (
                   <Badge
@@ -191,7 +181,7 @@ const Filter: FC<FilterProps> = () => {
                     size={'large'}
                     onPress={() => {
                       if (index !== 0 && !subscriptionState) {
-                        return askPurchase()
+                        return setSubscriptionAskModalVisible(true)
                       }
                       chooseFilterLanguage(lng)
                     }}
@@ -224,7 +214,7 @@ const Filter: FC<FilterProps> = () => {
                     size={'large'}
                     onPress={() => {
                       if (index !== 0 && !subscriptionState) {
-                        return askPurchase()
+                        return setSubscriptionAskModalVisible(true)
                       }
                       chooseFilterAge(age)
                     }}
@@ -255,7 +245,7 @@ const Filter: FC<FilterProps> = () => {
                     size={'large'}
                     onPress={() => {
                       if (index !== 0 && !subscriptionState) {
-                        return askPurchase()
+                        return setSubscriptionAskModalVisible(true)
                       }
                       chooseFilter(filter)
                     }}
@@ -272,6 +262,24 @@ const Filter: FC<FilterProps> = () => {
           <Spacing size={24}/>
 
           <Button title={t('save')} onPress={onEditFilter}/>
+
+          <AlertModal
+            title={t('subscription')}
+            description={t('open_subscription')}
+            isVisible={subscriptionAskModalVisible}
+            setIsVisible={setSubscriptionAskModalVisible}
+            buttons={[
+              {
+                title: t('subscription'),
+                onPress: () => purchase()
+              },
+              {
+                title: t('cancel'),
+                onPress: () => setSubscriptionAskModalVisible(false),
+                variant: 'outline'
+              }
+            ]}
+          />
 
         </ScrollView>
         :

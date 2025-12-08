@@ -10,6 +10,7 @@ export const colorTheme = {
     text_secondary: '103, 116, 130',
     text_tertiary: '149, 164, 180',
     text_inverted: '255, 255, 255',
+    text_primary_header: '255, 255, 255',
     text_positive: '0, 194, 112',
     text_negative: '255, 47, 1',
 
@@ -50,6 +51,7 @@ export const colorTheme = {
     icon_secondary: '103, 116, 130',
     icon_tertiary: '149, 164, 180',
     icon_inverted: '255, 255, 255',
+    icon_inverted_header: '255, 255, 255',
 
     // #endregion Icons Colors Start
 
@@ -222,6 +224,7 @@ export const colorTheme = {
   },
   dark: {
     // #region Text Colors Start
+    text_primary_header: '255, 255, 255',
     text_primary: '255, 255, 255',
     text_secondary: '149, 164, 180',
     text_tertiary: '103, 116, 130',
@@ -263,6 +266,7 @@ export const colorTheme = {
 
     // #region Icons Colors Start
     icon_primary: '255, 255, 255',
+    icon_inverted_header: '255, 255, 255',
     icon_secondary: '149, 164, 180',
     icon_tertiary: '103, 116, 130',
     icon_inverted: '7, 11, 17',

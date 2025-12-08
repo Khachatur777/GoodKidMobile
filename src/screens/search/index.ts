@@ -1,2 +1,2 @@
-export {default as Home} from './Search.tsx';
+export {default as Search} from './Search.tsx';
 export * from './Search.tsx';

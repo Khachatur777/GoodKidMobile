@@ -14,10 +14,10 @@ const ChangeThemeModal: FC<ChangeThemeModalProps> = ({
                                                              isVisible,
                                                              setIsVisible,
                                                            }) => {
-  const {theme, toggleTheme, useSystemTheme} = useContext(ThemeContext);
+  const {theme, toggleTheme} = useContext(ThemeContext);
   const { t } = useTranslation();
 
-  const onThemeChange = useCallback((id: string) => {
+  const onThemeChange = useCallback((id: any) => {
     toggleTheme(id);
     setIsVisible(false)
   }, []);

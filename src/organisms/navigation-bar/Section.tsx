@@ -14,11 +14,8 @@ const Section: FC<INavigationHeaderProps & { isTab: boolean }> = ({
   const { color } = useContext(ThemeContext);
 
   const {
-    icon,
     title,
     titleProps,
-    subTitle,
-    subTitleProps,
     leftIcon,
     renderRightSection,
     renderLeftSection,
@@ -28,14 +25,14 @@ const Section: FC<INavigationHeaderProps & { isTab: boolean }> = ({
 
   return (
     <View style={navBarStyles({ color }).sectionContainer}>
-      <View style={navBarStyles({}).sectionLeftIconContainer}>
+      <View >
         {renderLeftSection?.(navigation)}
 
         {navigation.canGoBack() &&
         showBackIcon ? (
+          <View style={navBarStyles({}).backTitleContainer}>
             <Pressable
               hitSlop={10}
-              style={navBarStyles({}).leftIcon}
               onPress={() =>
                 navigation.reset({
                   index: 0,
@@ -50,13 +47,24 @@ const Section: FC<INavigationHeaderProps & { isTab: boolean }> = ({
                 })
               }>
               <Icon
-                color="icon_secondary"
+                color="icon_inverted_header"
                 name="ChevronLeft"
-                width={24}
-                height={24}
+                width={26}
+                height={26}
                 {...leftIcon}
               />
             </Pressable>
+
+            {title && (
+              <Typography
+                type="bodyL"
+                textColor='text_primary_header'
+                {...titleProps}>
+                {title}
+              </Typography>
+            )}
+          </View>
+
           ) :
           defaultHeader ?
             (
@@ -83,30 +91,6 @@ const Section: FC<INavigationHeaderProps & { isTab: boolean }> = ({
             ) : (
               <></>
             )}
-      </View>
-
-      <View style={navBarStyles({}).sectionTitleContainer}>
-        {icon && <Icon {...icon} />}
-
-        {title && (
-          <Typography
-            type="headline"
-            textColor="text_primary"
-            textStyles={navBarStyles({}).textCenter}
-            {...titleProps}>
-            {title}
-          </Typography>
-        )}
-
-        {subTitle && (
-          <Typography
-            type="caption"
-            textColor="text_secondary"
-            textStyles={navBarStyles({}).textCenter}
-            {...subTitleProps}>
-            {subTitle}
-          </Typography>
-        )}
       </View>
 
       <View style={navBarStyles({}).sectionRightIconContainer}>

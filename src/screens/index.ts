@@ -2,6 +2,8 @@ export * from './no-internet-connection';
 export * from './home';
 export * from './error-404';
 export * from './filter';
+export * from './search';
 export * from './profile';
+export * from './playVideoList';
 export * from './auth';
 export * from './force-update';

@@ -15,20 +15,8 @@ export const profileStyle = ({color}: {color?: IGetColor}) => {
     },
     header: {
       width: '100%',
-      borderBottomLeftRadius: 24,
-      borderBottomRightRadius: 24,
-      paddingBottom: 48,
-    },
-    headerTop: {
       alignItems: 'center',
-    },
-    headerAvatarWrapper: {
-      position: 'relative',
-      marginTop: 20,
-    },
-    profileAvatar: {
-      position: 'absolute',
-      zIndex: -1,
+      height: 150,
     },
     headerPackageSkeleton: {
       alignItems: 'center',

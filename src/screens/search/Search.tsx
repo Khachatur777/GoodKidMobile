@@ -1,24 +1,15 @@
-import { FC, useCallback, useContext, useEffect, useRef, useState } from 'react';
-import {ActivityIndicator, FlatList, Platform, Pressable, TextInput, View} from 'react-native';
-import {
-  NavigationProp,
-  RouteProp,
-  useFocusEffect,
-} from '@react-navigation/native';
-import { BackgroundWrapper, Icon, Spinner } from 'molecules';
-import { searchStyles } from './search-styles.ts';
-import { t } from 'i18next';
-import { ThemeContext } from 'theme';
-import {
-  useGetAllHomeVideosMutation,
-  useGetSearchTitleVideosMutation,
-} from 'rtk/api/home.ts';
-import { VideoItem } from './components';
-import { Cell } from 'organisms';
-import { useSelector } from 'react-redux';
-import {getConfigDataState, getFilterDataState, isLoggedInSelector} from 'rtk';
-import { PlayVideoListModal } from 'screens/home/components';
-import { KidsVideoItem } from 'models';
+import {FC, useCallback, useContext, useEffect, useRef, useState} from 'react';
+import {ActivityIndicator, FlatList, Pressable, TextInput, View} from 'react-native';
+import {NavigationProp, RouteProp, useFocusEffect,} from '@react-navigation/native';
+import {BackgroundWrapper, Icon, Spinner} from 'molecules';
+import {searchStyles} from './search-styles.ts';
+import {t} from 'i18next';
+import {ThemeContext} from 'theme';
+import {useGetAllHomeVideosMutation, useGetSearchTitleVideosMutation,} from 'rtk';
+import {VideoItem} from 'screens';
+import {Cell} from 'organisms';
+import {useSelector} from 'react-redux';
+import {getFilterDataState, isLoggedInSelector} from 'rtk';
 
 export interface SearchProps {
   navigation: NavigationProp<any>;
@@ -38,7 +29,6 @@ const Search: FC<SearchProps> = ({ navigation }) => {
   const [getSearchTitleVideos] = useGetSearchTitleVideosMutation();
   const filter = useSelector(getFilterDataState);
   const isLoggedIn = useSelector(isLoggedInSelector);
-  const config = useSelector(getConfigDataState);
 
   const [cursor, setCursor] = useState<string>('');
   const [searchText, setSearchText] = useState<string>('');
@@ -48,8 +38,6 @@ const Search: FC<SearchProps> = ({ navigation }) => {
   const debounceRef = useRef<number | null>(null);
   const [showResults, setShowResults] = useState<boolean>(false);
   const [hasMore, setHasMore] = useState<boolean>(false);
-  const [isVisible, setIsVisible] = useState(false);
-  const [chooseVideo, setChooseVideo] = useState<KidsVideoItem | null>(null);
 
   const submitSearch = useCallback(async (term?: string) => {
     const value = (term ?? searchText).trim();
@@ -75,10 +63,6 @@ const Search: FC<SearchProps> = ({ navigation }) => {
         filter.categories?.length ? data.categories = filter.categories : null;
         filter.age ? data.age = filter.age : null;
         filter.language ? data.language = filter.language : null;
-      }
-
-      if(!config?.iosFilterEnable && Platform.OS === 'ios'){
-        data.language = 'hy'
       }
 
       const response = await getVideos(data);
@@ -204,8 +188,9 @@ const Search: FC<SearchProps> = ({ navigation }) => {
             <VideoItem
               videoData={item}
               onPress={() => {
-                setChooseVideo(item);
-                setIsVisible(true);
+                navigation.navigate('PlayVideoListScreen', {
+                  videoDataProps: item,
+                })
               }}
             />
           )}
@@ -222,14 +207,6 @@ const Search: FC<SearchProps> = ({ navigation }) => {
         />
       )}
 
-      {isVisible && (
-        <PlayVideoListModal
-          isVisible={isVisible}
-          setIsVisible={setIsVisible}
-          videoDataProps={chooseVideo}
-          cursorProps={cursor}
-        />
-      )}
 
     </BackgroundWrapper>
   );

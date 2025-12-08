@@ -13,11 +13,6 @@ export interface ProfileProps {
   navigation: NavigationProp<any>;
 }
 
-export interface PickerModalProps {
-  isImagePickerModalVisible: boolean;
-  personalAgentModalVisible: boolean;
-}
-
 const Profile: FC<ProfileProps> = ({ navigation }) => {
   const { color } = useContext(ThemeContext);
   const isLoggedIn = useSelector(isLoggedInSelector);

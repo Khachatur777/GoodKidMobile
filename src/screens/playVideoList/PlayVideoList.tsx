@@ -1,40 +1,42 @@
-import {Dispatch, FC, SetStateAction, useCallback, useEffect, useRef, useState} from 'react';
-import {Modal} from 'molecules';
-import {homeStyles} from '../home-styles';
-import VideoItem from './VideoItem.tsx';
-import {FlatList} from 'react-native-gesture-handler';
-import PlayerYoutuber from './PlayerYoutuber.tsx';
+import {FC, useCallback, useEffect, useRef, useState} from 'react';
+import {BackgroundWrapper} from 'molecules';
+import {playVideoListStyles} from './play-video-list-styles.ts';
+import {PlayerYoutuber} from './components';
 import {getFilterDataState, isLoggedInSelector, useGetAllHomeVideosMutation} from 'rtk';
 import {KidsVideoItem} from 'models';
 import {useSelector} from 'react-redux';
-import {ActivityIndicator, View} from 'react-native';
+import {ActivityIndicator, FlatList, View} from 'react-native';
 import {YoutubeItemSkeleton} from "organisms";
+import {NavigationProp, RouteProp} from "@react-navigation/native";
+import {VideoItem} from "screens";
 
-export interface PlayVideoListModalProps {
-  videoDataProps: KidsVideoItem | null;
-  isVisible: boolean;
-  cursorProps: string;
-  setIsVisible: Dispatch<SetStateAction<boolean>>;
+export interface PlayVideoListProps {
+  navigation: NavigationProp<any>;
+  route: RouteProp<
+    {
+      params: {
+        videoDataProps: KidsVideoItem | null;
+        cursorProps: string;
+      };
+    },
+    'params'
+  >;
 }
 
 
-const PlayVideoListModal: FC<PlayVideoListModalProps> = ({
-                                                           videoDataProps,
-                                                           isVisible,
-                                                           setIsVisible,
-                                                           cursorProps = ''
-                                                         }) => {
+const PlayVideoList: FC<PlayVideoListProps> = ({navigation, route}) => {
+
   const isLoggedIn = useSelector(isLoggedInSelector);
   const filter = useSelector(getFilterDataState);
+  const videoDataProps = route?.params?.videoDataProps;
 
   const [videoData, setVideoData] = useState<KidsVideoItem | null>(null)
   const [videosGet] = useGetAllHomeVideosMutation();
-  const [cursor, setCursor] = useState<string>(cursorProps);
+  const [cursor, setCursor] = useState<string>(route?.params?.cursorProps);
   const [videos, setVideos] = useState<KidsVideoItem[]>([]);
   const [hasMore, setHasMore] = useState<boolean>(false);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const loadMoreTimeoutRef = useRef<number | null>(null);
-
 
   const getVideos = useCallback(async (isLoadMore: boolean = false, id?: string) => {
     try {
@@ -82,11 +84,10 @@ const PlayVideoListModal: FC<PlayVideoListModalProps> = ({
         onPress={() => {
           setVideoData(item)
           getVideos(false, item?._id);
-
         }}
       />
     ),
-    [videoData],
+    [],
   );
 
   useEffect(() => {
@@ -101,7 +102,7 @@ const PlayVideoListModal: FC<PlayVideoListModalProps> = ({
       }
 
       loadMoreTimeoutRef.current = setTimeout(() => {
-        getVideos(true, '');
+        getVideos(true, videoData?._id);
         loadMoreTimeoutRef.current = null;
       }, 1000);
     }
@@ -111,27 +112,25 @@ const PlayVideoListModal: FC<PlayVideoListModalProps> = ({
   const renderFooter = useCallback(() => {
     if (!isLoadingMore) return null;
     return (
-      <View style={homeStyles({}).activeIndicatorContainer}>
+      <View style={playVideoListStyles({}).activeIndicatorContainer}>
         <ActivityIndicator size="small" color="#007AFF"/>
       </View>
     );
   }, [isLoadingMore]);
 
   return (
-    <Modal
-      type="bottom-sheet"
-      isVisible={isVisible}
-      setIsVisible={setIsVisible}
-      contentContainerStyles={homeStyles({}).modalContainer}
+    <BackgroundWrapper
+      backgroundColor="bg_primary"
+      containerStyles={playVideoListStyles({}).modalContainer}
     >
 
-      <PlayerYoutuber videoData={videoData} isVisible={isVisible}/>
+      <PlayerYoutuber videoData={videoData}/>
 
       {videos?.length ?
         <FlatList
           data={videos}
           renderItem={renderVideItem}
-          keyExtractor={(item, index) =>`${item.keyExtractor}`}
+          keyExtractor={(item, index) => `${item.keyExtractor}`}
           showsVerticalScrollIndicator={false}
           onEndReached={handleLoadMore}
           onEndReachedThreshold={0.1}
@@ -145,8 +144,8 @@ const PlayVideoListModal: FC<PlayVideoListModalProps> = ({
         <YoutubeItemSkeleton count={3}/>
       }
 
-    </Modal>
+    </BackgroundWrapper>
   );
 };
 
-export default PlayVideoListModal;
+export default PlayVideoList;

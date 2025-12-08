@@ -1,11 +1,9 @@
-import { FC, useContext } from 'react';
-import { CardWrapper, Typography } from 'molecules';
-import { homeStyles } from '../home-styles';
-import { Image, Pressable, View } from 'react-native';
-import { formatCount, formatTime, timeAgo } from 'utils';
-import { ThemeContext } from 'theme';
-import { Cell } from 'organisms';
-import { useTranslation } from 'react-i18next';
+import {FC, useContext} from 'react';
+import {CardWrapper, Typography} from 'molecules';
+import {homeStyles} from '../home-styles';
+import {Image, Pressable, View} from 'react-native';
+import {formatTime} from 'utils';
+import {ThemeContext} from 'theme';
 import {KidsVideoItem} from "models";
 
 export interface IVideoItemProps {
@@ -14,8 +12,8 @@ export interface IVideoItemProps {
 }
 
 const VideoItem: FC<IVideoItemProps> = ({ videoData, onPress }) => {
+
   const { color } = useContext(ThemeContext);
-  const {t} = useTranslation();
 
   return (
     <Pressable onPress={onPress}>

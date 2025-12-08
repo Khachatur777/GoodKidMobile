@@ -18,9 +18,6 @@ export const navBarStyles = ({
       backgroundColor: color?.(backgroundColor, backgroundColorOpacity),
     },
 
-    textCenter: {
-      textAlign: 'center',
-    },
 
     // Section
     sectionContainer: {
@@ -28,14 +25,18 @@ export const navBarStyles = ({
       alignItems: 'center',
       paddingHorizontal: 16,
       height: 44,
+      justifyContent: 'space-between',
     },
     sectionLeftIconContainer: {
       width: 32,
       height: 32,
       justifyContent: 'center',
     },
+    backTitleContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
     leftIcon: {
-      height: '100%',
       justifyContent: 'center',
       alignItems: 'flex-start',
     },
@@ -52,11 +53,7 @@ export const navBarStyles = ({
       width: 78,
       resizeMode: 'contain',
     },
-    sectionTitleContainer: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
+
 
     // Title
     titleContainer: {

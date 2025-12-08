@@ -1,38 +1,38 @@
 import {FC, Fragment, useCallback, useEffect, useMemo, useState} from 'react';
-import {Image, Platform, View} from 'react-native';
+import {Dimensions, Image, Platform, View} from 'react-native';
 import YoutubePlayer, {PLAYER_STATES} from 'react-native-youtube-iframe';
-import {Typography} from 'molecules';
-import {useTranslation} from 'react-i18next';
-import {homeStyles} from '../home-styles';
+import {Spacing, Typography} from 'molecules';
+import {playVideoListStyles} from '../play-video-list-styles.ts';
 import {KidsVideoItem} from 'models';
+import {t} from "i18next";
 
 export interface IPlayerYoutuberProps {
   videoData: KidsVideoItem | null;
-  isVisible: boolean;
 }
 
-const PlayerYoutuber: FC<IPlayerYoutuberProps> = ({ videoData, isVisible }) => {
+const PlayerYoutuber: FC<IPlayerYoutuberProps> = ({ videoData }) => {
   const [playing, setPlaying] = useState(false);
   const [muted, setMuted] = useState(Platform.OS === 'ios');
-  const [isPlayerReady, setIsPlayerReady] = useState(false); // <- для переключения thumbnail / видео
+  const [isPlayerReady, setIsPlayerReady] = useState(false);
 
-  const { t } = useTranslation();
+  const windowWidth = Dimensions.get('window').width;
+  const videoHeight = (windowWidth / 16) * 9;
 
   const playerKey = useMemo(
-    () => `${videoData?.youtubeId ?? 'no-id'}-${isVisible ? 'open' : 'closed'}`,
-    [videoData?.youtubeId, isVisible],
+    () => `${videoData?.youtubeId ?? 'no-id'}`,
+    [videoData?.youtubeId],
   );
 
   useEffect(() => {
     setIsPlayerReady(false);
 
-    if (isVisible && videoData?.youtubeId) {
+    if (videoData?.youtubeId) {
       setMuted(Platform.OS === 'ios');
       const t = setTimeout(() => setPlaying(true), 250);
       return () => clearTimeout(t);
     }
     setPlaying(false);
-  }, [isVisible, videoData?.youtubeId]);
+  }, [ videoData?.youtubeId]);
 
   const onStateChange = useCallback((state: string) => {
     if (state === PLAYER_STATES.ENDED || state === 'ended') {
@@ -43,29 +43,34 @@ const PlayerYoutuber: FC<IPlayerYoutuberProps> = ({ videoData, isVisible }) => {
   const onReady = useCallback(() => {
     setIsPlayerReady(true);
 
-    if (isVisible) {
       setTimeout(() => {
         setMuted(false);
         setPlaying(true);
       }, 1500);
-    }
-  }, [isVisible]);
+
+  }, []);
 
   return (
     <Fragment>
-      <View style={homeStyles({}).videoYoutubeContainer}>
-        {videoData?.thumbnail && (!isPlayerReady || !isVisible) && (
+      <View style={playVideoListStyles({}).videoYoutubeContainer}>
+        {videoData?.thumbnail && (!isPlayerReady) && (
           <Image
             source={{ uri: videoData.thumbnail }}
-            style={homeStyles({}).videoThumbnail}
+            style={playVideoListStyles({videoHeight}).videoThumbnail}
             resizeMode="cover"
           />
         )}
 
-        {isVisible && videoData?.youtubeId ? (
+        {Platform.OS === 'android' ?
+        <View style={playVideoListStyles({ playing }).hideYoutubeHeader} />
+
+          : null
+        }
+
+        {videoData?.youtubeId ? (
           <YoutubePlayer
             key={playerKey}
-            height={230}
+            height={videoHeight}
             play={playing}
             mute={muted} // iOS requires mute for autoplay
             videoId={videoData.youtubeId}
@@ -75,6 +80,7 @@ const PlayerYoutuber: FC<IPlayerYoutuberProps> = ({ videoData, isVisible }) => {
             initialPlayerParams={{
               controls: true,
               modestbranding: true,
+              disablekb: true,
               rel: false,
             }}
             webViewProps={{
@@ -89,13 +95,32 @@ const PlayerYoutuber: FC<IPlayerYoutuberProps> = ({ videoData, isVisible }) => {
           />
         ) : null}
 
-        <View style={Platform.OS === 'android' ? homeStyles({ playing }).hideYoutubeContainerAndroid : homeStyles({ playing }).hideYoutubeContainer} />
+        <View style={Platform.OS === 'android' ? playVideoListStyles({ playing }).hideYoutubeContainerAndroid : playVideoListStyles({ playing }).hideYoutubeContainer} />
       </View>
 
-      <View style={homeStyles({}).videoInfoContainer}>
+      <View style={playVideoListStyles({}).videoInfoContainer}>
+
         <Typography type={'bodyLBold'}>
           {videoData?.title}
         </Typography>
+
+        <Spacing size={4} />
+
+        <View>
+          <Typography type={'description'} textColor={'text_tertiary'}>
+            {t('source_title')}
+          </Typography>
+
+          <Typography type={'description'}  textColor={'text_tertiary'}>
+            {t('source_description')}
+          </Typography>
+
+          <Typography type={'description'}  textColor={'text_tertiary'}>
+            {t('source_note')}
+          </Typography>
+
+        </View>
+
 
       </View>
     </Fragment>

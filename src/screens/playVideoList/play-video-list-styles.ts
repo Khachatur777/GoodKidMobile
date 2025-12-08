@@ -3,24 +3,12 @@ import { IGetColor } from 'theme';
 
 const {width, height} = Dimensions.get('window');
 
-export const homeStyles = ({ color, playing = false, videoHeight }: { color?: IGetColor, playing?: boolean, videoHeight?: number }) =>
+export const playVideoListStyles = ({ color, playing = false, videoHeight }: { color?: IGetColor, playing?: boolean, videoHeight?: number }) =>
   StyleSheet.create({
-    rightHeaderContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 8,
-    },
     activeIndicatorContainer: {
       paddingVertical: 20,
       alignItems: 'center',
     },
-    emptyContainer: {
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-
-    //VideItem
     videoCardContainer: {
       marginBottom: 8,
     },

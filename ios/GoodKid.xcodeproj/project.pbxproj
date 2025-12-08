@@ -24,6 +24,7 @@
 		5709B34CF0A7D63546082F79 /* Pods-GoodKid.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GoodKid.release.xcconfig"; path = "Target Support Files/Pods-GoodKid/Pods-GoodKid.release.xcconfig"; sourceTree = "<group>"; };
 		5DCACB8F33CDC322A6C60F78 /* libPods-GoodKid.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-GoodKid.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = GoodKid/AppDelegate.swift; sourceTree = "<group>"; };
+		7EF363322EE2C64600467248 /* GoodKid.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = GoodKid.entitlements; path = GoodKid/GoodKid.entitlements; sourceTree = "<group>"; };
 		7EF6830F2ECA473D007A84FB /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = GoodKid/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
@@ -45,6 +46,7 @@
 		13B07FAE1A68108700A75B9A /* GoodKid */ = {
 			isa = PBXGroup;
 			children = (
+				7EF363322EE2C64600467248 /* GoodKid.entitlements */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				761780EC2CA45674006654EE /* AppDelegate.swift */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
@@ -271,7 +273,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CURRENT_PROJECT_VERSION = 8;
+				CODE_SIGN_ENTITLEMENTS = GoodKid/GoodKid.entitlements;
+				CURRENT_PROJECT_VERSION = 16;
 				DEVELOPMENT_TEAM = 7CY862ZD4H;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = GoodKid/Info.plist;
@@ -280,7 +283,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.21;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -300,7 +303,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CURRENT_PROJECT_VERSION = 8;
+				CODE_SIGN_ENTITLEMENTS = GoodKid/GoodKid.entitlements;
+				CURRENT_PROJECT_VERSION = 16;
 				DEVELOPMENT_TEAM = 7CY862ZD4H;
 				INFOPLIST_FILE = GoodKid/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
@@ -308,7 +312,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.21;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",

@@ -1,6 +1,5 @@
 import EventEmitter from 'eventemitter3';
 import i18n from 'i18next';
-import { useCallback } from 'react';
 
 export const eventEmitter = new EventEmitter();
 
