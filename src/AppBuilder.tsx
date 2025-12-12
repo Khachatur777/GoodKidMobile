@@ -11,7 +11,7 @@ import {getMainLoadingState, getNetInfo} from 'rtk';
 import {navigationRef} from 'helpers';
 import {useContext, useEffect} from 'react';
 import {ThemeContext} from 'theme';
-import {useToast} from 'hooks';
+import {useToast, configureGoogleSignIn} from 'hooks';
 import Toast from 'react-native-toast-message';
 import {RootNavigator} from 'navigation';
 import Purchases, {LOG_LEVEL} from "react-native-purchases";
@@ -37,6 +37,10 @@ const AppBuilder = () => {
     }
 
     Purchases.configure({apiKey});
+  }, []);
+
+  useEffect(() => {
+    configureGoogleSignIn();
   }, []);
 
   return (

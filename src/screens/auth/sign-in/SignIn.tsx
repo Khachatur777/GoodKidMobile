@@ -24,6 +24,7 @@ import {getBuildNumber, getVersion} from 'react-native-device-info';
 import {ThemeContext} from "theme";
 import Purchases from "react-native-purchases";
 import {checkUserSubscription} from "hooks/usePurchase.ts";
+import {signInWithGoogle} from "hooks";
 
 export interface SignInhProps {
   navigation: NavigationProp<any>;
@@ -126,6 +127,17 @@ const SignIn: FC<SignInhProps> = ({ navigation }) => {
     }
   }, [dispatch, filter, navigation, signIn, versionNumber]);
 
+  const handleLogin = async () => {
+    try {
+      const { userInfo, tokens } = await signInWithGoogle();
+      // сохранить в стейт / Redux
+    } catch (e) {
+      // уже залогировано
+    }
+  };
+
+
+
   return (
     <BackgroundWrapper includesSafeArea backgroundColor="bg_primary">
       <Formik
@@ -169,6 +181,9 @@ const SignIn: FC<SignInhProps> = ({ navigation }) => {
                     ? `${errors?.password}`
                     : ''}
                 />
+
+                <Button title="Sign in with Google" onPress={handleLogin} />
+
 
                 <Spacing size={8} />
 

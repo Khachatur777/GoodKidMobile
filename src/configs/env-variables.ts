@@ -8,3 +8,6 @@ export const baseUrlIp =  Config.RN_APP_BASE_URL_IP;
 export const purchaseKeyIos = Config.REVENUECAT_PURCHASE_KEY_IOS;
 export const purchaseKeyAndroid = Config.REVENUECAT_PURCHASE_KEY_ANDROID;
 export const purchaseKeyDebug = Config.REVENUECAT_PURCHASE_KEY_DEBUG;
+
+export const googleWebClientId = Config.GOOGLE_WEB_CLIENT_ID;
+export const googleIosClientId = Config.GOOGLE_IOS_CLIENT_ID;
