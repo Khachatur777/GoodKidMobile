@@ -1,11 +1,11 @@
 import {
   IAuthorizationResponseModel,
-  IBaseRequestModel,
+  IBaseRequestModel, IConfigResponseModel,
   IDefaultResponseModel,
   IForgotChangePasswordRequestModel,
-  IForgotSendCodeRequestModel,
+  IForgotSendCodeRequestModel, ISignInGoogleRequestModel,
   ISignInRequestModel,
-  ISignInResponseModel,
+  ISignInResponseModel, ISignUpGoogleRequestModel,
   ISignUpRequestModel,
   ISignUpVerifyRequestModel,
   IVerifyEmailAgainRequestModel,
@@ -24,6 +24,18 @@ export const authApi = baseApi
         query: (body) => {
           return {
             url: authRoutes().signIn,
+            method: 'POST',
+            body,
+          };
+        },
+      }),
+      signInGoogle: builder.mutation<
+        ISignInResponseModel,
+        ISignInGoogleRequestModel
+      >({
+        query: (body) => {
+          return {
+            url: authRoutes().signInGoogle,
             method: 'POST',
             body,
           };
@@ -53,8 +65,20 @@ export const authApi = baseApi
           };
         },
       }),
-      signUpVerify: builder.mutation<
+      signUpGoogle: builder.mutation<
         IDefaultResponseModel,
+        ISignUpGoogleRequestModel
+      >({
+        query: (body) => {
+          return {
+            url: authRoutes().signUpGoogle,
+            method: 'POST',
+            body,
+          };
+        },
+      }),
+      signUpVerify: builder.mutation<
+        ISignInResponseModel,
         ISignUpVerifyRequestModel
       >({
         query: (body) => {
@@ -101,7 +125,18 @@ export const authApi = baseApi
           };
         },
       }),
-
+      config: builder.mutation<
+        IConfigResponseModel,
+        IBaseRequestModel
+      >({
+        query: (body) => {
+          return {
+            url: authRoutes().config,
+            method: 'POST',
+            body,
+          };
+        },
+      }),
       refreshToken: builder.mutation<
         IAuthorizationResponseModel,
         { refreshToken: string }
@@ -126,6 +161,9 @@ export const {
   useForgotChangePasswordMutation,
   useAuthorizationMutation,
   useRefreshTokenMutation,
-  useVerifyEmailAgainMutation
+  useVerifyEmailAgainMutation,
+  useSignInGoogleMutation,
+  useSignUpGoogleMutation,
+  useConfigMutation
 } = authApi;
 

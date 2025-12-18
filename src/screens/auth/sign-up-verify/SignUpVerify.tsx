@@ -12,9 +12,22 @@ import {
 import {Logo, LogoWhiteWord} from 'assets';
 import { Formik } from 'formik';
 import { signUnVerifyValidationScheme } from './validations.ts';
-import { useSignUpVerifyMutation, useVerifyEmailAgainMutation } from 'rtk';
+import {
+  setConfigData, setFilterData,
+  setIsLoggedIn, setLanguageId,
+  setSubscriptionUserData, setTokenData,
+  setUser,
+  useSignUpVerifyMutation,
+  useVerifyEmailAgainMutation
+} from 'rtk';
 import { useTranslation } from 'react-i18next';
 import {ThemeContext} from "theme";
+import {IConfig, IUser} from "models";
+import {getBuildNumber, getVersion} from "react-native-device-info";
+import {checkUserSubscription} from "hooks/usePurchase.ts";
+import {setItem} from "configs";
+import {useDispatch} from "react-redux";
+import Purchases from "react-native-purchases";
 
 export interface SignUpProps {
   navigation: NavigationProp<any>;
@@ -31,6 +44,7 @@ const SignUpVerify: FC<SignUpProps> = ({ navigation, route }) => {
   const { theme } = useContext(ThemeContext);
   const [verifyEmailAgain] = useVerifyEmailAgainMutation()
   const [resendLeft, setResendLeft] = useState(15);
+  const dispatch = useDispatch();
 
   const [signUpVerify] = useSignUpVerifyMutation();
 
@@ -38,11 +52,111 @@ const SignUpVerify: FC<SignUpProps> = ({ navigation, route }) => {
     code: '',
   };
 
+  const versionNumber = Platform.OS === 'android' ? getVersion() : getBuildNumber();
+
+  const goForceUpdate = useCallback(() => {
+    navigation.reset({
+      index: 0,
+      routes: [{name: 'ForceUpdateScreen'}],
+    });
+  }, [navigation]);
+
+  const goHome = useCallback(() => {
+    navigation.reset({
+      routes: [{name: 'TabScreens', params: {screen: 'HomeTab'}}],
+      index: 0,
+    });
+  }, [navigation]);
+
   useEffect(() => {
     if (resendLeft <= 0) return;
     const id = setInterval(() => setResendLeft(s => s - 1), 1000);
     return () => clearInterval(id);
   }, [resendLeft]);
+
+
+  const isForceUpdateRequired = useCallback(
+    (config?: IConfig) => !!config?.forceUpdate && `${versionNumber}` !== `${config?.versionApp}`,
+    [versionNumber],
+  );
+
+  const setRevenueCatUser = useCallback(
+    async (user?: IUser) => {
+      if (!user?.id) return;
+
+      await Purchases.logIn(String(user.id));
+      await Purchases.setAttributes({
+        'E-mail': user?.email || '',
+        'Name': `${user?.profile?.firstName || ''} ${user?.profile?.lastName || ''}`.trim(),
+        VersionNumber: String(versionNumber),
+        LoginTime: new Date().toString(),
+      });
+    },
+    [versionNumber],
+  );
+
+  const saveAuthToStore = useCallback(
+    async (payload: {user: IUser; config?: IConfig; tokenData: {accessToken?: string; refreshToken?: string; expiresIn?: number}}) => {
+      const {user, config, tokenData} = payload;
+
+      // RevenueCat
+      await setRevenueCatUser(user);
+
+      // Subscription
+      const userSubscription = await checkUserSubscription();
+      dispatch(setSubscriptionUserData(!!userSubscription?.isSubscribed));
+
+      // Redux
+      dispatch(setIsLoggedIn(true));
+      dispatch(setUser(user));
+      dispatch(setLanguageId(user?.profile?.preferredLanguages));
+      dispatch(setConfigData(config as any));
+
+      dispatch(
+        setTokenData({
+          accessToken: tokenData?.accessToken as any,
+          expiresIn: tokenData?.expiresIn as any,
+          refreshToken: tokenData?.refreshToken as any,
+        }),
+      );
+
+      // Storage
+      await setItem('tokenData', {
+        accessToken: tokenData?.accessToken,
+        expiresIn: tokenData?.expiresIn,
+        refreshToken: tokenData?.refreshToken,
+      });
+
+    },
+    [dispatch, setRevenueCatUser],
+  );
+
+  const finalizeAuth = useCallback(
+    async (responseData?: any) => {
+      const config = responseData?.data?.config;
+
+      if (isForceUpdateRequired(config)) {
+        goForceUpdate();
+        return;
+      }
+
+      const user = responseData?.data?.user;
+      if (!user) return;
+
+      await saveAuthToStore({
+        user,
+        config,
+        tokenData: {
+          accessToken: responseData?.data?.accessToken,
+          refreshToken: responseData?.data?.refreshToken,
+          expiresIn: responseData?.data?.expiresIn,
+        },
+      });
+
+      goHome();
+    },
+    [goForceUpdate, goHome, isForceUpdateRequired, saveAuthToStore],
+  );
 
   const onSubmit = useCallback(async (values: typeof initialValues) => {
     try {
@@ -56,7 +170,7 @@ const SignUpVerify: FC<SignUpProps> = ({ navigation, route }) => {
       const response = await signUpVerify(data);
 
       if (response?.data?.success) {
-        navigation.navigate('SignIn');
+        return finalizeAuth(response?.data as any);
       }
 
     } catch (error) {

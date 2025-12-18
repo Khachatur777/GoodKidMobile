@@ -2,7 +2,7 @@ import {NavigationProp} from '@react-navigation/native';
 import {BackgroundWrapper, Button, Spacing, Typography} from 'molecules';
 import {FC, useCallback, useEffect, useState} from 'react';
 import {filterStyles} from './filter-styles.ts';
-import {Alert, Platform, ScrollView, View} from 'react-native';
+import {ScrollView, View} from 'react-native';
 import Badge from '../../molecules/badge/Badge.tsx';
 import {t} from 'i18next';
 import Toast from 'react-native-toast-message';
@@ -11,7 +11,8 @@ import {
   getSubscriptionUserState,
   getUserState,
   isLoggedInSelector,
-  setFilterData, setSubscriptionUserData,
+  setFilterData,
+  setSubscriptionUserData,
   useEditFilterMutation,
   useGetFilterQuery
 } from 'rtk';
@@ -181,7 +182,7 @@ const Filter: FC<FilterProps> = () => {
                     size={'large'}
                     onPress={() => {
                       if (index !== 0 && !subscriptionState) {
-                        return setSubscriptionAskModalVisible(true)
+                        return purchase()
                       }
                       chooseFilterLanguage(lng)
                     }}
@@ -214,7 +215,7 @@ const Filter: FC<FilterProps> = () => {
                     size={'large'}
                     onPress={() => {
                       if (index !== 0 && !subscriptionState) {
-                        return setSubscriptionAskModalVisible(true)
+                        return purchase()
                       }
                       chooseFilterAge(age)
                     }}
@@ -245,7 +246,7 @@ const Filter: FC<FilterProps> = () => {
                     size={'large'}
                     onPress={() => {
                       if (index !== 0 && !subscriptionState) {
-                        return setSubscriptionAskModalVisible(true)
+                        return purchase()
                       }
                       chooseFilter(filter)
                     }}
@@ -256,7 +257,6 @@ const Filter: FC<FilterProps> = () => {
                 )
               })}
             </View>
-
           </View>
 
           <Spacing size={24}/>

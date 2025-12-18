@@ -31,3 +31,4 @@ export {default as EmailIcon} from './email.svg';
 export {default as WarningCircleIcon} from './alert-circle.svg';
 export {default as CloseRed} from './close-red.svg';
 export {default as Lock} from './lock.svg';
+export {default as Google} from './google.svg';

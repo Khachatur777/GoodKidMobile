@@ -22,6 +22,7 @@ export type SharedState = {
   isTabBarHidden: boolean;
   subscriptionStatus: boolean;
   netInfo: boolean;
+  updateIsVisible: boolean;
   user: IUser | null;
   tokenData: ISharedTokenDataState | null;
   globalErrorModal: {
@@ -43,6 +44,7 @@ export const sharedReducerInitialState: SharedState = {
   isLoggedIn: null,
   languageId: null,
   isTabBarHidden: false,
+  updateIsVisible: false,
   netInfo: true,
   user: null,
   tokenData: null,

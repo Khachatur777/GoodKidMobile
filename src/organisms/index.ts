@@ -12,3 +12,4 @@ export * from './terms-modal';
 export * from './support-modal';
 export * from './skeleton';
 export * from './privacy-policy-modal';
+export * from './update-modal';

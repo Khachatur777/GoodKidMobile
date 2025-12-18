@@ -64,3 +64,8 @@ export const getSubscriptionUserState = createSelector(
   getSharedState,
   data => data.subscriptionStatus,
 );
+
+export const getUpdateState = createSelector(
+  getSharedState,
+  data => data.updateIsVisible,
+);

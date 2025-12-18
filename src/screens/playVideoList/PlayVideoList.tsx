@@ -7,8 +7,9 @@ import {KidsVideoItem} from 'models';
 import {useSelector} from 'react-redux';
 import {ActivityIndicator, FlatList, View} from 'react-native';
 import {YoutubeItemSkeleton} from "organisms";
-import {NavigationProp, RouteProp} from "@react-navigation/native";
+import {NavigationProp, RouteProp, useFocusEffect} from "@react-navigation/native";
 import {VideoItem} from "screens";
+import {usePreventSwipeBackOnAndroid} from "hooks";
 
 export interface PlayVideoListProps {
   navigation: NavigationProp<any>;
@@ -25,7 +26,7 @@ export interface PlayVideoListProps {
 
 
 const PlayVideoList: FC<PlayVideoListProps> = ({navigation, route}) => {
-
+  usePreventSwipeBackOnAndroid()
   const isLoggedIn = useSelector(isLoggedInSelector);
   const filter = useSelector(getFilterDataState);
   const videoDataProps = route?.params?.videoDataProps;
@@ -37,6 +38,14 @@ const PlayVideoList: FC<PlayVideoListProps> = ({navigation, route}) => {
   const [hasMore, setHasMore] = useState<boolean>(false);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const loadMoreTimeoutRef = useRef<number | null>(null);
+
+  useFocusEffect(
+    useCallback(() => {
+      navigation.setOptions({
+        gestureEnabled: false,
+      });
+    }, []),
+  );
 
   const getVideos = useCallback(async (isLoadMore: boolean = false, id?: string) => {
     try {

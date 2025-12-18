@@ -206,7 +206,7 @@ const SignUp: FC<SignUpProps> = ({ navigation }) => {
                 />
 
                 <Pressable onPress={() => setTermsModal(true)} style={signUpStyles().termsText}>
-                  <Typography numberOfLines={2} type={'bodyL'}>
+                  <Typography numberOfLines={2} type={'bodyL'} textStyles={{ textDecorationLine: 'underline' }}>
                     {t('terms_title')}
                   </Typography>
                 </Pressable>

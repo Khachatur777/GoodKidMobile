@@ -14,9 +14,28 @@ export interface ISignUpRequestModel extends IBaseRequestModel {
   };
 }
 
+export interface ISignUpGoogleRequestModel extends IBaseRequestModel {
+  email: string;
+  deviceId: string;
+  deviceModel: string;
+  osVersion: string;
+  productVersion: string;
+  pinCode: number;
+  profile: {
+    firstName: string;
+    lastName: string;
+    avatarUrl?: string;
+  };
+}
+
 export interface ISignInRequestModel extends IBaseRequestModel {
   email: string;
   password: string;
+}
+
+export interface ISignInGoogleRequestModel extends IBaseRequestModel {
+  email: string;
+  googleToken: string;
 }
 
 export interface ISignUpVerifyRequestModel extends IBaseRequestModel {

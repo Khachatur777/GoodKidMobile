@@ -74,6 +74,10 @@ export const sharedSlice = createSlice({
     setConfigData: (state, action: PayloadAction<IConfig>) => {
       state.configData = action.payload;
     },
+
+    setUpdateIsVisibleData: (state, action: PayloadAction<boolean>) => {
+      state.updateIsVisible = action.payload;
+    },
   },
 });
 
@@ -94,5 +98,6 @@ export const {
   setFilterData,
   setConfigData,
   setSubscriptionUserData,
-  setNetInfo
+  setNetInfo,
+  setUpdateIsVisibleData
 } = sharedSlice.actions;

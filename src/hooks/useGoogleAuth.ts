@@ -6,14 +6,9 @@ import {googleIosClientId, googleWebClientId} from "configs";
 
 export const configureGoogleSignIn = () => {
   GoogleSignin.configure({
-    webClientId: '408052597809-qke5e8fa9o9dq8jp5cclhsevktmphbfr.apps.googleusercontent.com',
-    iosClientId: '408052597809-pthnlhj5rd8qu443nuf815q7cvnsdacg.apps.googleusercontent.com',
-    scopes: [
-      /* what APIs you want to access on behalf of the user, default is email and profile
-      this is just an example, most likely you don't need this option at all! */
-      'https://www.googleapis.com/auth/drive.readonly',
-    ],
-    offlineAccess: false, // if you want to access Google API on behalf of the user FROM YOUR SERVER
+    webClientId: googleWebClientId,
+    iosClientId: googleIosClientId,
+    offlineAccess: false,
   });
 };
 
@@ -22,9 +17,6 @@ export const signInWithGoogle = async () => {
     await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
     const userInfo = await GoogleSignin.signIn();
     const tokens = await GoogleSignin.getTokens();
-
-    console.log('userInfo', userInfo);
-    console.log('tokens', tokens);
 
     return { userInfo, tokens };
   } catch (error: any) {

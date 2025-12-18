@@ -2,11 +2,16 @@ import {FC, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {
   ActivityIndicator,
   FlatList,
+  Image,
   Pressable,
   RefreshControl,
   View,
 } from 'react-native';
-import {NavigationProp, RouteProp, useFocusEffect} from '@react-navigation/native';
+import {
+  NavigationProp,
+  RouteProp,
+  useFocusEffect,
+} from '@react-navigation/native';
 import {BackgroundWrapper, Icon, Typography} from 'molecules';
 import {homeStyles} from './home-styles';
 import {VideoItem} from './components';
@@ -20,11 +25,13 @@ export interface HomeProps {
   navigation: NavigationProp<any>;
   route: RouteProp<
     {
-      params: { extraData: string };
+      params: {extraData: string};
     },
     'params'
   >;
 }
+
+const PREFETCH_AHEAD = 10;
 
 const Home: FC<HomeProps> = ({navigation}) => {
   const [videosGet] = useGetAllHomeVideosMutation();
@@ -37,7 +44,11 @@ const Home: FC<HomeProps> = ({navigation}) => {
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [isInitialLoading, setIsInitialLoading] = useState<boolean>(true);
+
   const loadMoreTimeoutRef = useRef<number | null>(null);
+
+  // cache set for prefetched urls
+  const prefetchedRef = useRef<Set<string>>(new Set());
 
   const styles = useMemo(() => homeStyles({}), []);
 
@@ -87,14 +98,28 @@ const Home: FC<HomeProps> = ({navigation}) => {
         const response: any = await videosGet(data);
 
         if (response?.data?.success) {
+          const newItems: KidsVideoItem[] = response.data.items || [];
+
           if (isLoadMore) {
-            setVideos(prevVideos => [...prevVideos, ...response.data.items]);
+            setVideos(prev => [...prev, ...newItems]);
           } else {
-            setVideos(response.data.items);
+            setVideos(newItems);
+            // при полном обновлении можно очистить prefetch cache,
+            // чтобы не разрастался бесконечно при смене фильтров
+            prefetchedRef.current = new Set();
           }
 
           setCursor(response.data.nextCursor || '');
           setHasMore(!!response.data.hasMore);
+
+          // Быстрый prefetch первых следующих (чтобы сразу не лагало при первом скролле)
+          newItems.slice(3, 3 + PREFETCH_AHEAD).forEach(v => {
+            const url = v?.thumbnail;
+            if (url && !prefetchedRef.current.has(url)) {
+              prefetchedRef.current.add(url);
+              Image.prefetch(url);
+            }
+          });
         }
       } catch (e) {
         console.log(e);
@@ -116,7 +141,7 @@ const Home: FC<HomeProps> = ({navigation}) => {
   );
 
   useEffect(() => {
-    setVideos([]);
+    // не чистим videos, чтобы не мигало пусто
     setCursor('');
     setHasMore(false);
     getVideos();
@@ -141,7 +166,7 @@ const Home: FC<HomeProps> = ({navigation}) => {
       loadMoreTimeoutRef.current = setTimeout(() => {
         getVideos({isLoadMore: true, cursorParam: currentCursor});
         loadMoreTimeoutRef.current = null;
-      }, 1000) as unknown as number;
+      }, 800) as unknown as number;
     }
   }, [hasMore, isLoadingMore, isRefreshing, cursor, getVideos]);
 
@@ -166,7 +191,7 @@ const Home: FC<HomeProps> = ({navigation}) => {
   );
 
   const renderVideItem = useCallback(
-    ({item}: { item: KidsVideoItem }) => (
+    ({item}: {item: KidsVideoItem}) => (
       <VideoItem
         videoData={item}
         onPress={() => {
@@ -190,12 +215,38 @@ const Home: FC<HomeProps> = ({navigation}) => {
     );
   }, [isLoadingMore, styles.activeIndicatorContainer]);
 
+  // Prefetch thumbnails AHEAD of current visible index (scroll-based)
+  const viewabilityConfig = useRef({
+    viewAreaCoveragePercentThreshold: 15,
+  }).current;
+
+  const onViewableItemsChanged = useRef(({viewableItems}: any) => {
+    if (!viewableItems?.length) return;
+
+    const maxIndex = Math.max(...viewableItems.map((v: any) => v.index ?? 0));
+
+    const start = maxIndex + 1;
+    const end = start + PREFETCH_AHEAD;
+
+    const slice = videos.slice(start, end);
+
+    for (const v of slice) {
+      const url = v?.thumbnail;
+      if (!url) continue;
+
+      if (!prefetchedRef.current.has(url)) {
+        prefetchedRef.current.add(url);
+        Image.prefetch(url);
+      }
+    }
+  }).current;
+
   return (
     <BackgroundWrapper
       backgroundColor="bg_primary"
       containerStyles={{paddingBottom: 80}}
     >
-      {isInitialLoading ? null : videos.length ? (
+      {isInitialLoading && !videos.length ? null : videos.length ? (
         <FlatList
           data={videos}
           renderItem={renderVideItem}
@@ -207,6 +258,8 @@ const Home: FC<HomeProps> = ({navigation}) => {
           removeClippedSubviews={true}
           maxToRenderPerBatch={10}
           windowSize={10}
+          onViewableItemsChanged={onViewableItemsChanged}
+          viewabilityConfig={viewabilityConfig}
           refreshControl={
             <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
           }

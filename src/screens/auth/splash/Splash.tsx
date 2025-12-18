@@ -12,9 +12,9 @@ import {
   setFilterData,
   setIsLoggedIn,
   setLanguageId,
-  setSubscriptionUserData,
+  setSubscriptionUserData, setUpdateIsVisibleData,
   setUser,
-  useAuthorizationMutation,
+  useAuthorizationMutation, useConfigMutation,
   useFilterMutation,
 } from 'rtk';
 import {getItem} from 'configs';
@@ -29,6 +29,7 @@ export interface SplashProps {
 const Splash: FC<SplashProps> = ({navigation}) => {
   const [authorization] = useAuthorizationMutation();
   const [filter] = useFilterMutation();
+  const [configData] = useConfigMutation();
   const dispatch = useDispatch();
   const styles = splashStyles();
 
@@ -60,6 +61,12 @@ const Splash: FC<SplashProps> = ({navigation}) => {
         await i18n.changeLanguage(language || 'en');
 
         if (!tokenData) {
+          const responseConfig = await configData({})
+
+          if (responseConfig?.data?.success && responseConfig?.data?.data?.update && `${versionNumber}` !== `${responseConfig?.data?.data?.versionApp}`) {
+            dispatch(setUpdateIsVisibleData(true));
+          }
+
           timeoutId = setTimeout(navigateToTabs, 1500);
           return;
         }

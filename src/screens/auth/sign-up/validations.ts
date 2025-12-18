@@ -8,13 +8,13 @@ export const signUpValidationScheme = () =>
       .string()
       .required(i18n.t('filed_is_required'))
       .max(30, i18n.t('last_name_length_is_invalid'))
-      .min(5, i18n.t('last_name_length_is_invalid')),
+      .min(2, i18n.t('last_name_length_is_invalid')),
 
     firstName: yup
       .string()
       .required(i18n.t('filed_is_required'))
       .max(30, i18n.t('first_name_length_is_invalid'))
-      .min(5, i18n.t('first_name_length_is_invalid')),
+      .min(2, i18n.t('first_name_length_is_invalid')),
 
     email: yup
       .string()

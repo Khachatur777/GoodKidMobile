@@ -37,6 +37,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@react-native-community/cli-platform-android", "npm:20.0.0"],\
             ["@react-native-community/cli-platform-ios", "npm:20.0.0"],\
             ["@react-native-community/netinfo", "virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:11.4.1"],\
+            ["@react-native-google-signin/google-signin", "virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:16.0.0"],\
             ["@react-native/babel-preset", "virtual:68e40f0ebb54f6ef3c09f385dedac957a8d046c3cef5a3ae5d58139ca508c79a0c98da38a39cb25e8cedfd85be1493f5a12d2d8ded8f83e62794bbb1f643ed9c#npm:0.82.1"],\
             ["@react-native/eslint-config", "virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:0.82.1"],\
             ["@react-native/metro-config", "npm:0.82.1"],\
@@ -65,7 +66,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["react-native", "virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:0.82.1"],\
             ["react-native-config", "virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:1.6.0"],\
             ["react-native-device-info", "virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:14.1.1"],\
-            ["react-native-eject", "npm:1.0.2"],\
+            ["react-native-fast-image", "virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:8.6.3"],\
             ["react-native-gesture-handler", "virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:2.29.0"],\
             ["react-native-linear-gradient", "virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:2.8.3"],\
             ["react-native-pager-view", "virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:6.9.1"],\
@@ -79,6 +80,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["react-native-svg-transformer", "virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:1.5.1"],\
             ["react-native-tab-view", "virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:4.2.0"],\
             ["react-native-toast-message", "virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:2.3.3"],\
+            ["react-native-video", "virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:6.18.0"],\
             ["react-native-webview", "virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:13.16.0"],\
             ["react-native-worklets", "virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:0.6.1"],\
             ["react-native-youtube-iframe", "virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:2.2.2"],\
@@ -3733,7 +3735,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["agent-base", "npm:7.1.4"],\
             ["http-proxy-agent", "npm:7.0.2"],\
             ["https-proxy-agent", "npm:7.0.6"],\
-            ["lru-cache", "npm:11.2.2"],\
+            ["lru-cache", "npm:11.2.4"],\
             ["socks-proxy-agent", "npm:8.0.5"]\
           ],\
           "linkType": "HARD"\
@@ -3978,6 +3980,36 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packagePeers": [\
             "@types/react-native",\
             "react-native"\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@react-native-google-signin/google-signin", [\
+        ["npm:16.0.0", {\
+          "packageLocation": "./.yarn/unplugged/@react-native-google-signin-google-signin-virtual-888106b28e/node_modules/@react-native-google-signin/google-signin/",\
+          "packageDependencies": [\
+            ["@react-native-google-signin/google-signin", "npm:16.0.0"]\
+          ],\
+          "linkType": "SOFT"\
+        }],\
+        ["virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:16.0.0", {\
+          "packageLocation": "./.yarn/unplugged/@react-native-google-signin-google-signin-virtual-888106b28e/node_modules/@react-native-google-signin/google-signin/",\
+          "packageDependencies": [\
+            ["@react-native-google-signin/google-signin", "virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:16.0.0"],\
+            ["@types/expo", null],\
+            ["@types/react", "npm:19.2.2"],\
+            ["@types/react-native", null],\
+            ["expo", null],\
+            ["react", "npm:19.1.1"],\
+            ["react-native", "virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:0.82.1"]\
+          ],\
+          "packagePeers": [\
+            "@types/expo",\
+            "@types/react-native",\
+            "@types/react",\
+            "expo",\
+            "react-native",\
+            "react"\
           ],\
           "linkType": "HARD"\
         }]\
@@ -5473,6 +5505,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@react-native-community/cli-platform-android", "npm:20.0.0"],\
             ["@react-native-community/cli-platform-ios", "npm:20.0.0"],\
             ["@react-native-community/netinfo", "virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:11.4.1"],\
+            ["@react-native-google-signin/google-signin", "virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:16.0.0"],\
             ["@react-native/babel-preset", "virtual:68e40f0ebb54f6ef3c09f385dedac957a8d046c3cef5a3ae5d58139ca508c79a0c98da38a39cb25e8cedfd85be1493f5a12d2d8ded8f83e62794bbb1f643ed9c#npm:0.82.1"],\
             ["@react-native/eslint-config", "virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:0.82.1"],\
             ["@react-native/metro-config", "npm:0.82.1"],\
@@ -5501,7 +5534,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["react-native", "virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:0.82.1"],\
             ["react-native-config", "virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:1.6.0"],\
             ["react-native-device-info", "virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:14.1.1"],\
-            ["react-native-eject", "npm:1.0.2"],\
+            ["react-native-fast-image", "virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:8.6.3"],\
             ["react-native-gesture-handler", "virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:2.29.0"],\
             ["react-native-linear-gradient", "virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:2.8.3"],\
             ["react-native-pager-view", "virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:6.9.1"],\
@@ -5515,6 +5548,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["react-native-svg-transformer", "virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:1.5.1"],\
             ["react-native-tab-view", "virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:4.2.0"],\
             ["react-native-toast-message", "virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:2.3.3"],\
+            ["react-native-video", "virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:6.18.0"],\
             ["react-native-webview", "virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:13.16.0"],\
             ["react-native-worklets", "virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:0.6.1"],\
             ["react-native-youtube-iframe", "virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:2.2.2"],\
@@ -6332,7 +6366,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@npmcli/fs", "npm:5.0.0"],\
             ["fs-minipass", "npm:3.0.3"],\
             ["glob", "npm:13.0.0"],\
-            ["lru-cache", "npm:11.2.2"],\
+            ["lru-cache", "npm:11.2.4"],\
             ["minipass", "npm:7.1.2"],\
             ["minipass-collect", "npm:2.0.1"],\
             ["minipass-flush", "npm:1.0.5"],\
@@ -10205,10 +10239,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           ],\
           "linkType": "HARD"\
         }],\
-        ["npm:11.2.2", {\
-          "packageLocation": "./.yarn/cache/lru-cache-npm-11.2.2-685f5506dc-052b3d0b81.zip/node_modules/lru-cache/",\
+        ["npm:11.2.4", {\
+          "packageLocation": "./.yarn/cache/lru-cache-npm-11.2.4-3f72660965-cb8cf72b80.zip/node_modules/lru-cache/",\
           "packageDependencies": [\
-            ["lru-cache", "npm:11.2.2"]\
+            ["lru-cache", "npm:11.2.4"]\
           ],\
           "linkType": "HARD"\
         }],\
@@ -10244,7 +10278,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["minipass-flush", "npm:1.0.5"],\
             ["minipass-pipeline", "npm:1.2.4"],\
             ["negotiator", "npm:1.0.0"],\
-            ["proc-log", "npm:6.0.0"],\
+            ["proc-log", "npm:6.1.0"],\
             ["promise-retry", "npm:2.0.1"],\
             ["ssri", "npm:13.0.0"]\
           ],\
@@ -10874,7 +10908,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["graceful-fs", "npm:4.2.11"],\
             ["make-fetch-happen", "npm:15.0.3"],\
             ["nopt", "npm:9.0.0"],\
-            ["proc-log", "npm:6.0.0"],\
+            ["proc-log", "npm:6.1.0"],\
             ["semver", "npm:7.7.3"],\
             ["tar", "npm:7.5.2"],\
             ["tinyglobby", "npm:0.2.15"],\
@@ -11320,7 +11354,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/path-scurry-npm-2.0.1-7744619e5d-a022c6c38f.zip/node_modules/path-scurry/",\
           "packageDependencies": [\
             ["path-scurry", "npm:2.0.1"],\
-            ["lru-cache", "npm:11.2.2"],\
+            ["lru-cache", "npm:11.2.4"],\
             ["minipass", "npm:7.1.2"]\
           ],\
           "linkType": "HARD"\
@@ -11429,10 +11463,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["proc-log", [\
-        ["npm:6.0.0", {\
-          "packageLocation": "./.yarn/cache/proc-log-npm-6.0.0-455d6f01a6-005a2aa24b.zip/node_modules/proc-log/",\
+        ["npm:6.1.0", {\
+          "packageLocation": "./.yarn/cache/proc-log-npm-6.1.0-84e609b3f4-ac450ff824.zip/node_modules/proc-log/",\
           "packageDependencies": [\
-            ["proc-log", "npm:6.0.0"]\
+            ["proc-log", "npm:6.1.0"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -11795,11 +11829,28 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
-      ["react-native-eject", [\
-        ["npm:1.0.2", {\
-          "packageLocation": "./.yarn/cache/react-native-eject-npm-1.0.2-f7a33beb40-380752d10d.zip/node_modules/react-native-eject/",\
+      ["react-native-fast-image", [\
+        ["npm:8.6.3", {\
+          "packageLocation": "./.yarn/unplugged/react-native-fast-image-virtual-ca8e637e8d/node_modules/react-native-fast-image/",\
           "packageDependencies": [\
-            ["react-native-eject", "npm:1.0.2"]\
+            ["react-native-fast-image", "npm:8.6.3"]\
+          ],\
+          "linkType": "SOFT"\
+        }],\
+        ["virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:8.6.3", {\
+          "packageLocation": "./.yarn/unplugged/react-native-fast-image-virtual-ca8e637e8d/node_modules/react-native-fast-image/",\
+          "packageDependencies": [\
+            ["react-native-fast-image", "virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:8.6.3"],\
+            ["@types/react", "npm:19.2.2"],\
+            ["@types/react-native", null],\
+            ["react", "npm:19.1.1"],\
+            ["react-native", "virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:0.82.1"]\
+          ],\
+          "packagePeers": [\
+            "@types/react-native",\
+            "@types/react",\
+            "react-native",\
+            "react"\
           ],\
           "linkType": "HARD"\
         }]\
@@ -12196,6 +12247,32 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/__virtual__/react-native-toast-message-virtual-035305e012/0/cache/react-native-toast-message-npm-2.3.3-fa42f11733-313fe6e6b6.zip/node_modules/react-native-toast-message/",\
           "packageDependencies": [\
             ["react-native-toast-message", "virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:2.3.3"],\
+            ["@types/react", "npm:19.2.2"],\
+            ["@types/react-native", null],\
+            ["react", "npm:19.1.1"],\
+            ["react-native", "virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:0.82.1"]\
+          ],\
+          "packagePeers": [\
+            "@types/react-native",\
+            "@types/react",\
+            "react-native",\
+            "react"\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["react-native-video", [\
+        ["npm:6.18.0", {\
+          "packageLocation": "./.yarn/unplugged/react-native-video-virtual-dbf918a649/node_modules/react-native-video/",\
+          "packageDependencies": [\
+            ["react-native-video", "npm:6.18.0"]\
+          ],\
+          "linkType": "SOFT"\
+        }],\
+        ["virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:6.18.0", {\
+          "packageLocation": "./.yarn/unplugged/react-native-video-virtual-dbf918a649/node_modules/react-native-video/",\
+          "packageDependencies": [\
+            ["react-native-video", "virtual:ed980a4eab55788e95e3f88897c28e160f2872b22266527fe7aebc03538870812edbfd57a5f0109c535b20625537d1edb9d8511fcb89075d7f6eac741012caf6#npm:6.18.0"],\
             ["@types/react", "npm:19.2.2"],\
             ["@types/react-native", null],\
             ["react", "npm:19.1.1"],\

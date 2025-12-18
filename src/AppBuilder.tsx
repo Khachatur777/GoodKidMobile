@@ -4,7 +4,7 @@ import {
   DefaultTheme,
   NavigationContainer,
 } from '@react-navigation/native';
-import {GlobalErrorModal, Pin} from 'organisms';
+import {GlobalErrorModal, Pin, UpdateModal} from 'organisms';
 import {Loader} from 'molecules';
 import {useSelector} from 'react-redux';
 import {getMainLoadingState, getNetInfo} from 'rtk';
@@ -56,10 +56,11 @@ const AppBuilder = () => {
         <Toast config={toastConfig} position="bottom" bottomOffset={60}/>
 
         <GlobalErrorModal/>
+
+        <UpdateModal/>
       </NavigationContainer>
 
       <Loader isLoading={isLoading}/>
-
 
     </View>
   );

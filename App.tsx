@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 
 import { Keyboard } from 'react-native';
 import 'react-native-screens';
@@ -8,6 +8,7 @@ import {
 } from 'react-native-reanimated';
 import { Provider } from 'react-redux';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import Orientation from 'react-native-orientation-locker';
 import { ThemeProvider } from './src/theme';
 import AppBuilder from './src/AppBuilder';
 import { createStore, FormContextProvider } from './src/rtk';
@@ -18,6 +19,15 @@ configureReanimatedLogger({
 });
 
 function App(): React.JSX.Element {
+
+  useEffect(() => {
+    Orientation.lockToPortrait();
+
+    return () => {
+      Orientation.unlockAllOrientations();
+    };
+  }, []);
+
   return (
     <SafeAreaProvider
       onStartShouldSetResponder={() => {

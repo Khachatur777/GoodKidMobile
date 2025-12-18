@@ -45,7 +45,7 @@ const Section: FC<INavigationHeaderProps & { isTab: boolean }> = ({
                     },
                   ],
                 })
-              }>
+              } style={navBarStyles({}).backTitleContainer}>
               <Icon
                 color="icon_inverted_header"
                 name="ChevronLeft"
@@ -53,16 +53,18 @@ const Section: FC<INavigationHeaderProps & { isTab: boolean }> = ({
                 height={26}
                 {...leftIcon}
               />
+
+              {title && (
+                <Typography
+                  type="bodyL"
+                  textColor='text_primary_header'
+                  {...titleProps}>
+                  {title}
+                </Typography>
+              )}
             </Pressable>
 
-            {title && (
-              <Typography
-                type="bodyL"
-                textColor='text_primary_header'
-                {...titleProps}>
-                {title}
-              </Typography>
-            )}
+
           </View>
 
           ) :

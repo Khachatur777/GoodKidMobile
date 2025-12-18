@@ -1,6 +1,7 @@
 export interface IDefaultResponseModel {
   message?: string;
   success?: boolean;
+  googleSignUp?: boolean;
 }
 
 export interface IUser {
@@ -38,6 +39,15 @@ export interface ISignInResponseModel extends IDefaultResponseModel{
 export interface IAuthorizationResponseModel extends IDefaultResponseModel{
   user: IUser,
   config: IConfig
+}
+
+export interface IConfigResponseModel extends IDefaultResponseModel{
+  data: {
+    forceUpdate: boolean,
+    update: boolean,
+    versionApp: number,
+    iosFilterEnable?: boolean
+  }
 }
 
 

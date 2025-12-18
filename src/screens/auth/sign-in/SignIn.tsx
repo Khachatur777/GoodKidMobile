@@ -16,15 +16,18 @@ import {
   setTokenData,
   setUser,
   useFilterMutation,
+  useSignInGoogleMutation,
   useSignInMutation,
+  useSignUpGoogleMutation,
 } from 'rtk';
 import {useDispatch} from 'react-redux';
 import {setItem} from 'configs';
-import {getBuildNumber, getVersion} from 'react-native-device-info';
+import {getBuildNumber, getModel, getSystemVersion, getUniqueId, getVersion} from 'react-native-device-info';
 import {ThemeContext} from "theme";
 import Purchases from "react-native-purchases";
 import {checkUserSubscription} from "hooks/usePurchase.ts";
-import {signInWithGoogle} from "hooks";
+import {signInWithGoogle, usePinAction} from "hooks";
+import {IConfig, IUser} from "models";
 
 export interface SignInhProps {
   navigation: NavigationProp<any>;
@@ -32,116 +35,212 @@ export interface SignInhProps {
 
 const SignIn: FC<SignInhProps> = ({ navigation }) => {
   const [signIn] = useSignInMutation();
-  const { theme } = useContext(ThemeContext);
-  const dispatch = useDispatch();
+  const [signInGoogle] = useSignInGoogleMutation();
+  const [signUpGoogle] = useSignUpGoogleMutation();
   const [filter] = useFilterMutation();
 
-  const initialValues = {
-    email: '',
-    password: '',
-  };
+  const {theme} = useContext(ThemeContext);
+  const dispatch = useDispatch();
+  const {startPinAction} = usePinAction();
 
-  const versionNumber =
-    Platform.OS === 'android' ? getVersion() : getBuildNumber();
+  const initialValues = {email: '', password: ''};
 
-  const onSubmit = useCallback(async (values: typeof initialValues) => {
-    try {
-      const data = {
-        email: values.email,
-        password: values.password,
-        showModal: true,
-        showLoader: true,
-      };
+  const versionNumber = Platform.OS === 'android' ? getVersion() : getBuildNumber();
 
-      const response = await signIn(data);
+  const goForceUpdate = useCallback(() => {
+    navigation.reset({
+      index: 0,
+      routes: [{name: 'ForceUpdateScreen'}],
+    });
+  }, [navigation]);
 
-      if (response?.data?.success) {
+  const goHome = useCallback(() => {
+    navigation.reset({
+      routes: [{name: 'TabScreens', params: {screen: 'HomeTab'}}],
+      index: 0,
+    });
+  }, [navigation]);
 
-        if(response?.data?.checkEmail){
-          return navigation.navigate('SignUpVerify', { email: data.email });
-        }
+  const isForceUpdateRequired = useCallback(
+    (config?: IConfig) => !!config?.forceUpdate && `${versionNumber}` !== `${config?.versionApp}`,
+    [versionNumber],
+  );
 
-        if (response?.data?.data?.config?.forceUpdate && `${versionNumber}` !== `${response?.data?.data?.config?.versionApp}`) {
-          return navigation.reset({
-            index: 0,
-            routes: [
-              {
-                name: 'ForceUpdateScreen',
-              },
-            ],
-          });
-        }
+  const setRevenueCatUser = useCallback(
+    async (user?: IUser) => {
+      if (!user?.id) return;
 
-        const user = response?.data?.data?.user
+      await Purchases.logIn(String(user.id));
+      await Purchases.setAttributes({
+        'E-mail': user?.email || '',
+        'Name': `${user?.profile?.firstName || ''} ${user?.profile?.lastName || ''}`.trim(),
+        VersionNumber: String(versionNumber),
+        LoginTime: new Date().toString(),
+      });
+    },
+    [versionNumber],
+  );
 
-        await Purchases.logIn(user?.id.toString()!);
+  const saveAuthToStore = useCallback(
+    async (payload: {user: IUser; config?: IConfig; tokenData: {accessToken?: string; refreshToken?: string; expiresIn?: number}}) => {
+      const {user, config, tokenData} = payload;
 
-        await Purchases.setAttributes({
-          'E-mail': user?.email!,
-          'Name': `${user?.profile?.firstName} ${user?.profile?.lastName}`,
-          "VersionNumber": versionNumber,
-          "LoginTime": new Date().toString()
-        });
+      // RevenueCat
+      await setRevenueCatUser(user);
 
-        const userSubscription = await checkUserSubscription()
+      // Subscription
+      const userSubscription = await checkUserSubscription();
+      dispatch(setSubscriptionUserData(!!userSubscription?.isSubscribed));
 
+      // Redux
+      dispatch(setIsLoggedIn(true));
+      dispatch(setUser(user));
+      dispatch(setLanguageId(user?.profile?.preferredLanguages));
+      dispatch(setConfigData(config as any));
 
-        dispatch(setSubscriptionUserData(userSubscription.isSubscribed))
+      dispatch(
+        setTokenData({
+          accessToken: tokenData?.accessToken as any,
+          expiresIn: tokenData?.expiresIn as any,
+          refreshToken: tokenData?.refreshToken as any,
+        }),
+      );
 
-        dispatch(setIsLoggedIn(true));
-        dispatch(setUser(user!));
-        dispatch(setTokenData({
-          accessToken: response?.data?.data?.accessToken!,
-          expiresIn: response?.data?.data?.expiresIn!,
-          refreshToken: response?.data?.data?.refreshToken!,
-        }));
-        await setItem('tokenData', {
-          accessToken: response?.data?.data?.accessToken,
-          expiresIn: response?.data?.data?.expiresIn,
-          refreshToken: response?.data?.data?.refreshToken,
-        });
-        dispatch(setLanguageId(user?.profile?.preferredLanguages!));
-        dispatch(setConfigData(response?.data?.data?.config!));
+      // Storage
+      await setItem('tokenData', {
+        accessToken: tokenData?.accessToken,
+        expiresIn: tokenData?.expiresIn,
+        refreshToken: tokenData?.refreshToken,
+      });
 
-        const responseFilter = await filter({});
+      // Filters
+      const responseFilter = await filter({});
+      if (responseFilter?.data?.success) {
+        dispatch(setFilterData(responseFilter?.data?.filter)); // ✅ fixed
+      }
+    },
+    [dispatch, filter, setRevenueCatUser],
+  );
 
-        if (responseFilter?.data?.success) {
-          dispatch(setFilterData(responseFilter?.data?.filter));
-        }
+  const finalizeAuth = useCallback(
+    async (responseData?: any) => {
+      const config = responseData?.data?.config;
 
-        navigation.reset({
-          routes: [
-            {
-              name: 'TabScreens',
-              params: {
-                screen: 'HomeTab',
-              },
-            },
-          ],
-          index: 0,
-        });
+      if (isForceUpdateRequired(config)) {
+        goForceUpdate();
+        return;
       }
 
+      const user = responseData?.data?.user;
+      if (!user) return;
+
+      await saveAuthToStore({
+        user,
+        config,
+        tokenData: {
+          accessToken: responseData?.data?.accessToken,
+          refreshToken: responseData?.data?.refreshToken,
+          expiresIn: responseData?.data?.expiresIn,
+        },
+      });
+
+      goHome();
+    },
+    [goForceUpdate, goHome, isForceUpdateRequired, saveAuthToStore],
+  );
+
+  const buildGoogleSignUpPayload = useCallback(
+    async (userInfo: any) => {
+      const pinRes = await startPinAction();
+      const pinCode = pinRes?.data;
+
+      const deviceId = await getUniqueId();
+      const deviceModel = getModel();
+      const osVersion = getSystemVersion();
+      const productVersion = Platform.OS === 'android' ? getVersion() : getBuildNumber();
+
+      return {
+        email: userInfo?.data?.user?.email?.trim?.().toLowerCase(),
+        deviceId,
+        deviceModel,
+        osVersion,
+        productVersion,
+        pinCode,
+        profile: {
+          firstName: userInfo?.data?.user?.givenName,
+          lastName: userInfo?.data?.user?.familyName,
+        },
+        showLoader: true,
+        showModal: true,
+      };
+    },
+    [startPinAction],
+  );
+
+  const handleGoogleSignIn = useCallback(async () => {
+    try {
+      const {userInfo, tokens} = await signInWithGoogle();
+
+      const email = userInfo?.data?.user?.email;
+      const idToken = tokens?.idToken;
+      console.log(idToken, email, 'email idToken');
+      if (!email || !idToken) return;
+
+      const loginRes = await signInGoogle({
+        email,
+        googleToken: idToken,
+        showModal: true,
+        showLoader: true,
+      });
+
+      if (loginRes?.data?.success) {
+        return finalizeAuth(loginRes?.data as any);
+      }
+
+      if (!loginRes?.data?.success && loginRes?.data?.googleSignUp) {
+        const signUpPayload = await buildGoogleSignUpPayload(userInfo);
+        const signUpRes = await signUpGoogle(signUpPayload);
+
+        if (signUpRes?.data?.success) {
+          return finalizeAuth(signUpRes?.data as any);
+        }
+      }
     } catch (e) {
       console.log(e);
     }
-  }, [dispatch, filter, navigation, signIn, versionNumber]);
+  }, [buildGoogleSignUpPayload, finalizeAuth, signInGoogle, signUpGoogle]);
 
-  const handleLogin = async () => {
-    try {
-      const { userInfo, tokens } = await signInWithGoogle();
-      // сохранить в стейт / Redux
-    } catch (e) {
-      // уже залогировано
-    }
-  };
+  const handleEmailSignIn = useCallback(
+    async (values: typeof initialValues) => {
+      try {
+        const email = values.email?.trim?.();
+        const password = values.password;
 
+        const response = await signIn({
+          email,
+          password,
+          showModal: true,
+          showLoader: true,
+        });
 
+        if (!response?.data?.success) return;
+
+        if (response?.data?.checkEmail) {
+          return navigation.navigate('SignUpVerify', {email});
+        }
+
+        return finalizeAuth(response?.data as any);
+      } catch (e) {
+        console.log(e);
+      }
+    },
+    [finalizeAuth, navigation, signIn],
+  );
 
   return (
     <BackgroundWrapper includesSafeArea backgroundColor="bg_primary">
       <Formik
-        onSubmit={onSubmit}
+        onSubmit={handleEmailSignIn}
         initialValues={initialValues}
         validationSchema={signInValidationScheme}
       >
@@ -182,9 +281,6 @@ const SignIn: FC<SignInhProps> = ({ navigation }) => {
                     : ''}
                 />
 
-                <Button title="Sign in with Google" onPress={handleLogin} />
-
-
                 <Spacing size={8} />
 
                 <View style={signInStyles().btnContainer}>
@@ -198,6 +294,13 @@ const SignIn: FC<SignInhProps> = ({ navigation }) => {
                   />
 
                   <Spacing size={8} />
+
+                  <Button
+                    startIconName={'Google'}
+                    title={t('sign_with_google')}
+                    onPress={handleGoogleSignIn}
+                    variant={'outline'}
+                  />
 
                   <Button
                     variant="ghost"
