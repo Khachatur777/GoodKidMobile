@@ -1,15 +1,21 @@
-import {FC, useCallback, useEffect, useRef, useState} from 'react';
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {BackgroundWrapper} from 'molecules';
 import {playVideoListStyles} from './play-video-list-styles.ts';
 import {PlayerYoutuber} from './components';
 import {getFilterDataState, isLoggedInSelector, useGetAllHomeVideosMutation} from 'rtk';
 import {KidsVideoItem} from 'models';
 import {useSelector} from 'react-redux';
-import {ActivityIndicator, FlatList, View} from 'react-native';
+import {
+  ActivityIndicator,
+  FlatList,
+  useWindowDimensions,
+  View,
+} from 'react-native';
 import {YoutubeItemSkeleton} from "organisms";
 import {NavigationProp, RouteProp, useFocusEffect} from "@react-navigation/native";
 import {VideoItem} from "screens";
 import {usePreventSwipeBackOnAndroid} from "hooks";
+import { isTablet } from 'utils';
 
 export interface PlayVideoListProps {
   navigation: NavigationProp<any>;
@@ -24,7 +30,6 @@ export interface PlayVideoListProps {
   >;
 }
 
-
 const PlayVideoList: FC<PlayVideoListProps> = ({navigation, route}) => {
   usePreventSwipeBackOnAndroid()
   const isLoggedIn = useSelector(isLoggedInSelector);
@@ -38,6 +43,14 @@ const PlayVideoList: FC<PlayVideoListProps> = ({navigation, route}) => {
   const [hasMore, setHasMore] = useState<boolean>(false);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const loadMoreTimeoutRef = useRef<number | null>(null);
+
+  const { width, height } = useWindowDimensions();
+
+  const styles = useMemo(
+    () =>
+      playVideoListStyles({  width, height, isTablet }),
+    [width, height, isTablet],
+  );
 
   useFocusEffect(
     useCallback(() => {
@@ -121,19 +134,26 @@ const PlayVideoList: FC<PlayVideoListProps> = ({navigation, route}) => {
   const renderFooter = useCallback(() => {
     if (!isLoadingMore) return null;
     return (
-      <View style={playVideoListStyles({}).activeIndicatorContainer}>
+      <View style={styles.activeIndicatorContainer}>
         <ActivityIndicator size="small" color="#007AFF"/>
       </View>
     );
   }, [isLoadingMore]);
 
+
+  const handleEnded = useCallback(() => {
+    setVideoData(videos?.[0])
+    getVideos(false, videos?.[0]?._id);
+
+  }, [getVideos]);
+
   return (
     <BackgroundWrapper
       backgroundColor="bg_primary"
-      containerStyles={playVideoListStyles({}).modalContainer}
+      containerStyles={styles.modalContainer}
     >
 
-      <PlayerYoutuber videoData={videoData}/>
+      <PlayerYoutuber videoData={videoData} onEnded={handleEnded}/>
 
       {videos?.length ?
         <FlatList

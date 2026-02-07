@@ -7,21 +7,30 @@ export interface UserSubscription {
   expiresAt: string | null;
 }
 
+export interface UserSubscription {
+  isSubscribed: boolean;
+  plan: string | null;
+  expiresAt: string | null;
+}
+
 export const checkUserSubscription = async (): Promise<UserSubscription> => {
   try {
+    await Purchases.invalidateCustomerInfoCache();
     const customerInfo = await Purchases.getCustomerInfo();
 
-    const entitlement = customerInfo.entitlements.active["GoodKid Pro"];
+    const subs = customerInfo.subscriptionsByProductIdentifier ?? {};
+    const activeSub = Object.values(subs).find((s: any) => s?.isActive);
 
-    const isSubscribed = !!entitlement?.isActive;
-    const plan = entitlement?.productIdentifier ?? null;
-    const expiresAt = entitlement?.expirationDate ?? null;
-
-    return { isSubscribed, plan, expiresAt };
+    return {
+      isSubscribed: !!activeSub,
+      plan: activeSub?.productIdentifier ?? null,
+      expiresAt: activeSub?.expiresDate ?? null,
+    };
   } catch (error) {
     return { isSubscribed: false, plan: null, expiresAt: null };
   }
 };
+
 
 
 export const purchaseUser = async () => {

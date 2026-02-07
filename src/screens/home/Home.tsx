@@ -5,6 +5,7 @@ import {
   Image,
   Pressable,
   RefreshControl,
+  useWindowDimensions,
   View,
 } from 'react-native';
 import {
@@ -20,6 +21,7 @@ import {KidsVideoItem} from 'models';
 import {useSelector} from 'react-redux';
 import {getFilterDataState, isLoggedInSelector} from 'rtk';
 import {t} from 'i18next';
+import { isTablet, thumbHeight } from 'utils';
 
 export interface HomeProps {
   navigation: NavigationProp<any>;
@@ -46,11 +48,12 @@ const Home: FC<HomeProps> = ({navigation}) => {
   const [isInitialLoading, setIsInitialLoading] = useState<boolean>(true);
 
   const loadMoreTimeoutRef = useRef<number | null>(null);
+  const {width, height} = useWindowDimensions();
 
-  // cache set for prefetched urls
   const prefetchedRef = useRef<Set<string>>(new Set());
 
-  const styles = useMemo(() => homeStyles({}), []);
+  const styles = useMemo(() => homeStyles({width, height, isTablet, thumbHeight}),
+    [ width, height, isTablet, thumbHeight]);
 
   const getVideos = useCallback(
     async (options?: {

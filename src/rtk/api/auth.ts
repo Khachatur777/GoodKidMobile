@@ -3,9 +3,10 @@ import {
   IBaseRequestModel, IConfigResponseModel,
   IDefaultResponseModel,
   IForgotChangePasswordRequestModel,
-  IForgotSendCodeRequestModel, ISignInGoogleRequestModel,
+  IForgotSendCodeRequestModel, ISignInAppleRequestModel, ISignInGoogleRequestModel,
   ISignInRequestModel,
-  ISignInResponseModel, ISignUpGoogleRequestModel,
+  ISignInResponseModel,
+  ISignInUpGuestRequestModel, ISignInUpGuestResponseModel, ISignUpAppleRequestModel, ISignUpGoogleRequestModel,
   ISignUpRequestModel,
   ISignUpVerifyRequestModel,
   IVerifyEmailAgainRequestModel,
@@ -36,6 +37,30 @@ export const authApi = baseApi
         query: (body) => {
           return {
             url: authRoutes().signInGoogle,
+            method: 'POST',
+            body,
+          };
+        },
+      }),
+      signInApple: builder.mutation<
+        ISignInResponseModel,
+        ISignInAppleRequestModel
+      >({
+        query: (body) => {
+          return {
+            url: authRoutes().signInApple,
+            method: 'POST',
+            body,
+          };
+        },
+      }),
+      signInUpGuest: builder.mutation<
+        ISignInUpGuestResponseModel,
+        ISignInUpGuestRequestModel
+      >({
+        query: (body) => {
+          return {
+            url: authRoutes().signInUpGuest,
             method: 'POST',
             body,
           };
@@ -72,6 +97,18 @@ export const authApi = baseApi
         query: (body) => {
           return {
             url: authRoutes().signUpGoogle,
+            method: 'POST',
+            body,
+          };
+        },
+      }),
+      signUpApple: builder.mutation<
+        IDefaultResponseModel,
+        ISignUpAppleRequestModel
+      >({
+        query: (body) => {
+          return {
+            url: authRoutes().signUpApple,
             method: 'POST',
             body,
           };
@@ -163,7 +200,10 @@ export const {
   useRefreshTokenMutation,
   useVerifyEmailAgainMutation,
   useSignInGoogleMutation,
+  useSignInAppleMutation,
   useSignUpGoogleMutation,
-  useConfigMutation
+  useConfigMutation,
+  useSignUpAppleMutation,
+  useSignInUpGuestMutation
 } = authApi;
 

@@ -27,6 +27,9 @@ export const navBarStyles = ({
       height: 44,
       justifyContent: 'space-between',
     },
+    sectionLeftContainer: {
+      paddingBottom: 8
+    },
     sectionLeftIconContainer: {
       width: 32,
       height: 32,

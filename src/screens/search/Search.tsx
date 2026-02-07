@@ -1,7 +1,7 @@
 import {FC, useCallback, useContext, useEffect, useRef, useState} from 'react';
-import {ActivityIndicator, FlatList, Pressable, TextInput, View} from 'react-native';
+import {ActivityIndicator, FlatList, Image, Pressable, TextInput, View} from 'react-native';
 import {NavigationProp, RouteProp, useFocusEffect,} from '@react-navigation/native';
-import {BackgroundWrapper, Icon, Spinner} from 'molecules';
+import {BackgroundWrapper, Icon, Spinner, Typography} from 'molecules';
 import {searchStyles} from './search-styles.ts';
 import {t} from 'i18next';
 import {ThemeContext} from 'theme';
@@ -33,7 +33,10 @@ const Search: FC<SearchProps> = ({ navigation }) => {
   const [cursor, setCursor] = useState<string>('');
   const [searchText, setSearchText] = useState<string>('');
   const [videos, setVideos] = useState<any[]>([]);
-  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [suggestions, setSuggestions] = useState<{
+    title: string,
+    thumbnail: string,
+  }[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const debounceRef = useRef<number | null>(null);
   const [showResults, setShowResults] = useState<boolean>(false);
@@ -156,15 +159,15 @@ const Search: FC<SearchProps> = ({ navigation }) => {
       {!showResults ? (
         <FlatList
           data={suggestions}
-          keyExtractor={(item: any) => item}
+          keyExtractor={(item: any) => `${item?.title} ${item?.thumbnail}`}
           renderItem={({ item }) => (
-            <Cell
-              type="icon"
-              iconName={'SearchLgIcon'}
-              showArrowIcon={false}
-              title={item || ''}
-              onPress={() => submitSearch(item || '')}
-            />
+            <Pressable  onPress={() => submitSearch(item?.title || '')} style={searchStyles({color}).searchItemContainer}>
+
+              <Image source={{uri: item.thumbnail}} style={searchStyles({}).searchItemImage}/>
+
+             <Typography numberOfLines={1} textStyles={{width: '90%'}}>{item.title}</Typography>
+            </Pressable>
+
           )}
           ListEmptyComponent={
             isLoading ? (

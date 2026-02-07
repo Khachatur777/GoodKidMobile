@@ -1,9 +1,19 @@
-import { Dimensions, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { IGetColor } from 'theme';
 
-const {width, height} = Dimensions.get('window');
-
-export const playVideoListStyles = ({ color, playing = false, videoHeight }: { color?: IGetColor, playing?: boolean, videoHeight?: number }) =>
+export const playVideoListStyles = ({
+  color,
+  isTablet,
+  width,
+  height,
+  playerHeightWithControls,
+}: {
+  color?: IGetColor;
+  isTablet?: boolean;
+  width: number;
+  height: number;
+  playerHeightWithControls?: number;
+}) =>
   StyleSheet.create({
     activeIndicatorContainer: {
       paddingVertical: 20,
@@ -31,7 +41,7 @@ export const playVideoListStyles = ({ color, playing = false, videoHeight }: { c
       bottom: 16,
     },
     title: {
-      padding: 16
+      padding: 16,
     },
 
     //PlayVideoListModal
@@ -43,42 +53,42 @@ export const playVideoListStyles = ({ color, playing = false, videoHeight }: { c
     //PlayerYoutuber
     videoYoutubeContainer: {
       position: 'relative',
-      height: 230,
+      height: isTablet ? playerHeightWithControls : 230,
       overflow: 'hidden',
     },
+
+    videoThumbnail: {
+      width: '100%',
+      height: isTablet ? playerHeightWithControls : 230,
+      borderRadius: 12,
+    },
+
     hideYoutubeContainer: {
       position: 'absolute',
-      width: playing ? width/2 :width/1.7 ,
+      width: width * 0.6,
       zIndex: 9999,
-      height: playing ? height/14 :height/15,
-      bottom: 8,
+      height: height * 0.06,
+      bottom: 12,
       right: 0,
     },
     hideYoutubeContainerAndroid: {
       position: 'absolute',
-      width: width/5,
+      width: width * 0.2,
       zIndex: 9999,
-      height:  height/31 ,
+      height: height * 0.035,
       bottom: 8,
-      right:  width/8,
+      right: width * 0.12,
     },
     hideYoutubeHeader: {
       position: 'absolute',
       width: width,
       zIndex: 9999,
-      height: height/18,
+      height: height * 0.06,
       top: 8,
       left: 0,
     },
-
     videoInfoContainer: {
       paddingHorizontal: 16,
-      paddingBottom: 16,
-    },
-    videoThumbnail: {
-      width: '100%',
-      height: videoHeight,
-      borderRadius: 12,
     },
 
     // Loading states

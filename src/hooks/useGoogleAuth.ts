@@ -3,12 +3,13 @@ import {
   statusCodes,
 } from '@react-native-google-signin/google-signin';
 import {googleIosClientId, googleWebClientId} from "configs";
+import {Alert} from "react-native";
 
 export const configureGoogleSignIn = () => {
   GoogleSignin.configure({
     webClientId: googleWebClientId,
     iosClientId: googleIosClientId,
-    offlineAccess: false,
+    offlineAccess: true
   });
 };
 
@@ -20,6 +21,8 @@ export const signInWithGoogle = async () => {
 
     return { userInfo, tokens };
   } catch (error: any) {
+    Alert.alert(error?.message || error);
+
     if (error.code === statusCodes.SIGN_IN_CANCELLED) {
       console.log('User cancelled sign in');
     } else if (error.code === statusCodes.IN_PROGRESS) {

@@ -1,6 +1,6 @@
 import {NavigationProp} from '@react-navigation/native';
 import {Image, Keyboard, Platform, View} from 'react-native';
-import React, {FC, useCallback, useContext} from 'react';
+import React, {FC, useCallback, useContext, useEffect} from 'react';
 import {BackgroundWrapper, Button, KeyboardAwareScrollView, PasswordField, Spacing, TextField,} from 'molecules';
 import {Logo, LogoWhiteWord} from 'assets';
 import {t} from 'i18next';
@@ -15,9 +15,9 @@ import {
   setSubscriptionUserData,
   setTokenData,
   setUser,
-  useFilterMutation,
+  useFilterMutation, useSignInAppleMutation,
   useSignInGoogleMutation,
-  useSignInMutation,
+  useSignInMutation, useSignUpAppleMutation,
   useSignUpGoogleMutation,
 } from 'rtk';
 import {useDispatch} from 'react-redux';
@@ -28,15 +28,19 @@ import Purchases from "react-native-purchases";
 import {checkUserSubscription} from "hooks/usePurchase.ts";
 import {signInWithGoogle, usePinAction} from "hooks";
 import {IConfig, IUser} from "models";
+import {appleAuth, AppleButton} from '@invertase/react-native-apple-authentication';
+
 
 export interface SignInhProps {
   navigation: NavigationProp<any>;
 }
 
-const SignIn: FC<SignInhProps> = ({ navigation }) => {
+const SignIn: FC<SignInhProps> = ({navigation}) => {
   const [signIn] = useSignInMutation();
   const [signInGoogle] = useSignInGoogleMutation();
+  const [signInApple] = useSignInAppleMutation();
   const [signUpGoogle] = useSignUpGoogleMutation();
+  const [signUpApple] = useSignUpAppleMutation();
   const [filter] = useFilterMutation();
 
   const {theme} = useContext(ThemeContext);
@@ -69,20 +73,24 @@ const SignIn: FC<SignInhProps> = ({ navigation }) => {
   const setRevenueCatUser = useCallback(
     async (user?: IUser) => {
       if (!user?.id) return;
-
-      await Purchases.logIn(String(user.id));
       await Purchases.setAttributes({
         'E-mail': user?.email || '',
         'Name': `${user?.profile?.firstName || ''} ${user?.profile?.lastName || ''}`.trim(),
         VersionNumber: String(versionNumber),
         LoginTime: new Date().toString(),
       });
+      await Purchases.logIn(String(user.id));
+
     },
     [versionNumber],
   );
 
   const saveAuthToStore = useCallback(
-    async (payload: {user: IUser; config?: IConfig; tokenData: {accessToken?: string; refreshToken?: string; expiresIn?: number}}) => {
+    async (payload: {
+      user: IUser;
+      config?: IConfig;
+      tokenData: { accessToken?: string; refreshToken?: string; expiresIn?: number }
+    }) => {
       const {user, config, tokenData} = payload;
 
       // RevenueCat
@@ -177,13 +185,41 @@ const SignIn: FC<SignInhProps> = ({ navigation }) => {
     [startPinAction],
   );
 
+  const buildAppleSignUpPayload = useCallback(
+    async (userInfo: any) => {
+      const pinRes = await startPinAction();
+      const pinCode = pinRes?.data;
+
+      const deviceId = await getUniqueId();
+      const deviceModel = getModel();
+      const osVersion = getSystemVersion();
+      const productVersion = Platform.OS === 'android' ? getVersion() : getBuildNumber();
+
+      return {
+        email: userInfo?.email?.trim?.().toLowerCase() || '',
+        deviceId,
+        appleId: userInfo.user,
+        deviceModel,
+        osVersion,
+        productVersion,
+        pinCode,
+        profile: {
+          firstName: userInfo?.fullName?.givenName,
+          lastName: userInfo?.fullName?.familyName,
+        },
+        showLoader: true,
+        showModal: true,
+      };
+    },
+    [startPinAction],
+  );
+
   const handleGoogleSignIn = useCallback(async () => {
     try {
       const {userInfo, tokens} = await signInWithGoogle();
 
       const email = userInfo?.data?.user?.email;
       const idToken = tokens?.idToken;
-      console.log(idToken, email, 'email idToken');
       if (!email || !idToken) return;
 
       const loginRes = await signInGoogle({
@@ -237,6 +273,42 @@ const SignIn: FC<SignInhProps> = ({ navigation }) => {
     [finalizeAuth, navigation, signIn],
   );
 
+  const signInWithApple = async () => {
+    try {
+      const appleAuthRequestResponse = await appleAuth.performRequest({
+        requestedOperation: appleAuth.Operation.LOGIN,
+        requestedScopes: [appleAuth.Scope.FULL_NAME, appleAuth.Scope.EMAIL],
+      });
+
+      const appleId = appleAuthRequestResponse?.user;
+      const appleToken = appleAuthRequestResponse?.identityToken;
+      if (!appleId || !appleToken) return;
+
+      const loginRes = await signInApple({
+        appleId,
+        appleToken,
+        showModal: true,
+        showLoader: true,
+      });
+
+      if (loginRes?.data?.success) {
+        return finalizeAuth(loginRes?.data as any);
+      }
+      if (!loginRes?.data?.success && loginRes?.data?.appleSignUp) {
+        const signUpPayload = await buildAppleSignUpPayload(appleAuthRequestResponse);
+
+        const signUpRes = await signUpApple(signUpPayload);
+
+        if (signUpRes?.data?.success) {
+          return finalizeAuth(signUpRes?.data as any);
+        }
+      }
+    } catch (e) {
+      console.log(e);
+    }
+
+  };
+
   return (
     <BackgroundWrapper includesSafeArea backgroundColor="bg_primary">
       <Formik
@@ -244,14 +316,14 @@ const SignIn: FC<SignInhProps> = ({ navigation }) => {
         initialValues={initialValues}
         validationSchema={signInValidationScheme}
       >
-        {({ setFieldValue, touched, handleSubmit, values, errors }) => (
+        {({setFieldValue, touched, handleSubmit, values, errors}) => (
           <KeyboardAwareScrollView
             enableOnAndroid
             showsVerticalScrollIndicator={false}
           >
             <View style={signInStyles().container}>
 
-              <Image source={theme === 'dark' ? LogoWhiteWord : Logo} style={signInStyles().logo} />
+              <Image source={theme === 'dark' ? LogoWhiteWord : Logo} style={signInStyles().logo}/>
               <>
                 <TextField
                   size="large"
@@ -276,12 +348,12 @@ const SignIn: FC<SignInhProps> = ({ navigation }) => {
                   }}
                   label={t('password_sign_in')}
                   error={Boolean(errors.password && touched?.password)}
-                  explanation={    errors?.password && touched?.password
+                  explanation={errors?.password && touched?.password
                     ? `${errors?.password}`
                     : ''}
                 />
 
-                <Spacing size={8} />
+                <Spacing size={8}/>
 
                 <View style={signInStyles().btnContainer}>
                   <Button
@@ -293,20 +365,41 @@ const SignIn: FC<SignInhProps> = ({ navigation }) => {
                     }}
                   />
 
-                  <Spacing size={8} />
+                  <Spacing size={8}/>
 
                   <Button
                     startIconName={'Google'}
                     title={t('sign_with_google')}
-                    onPress={handleGoogleSignIn}
+                    onPress={() => {
+                      Keyboard.dismiss();
+                      handleGoogleSignIn()
+                    }}
                     variant={'outline'}
                   />
+
+                  <Spacing size={8}/>
+
+                  {Platform.OS === 'ios' ?
+                    <Button
+                      startIconName={'Apple'}
+                      title={t('sign_with_apple')}
+                      onPress={() => {
+                        Keyboard.dismiss();
+                        signInWithApple()
+                      }}
+                      variant={'outline'}
+                    />
+                    :
+                    null
+                  }
 
                   <Button
                     variant="ghost"
                     title={t('forgot_password_btn')}
                     onPress={() => navigation.navigate('ForgotSendCode')}
                   />
+
+
                 </View>
               </>
             </View>

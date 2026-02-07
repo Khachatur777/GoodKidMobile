@@ -19,6 +19,20 @@ export const searchStyles = ({ color, playing = false }: { color?: IGetColor, pl
       width: width/1.42,
       color: color?.('bg_secondary'),
     },
+    searchItemContainer: {
+      flexDirection: 'row',
+      marginBottom: 3,
+      paddingVertical: 6,
+      alignItems: 'center',
+      borderBottomWidth: 0.5,
+      borderBottomColor: color?.('controls_border_default'),
+    },
+    searchItemImage: {
+      width: 36,
+      height: 36,
+      marginRight: 8,
+      borderRadius: 8,
+    },
     spinnerContainer: {
       flex: 1,
       justifyContent: 'center',

@@ -28,7 +28,8 @@ const AppBuilder = () => {
     const apiKey =
       __DEV__
         ? purchaseKeyDebug
-        : Platform.OS === 'ios'
+        :
+        Platform.OS === 'ios'
           ? purchaseKeyIos
           : purchaseKeyAndroid;
 

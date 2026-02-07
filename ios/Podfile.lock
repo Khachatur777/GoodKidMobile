@@ -17,7 +17,7 @@ PODS:
   - FBLazyVector (0.82.1)
   - fmt (11.0.2)
   - glog (0.3.5)
-  - GoogleSignIn (9.0.0):
+  - GoogleSignIn (9.1.0):
     - AppAuth (~> 2.0)
     - AppCheckCore (~> 11.0)
     - GTMAppAuth (~> 5.0)
@@ -2655,6 +2655,8 @@ PODS:
   - RevenueCat (5.46.3)
   - RevenueCatUI (5.46.3):
     - RevenueCat (= 5.46.3)
+  - RNAppleAuthentication (2.5.0):
+    - React-Core
   - RNCAsyncStorage (2.2.0):
     - boost
     - DoubleConversion
@@ -3132,6 +3134,7 @@ DEPENDENCIES:
   - ReactAppDependencyProvider (from `build/generated/ios`)
   - ReactCodegen (from `build/generated/ios`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
+  - "RNAppleAuthentication (from `../node_modules/@invertase/react-native-apple-authentication`)"
   - "RNCAsyncStorage (from `../node_modules/@react-native-async-storage/async-storage`)"
   - RNDeviceInfo (from `../node_modules/react-native-device-info`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
@@ -3327,6 +3330,8 @@ EXTERNAL SOURCES:
     :path: build/generated/ios
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
+  RNAppleAuthentication:
+    :path: "../node_modules/@invertase/react-native-apple-authentication"
   RNCAsyncStorage:
     :path: "../node_modules/@react-native-async-storage/async-storage"
   RNDeviceInfo:
@@ -3360,7 +3365,7 @@ SPEC CHECKSUMS:
   FBLazyVector: 0aa6183b9afe3c31fc65b5d1eeef1f3c19b63bfa
   fmt: a40bb5bd0294ea969aaaba240a927bd33d878cdd
   glog: 5683914934d5b6e4240e497e0f4a3b42d1854183
-  GoogleSignIn: c7f09cfbc85a1abf69187be091997c317cc33b77
+  GoogleSignIn: fcee2257188d5eda57a5e2b6a715550ffff9206d
   GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
   GTMAppAuth: 217a876b249c3c585a54fd6f73e6b58c4f5c4238
   GTMSessionFetcher: 5aea5ba6bd522a239e236100971f10cb71b96ab6
@@ -3445,6 +3450,7 @@ SPEC CHECKSUMS:
   ReactCommon: c5803af00bd3737dc1631749b1f1da5beba5b049
   RevenueCat: 635d32f21556b036ac6138a3ec44ac8e5a7c79b6
   RevenueCatUI: 41d0263265360a7171edd3cde324f051404a7ff0
+  RNAppleAuthentication: c088adfc7b371d44eb3da20c38d450d5543e5a0a
   RNCAsyncStorage: 302f2fac014fd450046c120567ca364632da682b
   RNDeviceInfo: 8b6fa8379062949dd79a009cf3d6b02a9c03ca59
   RNGestureHandler: 4fd2c1c449479d982116e0336513fc0f2e4b4617

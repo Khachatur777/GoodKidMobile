@@ -1,7 +1,19 @@
 import EventEmitter from 'eventemitter3';
 import i18n from 'i18next';
+import { useMemo } from 'react';
+import { useWindowDimensions } from 'react-native';
 
 export const eventEmitter = new EventEmitter();
+
+const {width, height} = useWindowDimensions();
+
+const shortest = Math.min(width, height);
+
+export const isTablet = shortest >= 768;
+
+const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
+
+export const controlsExtra = isTablet ? 90 : 70;
 
 export const getFontFamily = (
   fontFamily: 'Montserrat' | 'NotoSans',
@@ -117,3 +129,12 @@ export const validateThen =
     await onValid();
   };
 
+export const thumbHeight = useMemo(() => {
+  const h = (width - 0) * (9 / 16);
+  return clamp(h, isTablet ? 220 : 180, isTablet ? 420 : 260);
+}, [width, isTablet]);
+
+export const playerHeight = useMemo(() => {
+  const h = Math.round((width * 9) / 16);
+  return clamp(h, isTablet ? 260 : 200, isTablet ? 520 : 320);
+}, [width, isTablet]);

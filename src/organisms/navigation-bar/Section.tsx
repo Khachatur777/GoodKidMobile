@@ -25,7 +25,7 @@ const Section: FC<INavigationHeaderProps & { isTab: boolean }> = ({
 
   return (
     <View style={navBarStyles({ color }).sectionContainer}>
-      <View >
+      <View style={navBarStyles({}).sectionLeftContainer}>
         {renderLeftSection?.(navigation)}
 
         {navigation.canGoBack() &&
@@ -63,8 +63,6 @@ const Section: FC<INavigationHeaderProps & { isTab: boolean }> = ({
                 </Typography>
               )}
             </Pressable>
-
-
           </View>
 
           ) :

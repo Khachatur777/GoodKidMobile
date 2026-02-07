@@ -1,9 +1,23 @@
-import { Dimensions, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { IGetColor } from 'theme';
 
-const {width, height} = Dimensions.get('window');
 
-export const homeStyles = ({ color, playing = false, videoHeight }: { color?: IGetColor, playing?: boolean, videoHeight?: number }) =>
+
+export const homeStyles = ({
+                             color,
+                             playing = false,
+                             width,
+                             height,
+                             isTablet,
+                             thumbHeight,
+                           }: {
+  color?: IGetColor;
+  playing?: boolean;
+  width: number;
+  height: number;
+  isTablet: boolean;
+  thumbHeight: number;
+}) =>
   StyleSheet.create({
     rightHeaderContainer: {
       flexDirection: 'row',
@@ -21,15 +35,16 @@ export const homeStyles = ({ color, playing = false, videoHeight }: { color?: IG
     },
 
     //VideItem
+
     videoCardContainer: {
-      marginBottom: 8,
+      marginTop: 12,
     },
     videoThumbnailContainer: {
       position: 'relative',
     },
     videoItemThumbnail: {
       width: '100%',
-      height: 215,
+      height: thumbHeight,
       borderTopLeftRadius: 24,
       borderTopRightRadius: 24,
     },
@@ -43,7 +58,39 @@ export const homeStyles = ({ color, playing = false, videoHeight }: { color?: IG
       bottom: 16,
     },
     title: {
-      padding: 16
+      padding: 16,
+    },
+
+    videoYoutubeContainer: {
+      position: 'relative',
+      height: isTablet ? Math.round(width * 0.45) : Math.round(width * 0.56), // tablet чуть ниже, phone 16:9
+      overflow: 'hidden',
+    },
+
+    // Эти "hide*" лучше тоже от width/height, а не фикс
+    hideYoutubeContainer: {
+      position: 'absolute',
+      width: playing ? width * 0.5 : width * 0.6,
+      zIndex: 9999,
+      height: playing ? height * 0.07 : height * 0.06,
+      bottom: 8,
+      right: 0,
+    },
+    hideYoutubeContainerAndroid: {
+      position: 'absolute',
+      width: width * 0.2,
+      zIndex: 9999,
+      height: height * 0.035,
+      bottom: 8,
+      right: width * 0.12,
+    },
+    hideYoutubeHeader: {
+      position: 'absolute',
+      width: width,
+      zIndex: 9999,
+      height: height * 0.06,
+      top: 8,
+      left: 0,
     },
 
     //PlayVideoListModal
@@ -52,45 +99,14 @@ export const homeStyles = ({ color, playing = false, videoHeight }: { color?: IG
       padding: 0,
     },
 
-    //PlayerYoutuber
-    videoYoutubeContainer: {
-      position: 'relative',
-      height: 230,
-      overflow: 'hidden',
-    },
-    hideYoutubeContainer: {
-      position: 'absolute',
-      width: playing ? width/2 :width/1.7 ,
-      zIndex: 9999,
-      height: playing ? height/14 :height/15,
-      bottom: 8,
-      right: 0,
-    },
-    hideYoutubeContainerAndroid: {
-      position: 'absolute',
-      width: width/5,
-      zIndex: 9999,
-      height:  height/31 ,
-      bottom: 8,
-      right:  width/8,
-    },
-    hideYoutubeHeader: {
-      position: 'absolute',
-      width: width,
-      zIndex: 9999,
-      height: height/18,
-      top: 8,
-      left: 0,
-    },
-
     videoInfoContainer: {
       paddingHorizontal: 16,
       paddingBottom: 16,
     },
     videoThumbnail: {
-      width: '100%',
-      height: videoHeight,
       borderRadius: 12,
+      width: '100%',
+      height: thumbHeight,
     },
 
     // Loading states

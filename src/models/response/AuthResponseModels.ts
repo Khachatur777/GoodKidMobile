@@ -2,6 +2,7 @@ export interface IDefaultResponseModel {
   message?: string;
   success?: boolean;
   googleSignUp?: boolean;
+  appleSignUp?: boolean;
 }
 
 export interface IUser {
@@ -36,6 +37,10 @@ export interface ISignInResponseModel extends IDefaultResponseModel{
   }
 }
 
+export interface ISignInUpGuestResponseModel extends IDefaultResponseModel{
+  guest_id: string
+}
+
 export interface IAuthorizationResponseModel extends IDefaultResponseModel{
   user: IUser,
   config: IConfig
@@ -45,7 +50,8 @@ export interface IConfigResponseModel extends IDefaultResponseModel{
   data: {
     forceUpdate: boolean,
     update: boolean,
-    versionApp: number,
+    versionAppIos: number,
+    versionAppAndroid: number,
     iosFilterEnable?: boolean
   }
 }

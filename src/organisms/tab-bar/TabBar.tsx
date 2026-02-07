@@ -17,7 +17,6 @@ import {
 } from 'rtk';
 import {ThemeContext} from 'theme';
 import {tabBarStyles} from './tab-bar-styles';
-import { Sliders04Icon, User02Icon } from 'assets';
 
 export interface TabBarProps extends BottomTabBarProps {}
 
