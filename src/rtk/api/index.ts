@@ -5,3 +5,4 @@ export * from './filter';
 export * from './user';
 export * from './shared';
 export * from './support';
+export * from './learn';

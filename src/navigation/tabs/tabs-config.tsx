@@ -10,6 +10,7 @@ import {INavigationHeaderProps, NavigationBar} from 'organisms';
 import {HomeTab} from './home';
 import {FilterTab} from './filter';
 import {ProfileTab} from './profile';
+import { LearnTab } from './learn';
 
 export type ScreenTypes = RouteConfig<ParamListBase, any, any, {}, EventMapBase, any>;
 
@@ -28,7 +29,7 @@ export const tabScreens: ScreenTypes[] = [
   {
     name: 'HomeTab',
     component: HomeTab,
-    listeners: ({navigation}: {navigation: NavigationProp<any>}) => ({
+    listeners: ({ navigation }: { navigation: NavigationProp<any> }) => ({
       tabPress: (e: any) => {
         e.preventDefault();
         navigation.navigate('HomeTab', {
@@ -40,7 +41,7 @@ export const tabScreens: ScreenTypes[] = [
   {
     name: 'FilterTab',
     component: FilterTab,
-    listeners: ({navigation}: {navigation: NavigationProp<any>}) => ({
+    listeners: ({ navigation }: { navigation: NavigationProp<any> }) => ({
       tabPress: (e: any) => {
         e.preventDefault();
         navigation.navigate('FilterTab', {
@@ -49,14 +50,25 @@ export const tabScreens: ScreenTypes[] = [
       },
     }),
   },
-
+  {
+    name: 'LearnTab',
+    component: LearnTab,
+    listeners: ({ navigation }: { navigation: NavigationProp<any> }) => ({
+      tabPress: (e: any) => {
+        e.preventDefault();
+        navigation.navigate('LearnTab', {
+          screen: 'LearnScreen',
+        });
+      },
+    }),
+  },
   {
     name: 'ProfileTab',
     component: ProfileTab,
     options: {
       unmountOnBlur: true,
     },
-    listeners: ({navigation}: {navigation: NavigationProp<any>}) => ({
+    listeners: ({ navigation }: { navigation: NavigationProp<any> }) => ({
       tabPress: (e: any) => {
         navigation.navigate('ProfileTab', {
           screen: 'Profile',

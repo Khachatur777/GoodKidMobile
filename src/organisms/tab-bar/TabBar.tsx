@@ -104,33 +104,28 @@ const TabBar: FC<TabBarProps> = ({descriptors, state, navigation}) => {
               case 'HomeTab':
                 return (
                   <Icon
-                    color={
-                      isFocused
-                        ? 'red_500'
-                        : 'controls_tab_bar_inactive'
-                    }
+                    color={isFocused ? 'red_500' : 'controls_tab_bar_inactive'}
                     name="Home04Icon"
                   />
                 );
               case 'FilterTab':
                 return (
                   <Icon
-                    color={
-                      isFocused
-                        ? 'red_500'
-                        : 'controls_tab_bar_inactive'
-                    }
+                    color={isFocused ? 'red_500' : 'controls_tab_bar_inactive'}
                     name="Sliders04Icon"
+                  />
+                );
+              case 'LearnTab':
+                return (
+                  <Icon
+                    color={isFocused ? 'red_500' : 'controls_tab_bar_inactive'}
+                    name="PuzzleIcon"
                   />
                 );
               case 'ProfileTab':
                 return (
                   <Icon
-                    color={
-                      isFocused
-                        ? 'red_500'
-                        : 'controls_tab_bar_inactive'
-                    }
+                    color={isFocused ? 'red_500' : 'controls_tab_bar_inactive'}
                     name="User02Icon"
                   />
                 );
@@ -144,6 +139,8 @@ const TabBar: FC<TabBarProps> = ({descriptors, state, navigation}) => {
                 return t('home_tab');
               case 'FilterTab':
                 return t('filter_tab');
+              case 'LearnTab':
+                return t('learn_tab');
               case 'ProfileTab':
                 return t('profile_tab');
               default:

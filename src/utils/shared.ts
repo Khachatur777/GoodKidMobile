@@ -2,6 +2,7 @@ import EventEmitter from 'eventemitter3';
 import i18n from 'i18next';
 import { useMemo } from 'react';
 import { useWindowDimensions } from 'react-native';
+import { fileUrl } from 'configs';
 
 export const eventEmitter = new EventEmitter();
 
@@ -14,6 +15,9 @@ export const isTablet = shortest >= 768;
 const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
 
 export const controlsExtra = isTablet ? 90 : 70;
+
+export const getFileUri = (filePath: string, slash: string = ''): string =>
+  `${fileUrl}${slash}${filePath}`;
 
 export const getFontFamily = (
   fontFamily: 'Montserrat' | 'NotoSans',

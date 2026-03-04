@@ -7,3 +7,5 @@ export * from './profile';
 export * from './playVideoList';
 export * from './auth';
 export * from './force-update';
+export * from './learn';
+export * from './learn-explanation';

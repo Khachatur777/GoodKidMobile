@@ -50,7 +50,7 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({navigation}) => {
         dispatch(setSubscriptionUserData(res?.isSubscribed!))
       })
       .catch(e => {
-        console.log(e, 'rrrr');
+        console.log(e);
       })
   }, [])
 

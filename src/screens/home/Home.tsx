@@ -190,7 +190,7 @@ const Home: FC<HomeProps> = ({navigation}) => {
           </View>
         ),
       });
-    }, [navigation, styles.rightHeaderContainer]),
+    }, [navigation]),
   );
 
   const renderVideItem = useCallback(

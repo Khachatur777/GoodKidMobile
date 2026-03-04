@@ -33,3 +33,5 @@ export {default as CloseRed} from './close-red.svg';
 export {default as Lock} from './lock.svg';
 export {default as Google} from './google.svg';
 export {default as Apple} from './apple.svg';
+export {default as PuzzleIcon} from './puzzle.svg';
+export {default as SoundIcon} from './sound.svg';

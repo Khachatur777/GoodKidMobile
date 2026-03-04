@@ -93,6 +93,7 @@ const Section: FC<INavigationHeaderProps & { isTab: boolean }> = ({
             )}
       </View>
 
+
       <View style={navBarStyles({}).sectionRightIconContainer}>
         {renderRightSection?.(navigation)}
       </View>

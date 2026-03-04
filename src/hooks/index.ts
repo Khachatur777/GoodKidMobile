@@ -5,5 +5,6 @@ export {default as usePin} from './usePin';
 export {default as usePinAction} from './usePinAction';
 export {default as useToast} from './useToast.tsx';
 export {default as useGetTranslations} from './useGetTranslations';
-export * from './useGoogleAuth.ts';
 export {default as usePreventSwipeBackOnAndroid} from './usePreventSwipeBackOnAndroid';
+export * from './useGoogleAuth.ts';
+export * from './useAudioPlayer.ts';
