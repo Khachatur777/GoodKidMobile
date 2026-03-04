@@ -56,11 +56,11 @@ const LearnExplanation: FC<LearnProps> = ({ route }) => {
         categoryId: category._id,
         limit: 100,
         showModal: true,
-        showLoader: true,
       }
     : skipToken;
 
-  const { data, refetch } = useGetAllLearnCategoryItemsQuery(queryArg);
+  const { data, refetch, fulfilledTimeStamp } =
+    useGetAllLearnCategoryItemsQuery(queryArg);
 
   useEffect(() => {
     if (data?.success && Array.isArray(data?.data) && data.data.length) {
@@ -68,7 +68,7 @@ const LearnExplanation: FC<LearnProps> = ({ route }) => {
       setActiveIndex(0);
       setActiveLearnData(data.data[0]);
     }
-  }, [data?.success, data?.data]);
+  }, [data?.success, data?.data, fulfilledTimeStamp]);
 
   const onPressVoice = useCallback(async () => {
     const audioPath = activeLearnData?.audio?.[language]?.path;

@@ -4,9 +4,11 @@ import { NavigationProp, RouteProp } from '@react-navigation/native';
 import { BackgroundWrapper, Typography } from 'molecules';
 import { learnStyles } from './learn-styles.ts';
 import { useTranslation } from 'react-i18next';
-import { useGetAllLearnCategoryQuery } from 'rtk';
+import { isLoggedInSelector, useGetAllLearnCategoryQuery } from 'rtk';
 import { ILearnCategoryItem } from 'models';
 import { getFileUri } from 'utils';
+import { useSelector } from 'react-redux';
+import { NoSignIn } from 'organisms';
 
 export interface LearnProps {
   navigation: NavigationProp<any>;
@@ -21,11 +23,14 @@ export interface LearnProps {
 const Learn: FC<LearnProps> = ({ navigation }) => {
   const { t } = useTranslation();
   const styles = useMemo(() => learnStyles(), []);
+  const isLoggedIn = useSelector(isLoggedInSelector);
 
-  const { data: learnCategory } = useGetAllLearnCategoryQuery({
-    showLoader: true,
-    showModal: true,
-  });
+  const { data: learnCategory, isLoading } = useGetAllLearnCategoryQuery(
+    {
+      showModal: true,
+    },
+    { skip: !isLoggedIn },
+  );
 
   const _renderCategoriesItem = useCallback(
     ({ item }: { item: ILearnCategoryItem }) => {
@@ -50,14 +55,18 @@ const Learn: FC<LearnProps> = ({ navigation }) => {
 
   return (
     <BackgroundWrapper containerStyles={{ paddingBottom: 80 }}>
-      {learnCategory?.categories?.length ? (
-        <FlatList
-          contentContainerStyle={styles.flatListContainer}
-          keyExtractor={item => `${item._id}`}
-          data={learnCategory?.categories}
-          renderItem={_renderCategoriesItem}
-        />
-      ) : null}
+      {isLoggedIn ? (
+        learnCategory?.categories?.length ? (
+          <FlatList
+            contentContainerStyle={styles.flatListContainer}
+            keyExtractor={item => `${item._id}`}
+            data={learnCategory?.categories}
+            renderItem={_renderCategoriesItem}
+          />
+        ) : null
+      ) : (
+        <NoSignIn typeDescription={'filter'} />
+      )}
     </BackgroundWrapper>
   );
 };

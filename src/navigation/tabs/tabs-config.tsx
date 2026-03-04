@@ -70,6 +70,7 @@ export const tabScreens: ScreenTypes[] = [
     },
     listeners: ({ navigation }: { navigation: NavigationProp<any> }) => ({
       tabPress: (e: any) => {
+        e.preventDefault();
         navigation.navigate('ProfileTab', {
           screen: 'Profile',
         });

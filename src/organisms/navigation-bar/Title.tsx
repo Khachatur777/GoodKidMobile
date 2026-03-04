@@ -11,64 +11,35 @@ const Title: FC<INavigationHeaderProps> = ({options, navigation}) => {
     titleProps,
     leftIcon,
     renderRightSection,
-    onLeftIconPress = undefined,
-    showIconInTabScreen = true,
-    showBackIcon = true
   } = options;
 
   return (
     <View style={navBarStyles({}).titleContainer}>
       <View style={navBarStyles({}).titleTop}>
         <View style={navBarStyles({}).sectionLeftIconContainer}>
-          {showBackIcon ?
-            navigation.canGoBack() && showIconInTabScreen ? (
-            <Pressable
-              hitSlop={10}
-              style={navBarStyles({}).leftIcon}
-              onPress={onLeftIconPress || navigation.goBack}>
-              <Icon
-                color="icon_secondary"
-                name="ChevronLeft"
-                width={24}
-                height={24}
-                {...leftIcon}
-              />
-            </Pressable>
-          ) : (
-            <Pressable
-              hitSlop={10}
-              style={navBarStyles({}).leftIcon}
-              onPress={() =>
-                navigation.reset({
-                  index: 0,
-                  routes: [
-                    {
-                      name: 'HomeTab',
-                      params: {
-                        screen: 'HomeScreen',
-                      },
-                    },
-                  ],
-                })
-              }>
-              <Icon
-                color="icon_secondary"
-                name="ChevronLeft"
-                width={24}
-                height={24}
-                {...leftIcon}
-              />
-            </Pressable>
-          ) : null}
+          <Pressable
+            hitSlop={10}
+            style={navBarStyles({}).leftIcon}
+            onPress={e => {
+              e.preventDefault();
+              navigation.goBack();
+            }}
+          >
+            <Icon
+              color="icon_secondary"
+              name="ChevronLeft"
+              width={24}
+              height={24}
+              {...leftIcon}
+            />
+          </Pressable>
         </View>
 
-        {renderRightSection ?
-        <View style={navBarStyles({}).sectionRightIconContainer}>
-          {renderRightSection?.(navigation)}
-        </View>
-          :
-          null
-        }
+        {renderRightSection ? (
+          <View style={navBarStyles({}).sectionRightIconContainer}>
+            {renderRightSection?.(navigation)}
+          </View>
+        ) : null}
       </View>
 
       {title && (
@@ -77,8 +48,7 @@ const Title: FC<INavigationHeaderProps> = ({options, navigation}) => {
         </Typography>
       )}
 
-      <View/>
-
+      <View />
     </View>
   );
 };

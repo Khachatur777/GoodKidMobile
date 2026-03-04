@@ -25,7 +25,6 @@ export type INavigationHeaderProps = StackHeaderProps & {
     defaultHeader?: boolean;
     renderRightSection?: (navigation: NavigationProp<any>) => ReactNode;
     renderLeftSection?: (navigation: NavigationProp<any>) => ReactNode;
-    onLeftIconPress?: () => void;
   };
 };
 

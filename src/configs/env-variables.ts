@@ -1,9 +1,9 @@
 import Config from 'react-native-config';
 
-export const baseUrl = 'http://192.168.15.71:8373/api';
+export const baseUrl = Config.RN_APP_BASE_URL;
 export const baseFileUrl = Config.RN_APP_BASE_FILE_URL;
 export const baseUrlDev = Config.RN_APP_BASE_URL_DEV;
-export const baseUrlIp = 'http://192.168.15.71:8373/api';
+export const baseUrlIp = Config.RN_APP_BASE_URL_IP;
 export const fileUrl = Config.RN_APP_FILE_URL;
 
 export const purchaseKeyIos = Config.REVENUECAT_PURCHASE_KEY_IOS;

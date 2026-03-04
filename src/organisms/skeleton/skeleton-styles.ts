@@ -24,5 +24,17 @@ export const skeletonStyles = () =>
       flexDirection: 'row',
       marginLeft: 16,
       alignItems: 'center'
+    },
+
+    //Lear Skeleton
+    learnSkeletonContainer: {
+      paddingHorizontal: 16,
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      flexWrap: 'wrap',
+    },
+    learnItemSkeletonContainer: {
+      marginTop: 16,
+      alignItems: 'center'
     }
   });
