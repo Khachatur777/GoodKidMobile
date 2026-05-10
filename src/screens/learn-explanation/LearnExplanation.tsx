@@ -1,6 +1,13 @@
+import { Image, ScrollView, TouchableOpacity, View } from 'react-native';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { NavigationProp, RouteProp } from '@react-navigation/native';
-import { BackgroundWrapper, Button, Spacing, Typography } from 'molecules';
+import {
+  BackgroundWrapper,
+  Button,
+  CardWrapper,
+  Spacing,
+  Typography,
+} from 'molecules';
 import { learnExplanationStyles } from './learn-explanation-styles.ts';
 import { useTranslation } from 'react-i18next';
 import { ILearnCategoryItem, ILearnCategoryItems } from 'models';
@@ -9,13 +16,11 @@ import {
   useViewLearnItemsMutation,
   useViewLearnItemsResetMutation,
 } from 'rtk';
-import { Image, ScrollView, View } from 'react-native';
 import { getFileUri } from 'utils';
 import i18n from 'i18next';
 import { skipToken } from '@reduxjs/toolkit/query';
 import { useAudioPlayer } from 'hooks/useAudioPlayer';
 import { ChangeLanguageLearnModal } from './components';
-import { Cell } from 'organisms';
 
 type LearnLanguage = 'ru' | 'en' | 'hy';
 
@@ -47,7 +52,7 @@ const LearnExplanation: FC<LearnProps> = ({ route }) => {
       : 'en');
   const [activeLearnData, setActiveLearnData] =
     useState<ILearnCategoryItems | null>(null);
-
+  console.log(activeLearnData);;
   const [viewLearn] = useViewLearnItemsMutation();
   const [viewLearnReset] = useViewLearnItemsResetMutation();
 
@@ -115,67 +120,76 @@ const LearnExplanation: FC<LearnProps> = ({ route }) => {
 
   return (
     <BackgroundWrapper containerStyles={{ paddingBottom: 80 }}>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View>
-          <Cell
-            showArrowIcon={false}
-            type="icon"
-            iconName="GlobeIcon02"
-            title={t('learn_language')}
-            description={t('choose_learn_anguage')}
-            onPress={() => setChangeLanguageLearnModalVisible(true)}
+      <CardWrapper containerStyles={styles.cardContainer}>
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          <View>
+            <TouchableOpacity
+              onPress={() => setChangeLanguageLearnModalVisible(true)}
+            >
+              <Typography type={'caption'}>
+                {t('choose_learn_language')}
+              </Typography>
+              <Typography>English</Typography>
+            </TouchableOpacity>
+
+            <Spacing size={12} />
+
+            {!!activeLearnData?.images?.length && (
+              <View style={styles.imgContainer}>
+                {activeLearnData.images.map(img => (
+                  <Image
+                    key={img?.type}
+                    source={{ uri: getFileUri(img?.path) }}
+                    style={styles.image}
+                  />
+                ))}
+              </View>
+            )}
+
+            <Spacing size={16} />
+
+            <Typography type={'titleXLMedium'}>
+              {activeLearnData?.title?.[language] || ''}
+            </Typography>
+
+            <Spacing size={16} />
+
+            <Typography type={'bodyL'}>
+              {activeLearnData?.description?.[language] || ''}
+            </Typography>
+
+            <Spacing size={24} />
+          </View>
+
+          <View>
+            <Button
+              title={t('voice_playing')}
+              onPress={onPressVoice}
+              startIconName={'SoundIcon'}
+              disabled={!activeLearnData?.audio?.[language]?.path || playing}
+            />
+
+            <Spacing size={16} />
+
+            <Button
+              disabled={!activeLearnData?.audio?.[language]?.path || playing}
+              variant={'outline'}
+              title={t('next')}
+              onPress={onPressNext}
+            />
+          </View>
+
+          <ChangeLanguageLearnModal
+            isVisible={changeLanguageLearnModalVisible}
+            setIsVisible={setChangeLanguageLearnModalVisible}
+            onLanguageChange={lng => {
+              setLanguage(lng as LearnLanguage);
+              setChangeLanguageLearnModalVisible(false);
+            }}
+            language={language}
           />
-
-          {!!activeLearnData?.images?.length && (
-            <View style={styles.imgContainer}>
-              {activeLearnData.images.map(img => (
-                <Image
-                  key={img?.path}
-                  source={{ uri: getFileUri(img?.path) }}
-                  style={styles.image}
-                />
-              ))}
-            </View>
-          )}
-
-          <Spacing size={16} />
-
-          <Typography type={'titleXLMedium'}>
-            {activeLearnData?.title?.[language] || ''}
-          </Typography>
-
-          <Spacing size={16} />
-
-          <Typography type={'bodyL'}>
-            {activeLearnData?.description?.[language] || ''}
-          </Typography>
-
-          <Spacing size={24} />
-        </View>
-
-        <View>
-          <Button
-            title={t('voice_playing')}
-            onPress={onPressVoice}
-            startIconName={'SoundIcon'}
-            disabled={!activeLearnData?.audio?.[language]?.path || playing}
-          />
-
-          <Spacing size={16} />
-
-          <Button variant={'outline'} title={t('next')} onPress={onPressNext} />
-        </View>
-
-        <ChangeLanguageLearnModal
-          isVisible={changeLanguageLearnModalVisible}
-          setIsVisible={setChangeLanguageLearnModalVisible}
-          onLanguageChange={lng => {
-            setLanguage(lng as LearnLanguage);
-            setChangeLanguageLearnModalVisible(false);
-          }}
-          language={language}
-        />
-      </ScrollView>
+        </ScrollView>
+      </CardWrapper>
     </BackgroundWrapper>
   );
 };

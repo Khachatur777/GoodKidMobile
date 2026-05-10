@@ -8,15 +8,13 @@ export const learnExplanationStyles = () =>
       borderRadius: 24,
       marginBottom: 16,
     },
+    cardContainer: {
+      flex: 1,
+    },
     scrollContainer: {
-      backgroundColor: '#FFFFFF',
       borderRadius: 28,
       padding: 20,
       margin: 16,
-      shadowColor: '#000',
-      shadowOpacity: 0.1,
-      shadowRadius: 12,
-      elevation: 4,
       flexGrow: 1,
       justifyContent: 'space-between',
     },

@@ -17,7 +17,7 @@ export const learnScreens: IScreens[] = [
     name: 'LearnExplanation',
     component: LearnExplanation,
     options: () => ({
-      title: i18n.t('LearnExplanation'),
+      title: i18n.t('learn_explanation'),
       type: 'title',
       showBackIcon: true,
       showIconInTabScreen: false,
