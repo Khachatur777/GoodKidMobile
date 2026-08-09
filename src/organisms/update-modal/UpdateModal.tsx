@@ -5,10 +5,10 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getUpdateState, setUpdateIsVisibleData } from 'rtk';
 import { Linking, Platform } from 'react-native';
 
-const IOS_STORE_URL =
-  'https://apps.apple.com/us/app/goodk-app/id6755148083';
-
-const ANDROID_STORE_URL = '';
+const STORE_URL = Platform.select({
+  ios: 'itms-apps://itunes.apple.com/app/id000000000?action=write-review',
+  android: 'https://play.google.com/store/apps/details?id=com.goodkid',
+});
 
 const UpdateModal = () => {
   const updateIsVisible = useSelector(getUpdateState);
@@ -20,9 +20,7 @@ const UpdateModal = () => {
   }, []);
 
   const onUpdate = useCallback(() => {
-    const url = Platform.OS === 'ios'
-      ? IOS_STORE_URL
-      : ANDROID_STORE_URL;
+    const url = STORE_URL || '';
 
     Linking.openURL(url)
 

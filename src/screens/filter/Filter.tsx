@@ -176,14 +176,14 @@ const Filter: FC<FilterProps> = () => {
                 const isSelected = language === (lng.key || lng.name);
                 return (
                   <Badge
-                    iconName={index === 0 || subscriptionState ? undefined : 'Lock'}
+                  //  iconName={index === 0 || subscriptionState ? undefined : 'Lock'}
                     key={lng?.id}
                     title={t(lng?.name)}
                     size={'large'}
                     onPress={() => {
-                      if (index !== 0 && !subscriptionState) {
-                        return purchase()
-                      }
+                      // if (index !== 0 && !subscriptionState) {
+                      //   return purchase()
+                      // }
                       chooseFilterLanguage(lng)
                     }}
                     borderWidth={isSelected ? 0 : 1}
@@ -209,14 +209,14 @@ const Filter: FC<FilterProps> = () => {
                 const isSelected = ages === age.id;
                 return (
                   <Badge
-                    iconName={index === 0 || subscriptionState ? undefined : 'Lock'}
+                   // iconName={index === 0 || subscriptionState ? undefined : 'Lock'}
                     key={age?.id}
                     title={`${age?.name} ${t('age')}`}
                     size={'large'}
                     onPress={() => {
-                      if (index !== 0 && !subscriptionState) {
-                        return purchase()
-                      }
+                      // if (index !== 0 && !subscriptionState) {
+                      //   return purchase()
+                      // }
                       chooseFilterAge(age)
                     }}
                     borderWidth={isSelected ? 0 : 1}
@@ -239,15 +239,15 @@ const Filter: FC<FilterProps> = () => {
                 const isSelected = categories.includes(filter.id);
                 return (
                   <Badge
-                    iconName={index === 0 || subscriptionState ? undefined : 'Lock'}
+                    //iconName={index === 0 || subscriptionState ? undefined : 'Lock'}
                     disabled={true}
                     key={filter?.id}
                     title={t(filter?.name)}
                     size={'large'}
                     onPress={() => {
-                      if (index !== 0 && !subscriptionState) {
-                        return purchase()
-                      }
+                      // if (index !== 0 && !subscriptionState) {
+                      //   return purchase()
+                      // }
                       chooseFilter(filter)
                     }}
                     borderWidth={isSelected ? 0 : 1}

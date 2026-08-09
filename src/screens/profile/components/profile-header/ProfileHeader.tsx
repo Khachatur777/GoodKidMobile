@@ -1,10 +1,9 @@
-import {Avatar} from 'molecules';
-import {FC} from 'react';
-import {View} from 'react-native';
-import {profileStyle} from '../../profile-styles.ts';
+import { FC } from 'react';
+import { Image, View } from 'react-native';
+import { profileStyle } from '../../profile-styles.ts';
+import { Ladybug } from 'assets';
 
-export interface ProfileHeaderProps {
-}
+export interface ProfileHeaderProps {}
 
 const ProfileHeader: FC<ProfileHeaderProps> = () => {
 
@@ -15,11 +14,7 @@ const ProfileHeader: FC<ProfileHeaderProps> = () => {
         profileStyle({}).header,
       ]}
     >
-      <Avatar
-        size="xl"
-        backgroundColor="blue_450"
-        iconName="User02Icon"
-      />
+      <Image source={Ladybug} style={{width: 100, height: 100, resizeMode: 'contain'}}/>
 
     </View>
   );

@@ -1,6 +1,12 @@
 import { FC, useState } from 'react';
 import { CardWrapper } from 'molecules';
-import {Cell, PrivacyPolicyModal, SupportModal, TermsModal} from 'organisms';
+import {
+  Cell,
+  ParentGateModal,
+  PrivacyPolicyModal,
+  SupportModal,
+  TermsModal,
+} from 'organisms';
 import { profileStyle } from '../../profile-styles.ts';
 import { NavigationProp } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
@@ -16,7 +22,14 @@ const ProfileInformation: FC<ProfileInformationProps> = ({
   const [termsModal, setTermsModal] = useState<boolean>(false);
   const [supportModalVisible, setSupportModalVisible] = useState<boolean>(false);
   const [privacyModal, setPrivacyModal] = useState<boolean>(false);
+  const [parentGateVisible, setParentGateVisible] = useState(false);
+  const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
   const { t } = useTranslation();
+
+  const openWithParentGate = (callback: () => void) => {
+    setPendingAction(() => callback);
+    setParentGateVisible(true);
+  };
 
   return (
     <CardWrapper
@@ -26,52 +39,67 @@ const ProfileInformation: FC<ProfileInformationProps> = ({
       }}
       showArrowBtn={false}
       title={t('profile_information')}
-      containerStyles={profileStyle({}).profileWrapper}>
+      containerStyles={profileStyle({}).profileWrapper}
+    >
       <Cell
         type="icon"
         iconName="MessageChatSquareIcon"
         title={t('profile_support')}
-        onPress={() => setSupportModalVisible(true)}
+        onPress={() => {
+          openWithParentGate(() => {
+            setSupportModalVisible(true);
+          });
+        }}
       />
 
       <Cell
         type="icon"
         iconName="DocumentIcon"
         title={t('privacy_policy_conditions')}
-        onPress={() => Linking.openURL('https://goodkid.app/privacy')}
+        onPress={() => {
+          openWithParentGate(() => {
+            Linking.openURL('https://goodkid.app/privacy');
+          });
+        }}
       />
 
       <Cell
         type="icon"
         iconName="DocumentIcon"
         title={t('profile_terms_conditions')}
-        onPress={() =>  Linking.openURL('https://goodkid.app/terms')}
+        onPress={() => {
+          openWithParentGate(() => {
+            Linking.openURL('https://goodkid.app/terms');
+          });
+        }}
       />
 
-      {termsModal ?
-        <TermsModal
-          isVisible={termsModal}
-          setIsVisible={setTermsModal}
-        />
-        :
-        null}
+      {termsModal ? (
+        <TermsModal isVisible={termsModal} setIsVisible={setTermsModal} />
+      ) : null}
 
-      {privacyModal ?
+      {privacyModal ? (
         <PrivacyPolicyModal
           isVisible={privacyModal}
           setIsVisible={setPrivacyModal}
         />
-        :
-        null}
+      ) : null}
 
-      {supportModalVisible ?
+      {supportModalVisible ? (
         <SupportModal
           isVisible={supportModalVisible}
           setIsVisible={setSupportModalVisible}
         />
-        :
-        null}
+      ) : null}
 
+      <ParentGateModal
+        isVisible={parentGateVisible}
+        setIsVisible={setParentGateVisible}
+        onSuccess={() => {
+          pendingAction?.();
+          setPendingAction(null);
+        }}
+      />
     </CardWrapper>
   );
 };

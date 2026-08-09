@@ -1,7 +1,12 @@
 import {FC, useCallback, useState} from 'react';
 import {NavigationProp} from '@react-navigation/native';
 import {CardWrapper, AlertModal} from 'molecules';
-import {Cell, ChangeLanguageModal, ChangeThemeModal} from 'organisms';
+import {
+  Cell,
+  ChangeLanguageModal,
+  ChangeThemeModal,
+  ParentGateModal,
+} from 'organisms';
 import {profileStyle} from '../../profile-styles.ts';
 import {useTranslation} from 'react-i18next';
 import Toast from "react-native-toast-message";
@@ -19,6 +24,8 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({navigation}) => {
   const [languageModal, setLanguageModal] = useState<boolean>(false);
   const [themeModal, setThemeModal] = useState<boolean>(false);
   const [subscriptionInfoModalVisible, setSubscriptionInfoModalVisible] = useState<boolean>(false);
+  const [parentGateVisible, setParentGateVisible] = useState(false);
+  const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
   const {startPinAction} = usePinAction();
   const dispatch = useDispatch();
   const user = useSelector(getUserState);
@@ -27,6 +34,11 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({navigation}) => {
   const onLanguageChange = useCallback(() => setLanguageModal(true), []);
 
   const onThemeChange = useCallback(() => setThemeModal(true), []);
+
+  const openWithParentGate = (callback: () => void) => {
+    setPendingAction(() => callback);
+    setParentGateVisible(true);
+  };
 
   const purchase = useCallback(async () => {
 
@@ -62,18 +74,20 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({navigation}) => {
       }}
       showArrowBtn={false}
       title={t('profile_settings')}
-      containerStyles={profileStyle({}).profileWrapper}>
-
-
+      containerStyles={profileStyle({}).profileWrapper}
+    >
       <Cell
         type="icon"
-        iconName="GlobeIcon02"
+        iconName="CreditCardDownIcon"
         title={t('subscription')}
-        onPress={() =>{
-          if(subscriptionState){
-            return setSubscriptionInfoModalVisible(true)
-          }
-          purchase()
+        onPress={() => {
+          openWithParentGate(() => {
+            if (subscriptionState) {
+              return setSubscriptionInfoModalVisible(true);
+            }
+
+            purchase();
+          });
         }}
       />
 
@@ -98,10 +112,7 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({navigation}) => {
         setIsVisible={setLanguageModal}
       />
 
-      <ChangeThemeModal
-        isVisible={themeModal}
-        setIsVisible={setThemeModal}
-      />
+      <ChangeThemeModal isVisible={themeModal} setIsVisible={setThemeModal} />
 
       <AlertModal
         title={t('you_have_subscription')}
@@ -112,11 +123,18 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({navigation}) => {
           {
             title: t('close'),
             onPress: () => setSubscriptionInfoModalVisible(false),
-          }
+          },
         ]}
       />
 
-
+      <ParentGateModal
+        isVisible={parentGateVisible}
+        setIsVisible={setParentGateVisible}
+        onSuccess={() => {
+          pendingAction?.();
+          setPendingAction(null);
+        }}
+      />
     </CardWrapper>
   );
 };

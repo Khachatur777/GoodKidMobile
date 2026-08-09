@@ -52,7 +52,7 @@ const LearnExplanation: FC<LearnProps> = ({ route }) => {
       : 'en');
   const [activeLearnData, setActiveLearnData] =
     useState<ILearnCategoryItems | null>(null);
-  console.log(activeLearnData);;
+
   const [viewLearn] = useViewLearnItemsMutation();
   const [viewLearnReset] = useViewLearnItemsResetMutation();
 
@@ -129,7 +129,7 @@ const LearnExplanation: FC<LearnProps> = ({ route }) => {
               <Typography type={'caption'}>
                 {t('choose_learn_language')}
               </Typography>
-              <Typography>English</Typography>
+              <Typography>{language === 'hy' ? t('change_language_armenian') : language === 'en' ? t('change_language_english') : t('change_language_russian')}</Typography>
             </TouchableOpacity>
 
             <Spacing size={12} />

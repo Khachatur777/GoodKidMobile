@@ -32,7 +32,29 @@
 				<string>com.googleusercontent.apps.408052597809-pthnlhj5rd8qu443nuf815q7cvnsdacg</string>
 			</array>
 		</dict>
+    
+    <dict>
+        <key>CFBundleURLSchemes</key>
+        <array>
+            <string>fb1293986242224404</string>
+        </array>
+    </dict>
 	</array>
+  <key>FacebookAppID</key>
+  <string>1293986242224404</string>
+
+  <key>FacebookClientToken</key>
+  <string>4d2d7cc232f697edc8fa1888ef4fc5d5</string>
+
+  <key>FacebookDisplayName</key>
+  <string>GoodKid</string>
+
+  <key>LSApplicationQueriesSchemes</key>
+  <array>
+      <string>fbapi</string>
+      <string>fb-messenger-share-api</string>
+  </array>
+
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>

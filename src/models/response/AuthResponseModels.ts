@@ -20,10 +20,10 @@ export interface IUser {
 }
 
 export interface IConfig {
-  forceUpdate: boolean,
-  update: boolean,
-  versionApp: number,
-  iosFilterEnable?: boolean
+  update: boolean;
+  forceUpdate?: boolean;
+  versionAppIos?: number;
+  versionAppAndroid?: number;
 }
 
 export interface ISignInResponseModel extends IDefaultResponseModel{

@@ -12,8 +12,22 @@ export const learnStyles = () =>
       flex: 1,
     },
     categoriesItemContainer: {
+      position: 'relative',
       alignItems: 'center',
-      marginTop: 16
+      justifyContent: 'center',
+      marginTop: 16,
+    },
+    lock_icon: {
+      position: 'absolute',
+    },
+    overlay: {
+      ...StyleSheet.absoluteFillObject,
+      height: 147,
+      backgroundColor: 'rgba(255, 255, 255, 0.5)',
+      borderRadius: 8,
+    },
+    blurredText: {
+      opacity: 0.4,
     },
     image: {
       paddingBottom: 4,

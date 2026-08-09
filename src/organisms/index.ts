@@ -13,3 +13,4 @@ export * from './support-modal';
 export * from './skeleton';
 export * from './privacy-policy-modal';
 export * from './update-modal';
+export * from './parent-gate-modal';

@@ -1,18 +1,17 @@
-import {FC, useEffect} from 'react';
-import {Image, Platform} from 'react-native';
-import {NavigationProp} from '@react-navigation/native';
-import {useDispatch} from 'react-redux';
+import { FC, useEffect } from 'react';
+import { Image, Platform } from 'react-native';
+import { NavigationProp } from '@react-navigation/native';
+import { useDispatch } from 'react-redux';
 import {
   getBuildNumber,
   getModel,
   getSystemVersion,
   getUniqueId,
-  getVersion,
 } from 'react-native-device-info';
 
-import {BackgroundWrapper} from 'molecules';
-import {LogoMin} from 'assets';
-import {splashStyles} from './splash-styles.ts';
+import { BackgroundWrapper } from 'molecules';
+import { LogoMin } from 'assets';
+import { splashStyles } from './splash-styles.ts';
 import {
   setConfigData,
   setFilterData,
@@ -26,9 +25,9 @@ import {
   useFilterMutation,
   useSignInUpGuestMutation,
 } from 'rtk';
-import {getItem, setItem} from 'configs';
+import { getItem, setItem } from 'configs';
 import i18n from 'localization/localization.ts';
-import {checkUserSubscription} from 'hooks/usePurchase.ts';
+import { checkUserSubscription } from 'hooks/usePurchase.ts';
 
 export interface SplashProps {
   navigation: NavigationProp<any>;
@@ -43,20 +42,12 @@ const Splash: FC<SplashProps> = ({navigation}) => {
   const [fetchConfig] = useConfigMutation();
   const [signInUpGuestRequest] = useSignInUpGuestMutation();
 
-  const productVersion = Platform.OS === 'android' ? getVersion() : getBuildNumber();
+  const productVersion = getBuildNumber();
 
   const resetTo = (name: string) => {
     navigation.reset({index: 0, routes: [{name}]});
   };
 
-  const getServerVersion = (cfg?: any) => {
-    // поправь ключи под реальный контракт бэка:
-    // например versionAppIos / versionAppAndroid
-    if (!cfg) return '';
-    return Platform.OS === 'ios'
-      ? `${cfg.versionAppIos ?? cfg.versionApp ?? ''}`
-      : `${cfg.versionAppAndroid ?? cfg.versionApp ?? ''}`;
-  };
 
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout> | undefined;
@@ -102,13 +93,15 @@ const Splash: FC<SplashProps> = ({navigation}) => {
           const responseConfig = await fetchConfig({});
           const cfg = responseConfig?.data?.data;
 
-          const serverVersion = getServerVersion(cfg);
-
           if (
             responseConfig?.data?.success &&
             cfg?.update &&
-            serverVersion &&
-            `${productVersion}` !== `${serverVersion}`
+            `${productVersion}` !==
+              `${
+                Platform.OS === 'android'
+                  ? cfg?.versionAppAndroid
+                  : cfg?.versionAppIos
+              }`
           ) {
             dispatch(setUpdateIsVisibleData(true));
           }
@@ -126,7 +119,15 @@ const Splash: FC<SplashProps> = ({navigation}) => {
 
         const {user, config} = response.data;
 
-        if (config?.forceUpdate && `${productVersion}` !== `${config?.versionApp}`) {
+        if (
+          config?.forceUpdate &&
+          `${productVersion}` !==
+            `${
+              Platform.OS === 'android'
+                ? config?.versionAppAndroid
+                : config?.versionAppIos
+            }`
+        ) {
           resetTo('ForceUpdateScreen');
           return;
         }

@@ -1,12 +1,19 @@
-import {NavigationProp} from '@react-navigation/native';
-import {Image, Keyboard, Platform, View} from 'react-native';
-import React, {FC, useCallback, useContext, useEffect} from 'react';
-import {BackgroundWrapper, Button, KeyboardAwareScrollView, PasswordField, Spacing, TextField,} from 'molecules';
-import {Logo, LogoWhiteWord} from 'assets';
-import {t} from 'i18next';
-import {Formik} from 'formik';
-import {signInValidationScheme} from './validations.ts';
-import {signInStyles} from './sign-in-styles.ts';
+import { NavigationProp } from '@react-navigation/native';
+import { Image, Keyboard, Platform, View } from 'react-native';
+import React, { FC, useCallback, useContext } from 'react';
+import {
+  BackgroundWrapper,
+  Button,
+  KeyboardAwareScrollView,
+  PasswordField,
+  Spacing,
+  TextField,
+} from 'molecules';
+import { Logo, LogoWhiteWord } from 'assets';
+import { t } from 'i18next';
+import { Formik } from 'formik';
+import { signInValidationScheme } from './validations.ts';
+import { signInStyles } from './sign-in-styles.ts';
 import {
   setConfigData,
   setFilterData,
@@ -15,21 +22,28 @@ import {
   setSubscriptionUserData,
   setTokenData,
   setUser,
-  useFilterMutation, useSignInAppleMutation,
+  useFilterMutation,
+  useSignInAppleMutation,
   useSignInGoogleMutation,
-  useSignInMutation, useSignUpAppleMutation,
+  useSignInMutation,
+  useSignUpAppleMutation,
   useSignUpGoogleMutation,
 } from 'rtk';
-import {useDispatch} from 'react-redux';
-import {setItem} from 'configs';
-import {getBuildNumber, getModel, getSystemVersion, getUniqueId, getVersion} from 'react-native-device-info';
-import {ThemeContext} from "theme";
-import Purchases from "react-native-purchases";
-import {checkUserSubscription} from "hooks/usePurchase.ts";
-import {signInWithGoogle, usePinAction} from "hooks";
-import {IConfig, IUser} from "models";
-import {appleAuth, AppleButton} from '@invertase/react-native-apple-authentication';
-
+import { useDispatch } from 'react-redux';
+import { setItem } from 'configs';
+import {
+  getBuildNumber,
+  getModel,
+  getSystemVersion,
+  getUniqueId,
+  getVersion,
+} from 'react-native-device-info';
+import { ThemeContext } from 'theme';
+import Purchases from 'react-native-purchases';
+import { checkUserSubscription } from 'hooks/usePurchase.ts';
+import { signInWithGoogle, usePinAction } from 'hooks';
+import { IConfig, IUser } from 'models';
+import { appleAuth } from '@invertase/react-native-apple-authentication';
 
 export interface SignInhProps {
   navigation: NavigationProp<any>;
@@ -49,7 +63,8 @@ const SignIn: FC<SignInhProps> = ({navigation}) => {
 
   const initialValues = {email: '', password: ''};
 
-  const versionNumber = Platform.OS === 'android' ? getVersion() : getBuildNumber();
+  const versionNumber = getBuildNumber();
+
 
   const goForceUpdate = useCallback(() => {
     navigation.reset({
@@ -64,11 +79,6 @@ const SignIn: FC<SignInhProps> = ({navigation}) => {
       index: 0,
     });
   }, [navigation]);
-
-  const isForceUpdateRequired = useCallback(
-    (config?: IConfig) => !!config?.forceUpdate && `${versionNumber}` !== `${config?.versionApp}`,
-    [versionNumber],
-  );
 
   const setRevenueCatUser = useCallback(
     async (user?: IUser) => {
@@ -124,7 +134,7 @@ const SignIn: FC<SignInhProps> = ({navigation}) => {
       // Filters
       const responseFilter = await filter({});
       if (responseFilter?.data?.success) {
-        dispatch(setFilterData(responseFilter?.data?.filter)); // ✅ fixed
+        dispatch(setFilterData(responseFilter?.data?.filter));
       }
     },
     [dispatch, filter, setRevenueCatUser],
@@ -134,7 +144,15 @@ const SignIn: FC<SignInhProps> = ({navigation}) => {
     async (responseData?: any) => {
       const config = responseData?.data?.config;
 
-      if (isForceUpdateRequired(config)) {
+      if (
+        config?.forceUpdate &&
+        `${versionNumber}` !==
+          `${
+            Platform.OS === 'android'
+              ? config?.versionAppAndroid
+              : config?.versionAppIos
+          }`
+      ) {
         goForceUpdate();
         return;
       }
@@ -154,7 +172,7 @@ const SignIn: FC<SignInhProps> = ({navigation}) => {
 
       goHome();
     },
-    [goForceUpdate, goHome, isForceUpdateRequired, saveAuthToStore],
+    [goForceUpdate, goHome, saveAuthToStore],
   );
 
   const buildGoogleSignUpPayload = useCallback(

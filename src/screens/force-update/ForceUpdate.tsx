@@ -6,7 +6,7 @@ import { forceUpdateStyles } from './force-update-styles.ts';
 
 const STORE_URL = Platform.select({
   ios: 'itms-apps://itunes.apple.com/app/id000000000?action=write-review',
-  android: 'market://details?id=com.kidsplay',
+  android: 'https://play.google.com/store/apps/details?id=com.goodkid',
 });
 
 const ForceUpdate: FC = () => {
