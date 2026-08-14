@@ -36,7 +36,12 @@ export const pinFieldStyles = ({
       width: '100%',
       height: 80,
       borderRadius: 40,
-      backgroundColor: color?.('controls_secondary_default'),
+      backgroundColor: color?.('surface_primary'),
+      shadowColor: '#191634',
+      shadowOpacity: 0.06,
+      shadowRadius: 8,
+      shadowOffset: {width: 0, height: 2},
+      elevation: 2,
     },
     circlesContainer: {
       flexDirection: 'row',
@@ -48,8 +53,8 @@ export const pinFieldStyles = ({
       height: 16,
       borderRadius: 10,
       backgroundColor: isCircleActive
-        ? color?.('red_500')
-        : color?.(error ? 'accent_negative' : 'icon_tertiary'),
+        ? color?.('accent_active')
+        : color?.(error ? 'accent_negative' : 'surface_stroke'),
     },
     forgotPin: {
       width: 65,

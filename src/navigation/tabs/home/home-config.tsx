@@ -12,28 +12,21 @@ export const homeScreens: IScreens[] = [
     name: 'HomeScreen',
     component: Home,
     options: () => ({
-      headerShown: true,
-      headerTransparent: false,
-      backgroundColor: 'red_500',
+      headerShown: false,
     }),
   },
   {
     name: 'PlayVideoListScreen',
     component: PlayVideoList,
     options: () => ({
-      title: i18n.t('youtube_video_title'),
-      showBackIcon: true,
-      backgroundColor: 'red_500',
+      headerShown: false,
     }),
   },
   {
     name: 'SearchScreen',
     component: Search,
     options: () => ({
-      headerShown: true,
-      headerTransparent: false,
-      showBackIcon: true,
-      backgroundColor: 'red_500',
+      headerShown: false,
     }),
   },
   {

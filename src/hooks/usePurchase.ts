@@ -7,12 +7,6 @@ export interface UserSubscription {
   expiresAt: string | null;
 }
 
-export interface UserSubscription {
-  isSubscribed: boolean;
-  plan: string | null;
-  expiresAt: string | null;
-}
-
 export const checkUserSubscription = async (): Promise<UserSubscription> => {
   try {
     await Purchases.invalidateCustomerInfoCache();

@@ -2,16 +2,13 @@ import { NavigationProp } from '@react-navigation/native';
 import { Image, Keyboard, Platform, Pressable, View } from 'react-native';
 import { signUpStyles } from './sign-up-styles.ts';
 import React, {FC, useCallback, useContext, useRef, useState} from 'react';
-import {
-  BackgroundWrapper,
+import {GoodKidLogo, BackgroundWrapper,
   Button,
   KeyboardAwareScrollView,
   PasswordField,
   Radio,
   TextField,
-  Typography,
-} from 'molecules';
-import {Logo, LogoWhiteWord} from 'assets';
+  Typography,} from 'molecules';
 import { Formik } from 'formik';
 import { signUpValidationScheme } from './validations.ts';
 import { useSignUpMutation } from 'rtk/api';
@@ -121,7 +118,7 @@ const SignUp: FC<SignUpProps> = ({ navigation }) => {
 
             <View style={signUpStyles().container}>
 
-              <Image source={theme === 'dark' ? LogoWhiteWord : Logo} style={signUpStyles().logo} />
+              <GoodKidLogo size={56} variant="stacked" />
 
               <TextField
                 size="large"

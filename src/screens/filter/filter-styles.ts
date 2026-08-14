@@ -2,6 +2,11 @@ import {StyleSheet} from 'react-native';
 
 export const filterStyles = () =>
   StyleSheet.create({
+    resetRow: {
+      flexDirection: 'row',
+      justifyContent: 'flex-end',
+      paddingBottom: 10,
+    },
     scrollContainer: {
       flexGrow: 1,
       paddingHorizontal: 16,

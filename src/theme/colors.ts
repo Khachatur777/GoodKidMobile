@@ -6,9 +6,9 @@ export interface IColorTheme {
 export const colorTheme = {
   light: {
     // #region Text Colors Start
-    text_primary: '7, 11, 17',
-    text_secondary: '103, 116, 130',
-    text_tertiary: '149, 164, 180',
+    text_primary: '25, 22, 52',
+    text_secondary: '99, 95, 126',
+    text_tertiary: '153, 149, 174',
     text_inverted: '255, 255, 255',
     text_primary_header: '255, 255, 255',
     text_positive: '0, 194, 112',
@@ -23,8 +23,8 @@ export const colorTheme = {
     // #endregion Link Colors End
 
     // #region Background Colors Start
-    bg_primary: '255, 255, 255',
-    bg_secondary: '230, 234, 246',
+    bg_primary: '246, 244, 251',
+    bg_secondary: '246, 244, 251',
     bg_inverted: '7, 11, 17',
     bg_overlay: '7, 11, 17',
 
@@ -32,13 +32,13 @@ export const colorTheme = {
 
     // #region Surface Colors Start
     surface_primary: '255, 255, 255',
-    surface_secondary: '230, 234, 246',
+    surface_secondary: '237, 233, 253',
     surface_tertiary: '204, 214, 230',
     surface_inverted: '7, 11, 17',
     surface_overlay: '255, 255, 255',
     surface_navigation: '255, 255, 255',
     surface_counter: '255, 255, 255',
-    surface_stroke: '204, 214, 230',
+    surface_stroke: '226, 221, 240',
     surface_footer: '246, 247, 255',
     surface_quaternary: '255, 255, 255',
     surface_avatar_content: '255, 255, 255',
@@ -71,7 +71,7 @@ export const colorTheme = {
     controls_cell_selected: '246, 247, 255',
     controls_cell_pressed: '230, 234, 246',
     controls_tab_bar_active: '63, 0, 255',
-    controls_tab_bar_inactive: '103, 116, 130',
+    controls_tab_bar_inactive: '153, 149, 174',
     controls_tab_bar_bg: '255, 255, 255',
     controls_border_default: '204, 214, 230',
     controls_border_hover: '180, 195, 210',
@@ -225,9 +225,9 @@ export const colorTheme = {
   dark: {
     // #region Text Colors Start
     text_primary_header: '255, 255, 255',
-    text_primary: '255, 255, 255',
-    text_secondary: '149, 164, 180',
-    text_tertiary: '103, 116, 130',
+    text_primary: '239, 237, 250',
+    text_secondary: '156, 151, 190',
+    text_tertiary: '126, 121, 160',
     text_inverted: '7, 11, 17',
     text_positive: '0, 194, 112',
     text_negative: '255, 89, 52',
@@ -241,22 +241,22 @@ export const colorTheme = {
     // #endregion Link Colors End
 
     // #region Background Colors Start
-    bg_primary: '7, 11, 17',
-    bg_secondary: '12, 17, 24',
+    bg_primary: '19, 17, 38',
+    bg_secondary: '19, 17, 38',
     bg_inverted: '255, 255, 255',
     bg_overlay: '7, 11, 17',
 
     // #endregion Background Colors End
 
     // #region Surface Colors Start
-    surface_primary: '26, 33, 41',
-    surface_secondary: '33, 40, 49',
+    surface_primary: '30, 27, 51',
+    surface_secondary: '42, 39, 69',
     surface_tertiary: '50, 60, 71',
     surface_inverted: '255, 255, 255',
     surface_overlay: '18, 24, 31',
-    surface_navigation: '26, 33, 41',
+    surface_navigation: '30, 27, 51',
     surface_counter: '7, 11, 17',
-    surface_stroke: '50, 60, 71',
+    surface_stroke: '58, 53, 87',
     surface_footer: '18, 24, 31',
     surface_quaternary: '50, 60, 71',
     surface_avatar_content: '149, 164, 180',
@@ -289,8 +289,8 @@ export const colorTheme = {
     controls_cell_selected: '18, 24, 31',
     controls_cell_pressed: '33, 40, 49',
     controls_tab_bar_active: '102, 133, 255',
-    controls_tab_bar_inactive: '149, 164, 180',
-    controls_tab_bar_bg: '26, 33, 41',
+    controls_tab_bar_inactive: '131, 126, 163',
+    controls_tab_bar_bg: '30, 27, 51',
     controls_border_default: '66, 77, 88',
     controls_border_hover: '81, 94, 107',
     controls_border_focus: '102, 133, 255',

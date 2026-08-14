@@ -2,8 +2,7 @@ import { NavigationProp, ParamListBase, RouteProp } from '@react-navigation/nati
 import { Image, Keyboard, Platform, View } from 'react-native';
 import { forgotChangePasswordStyles } from './forgot-change-password-styles.ts';
 import {FC, useCallback, useContext, useEffect, useState} from 'react';
-import { BackgroundWrapper, Button, KeyboardAwareScrollView, PasswordField, Spacing, TextField } from 'molecules';
-import {Logo, LogoWhiteWord} from 'assets';
+import {GoodKidLogo, BackgroundWrapper, Button, KeyboardAwareScrollView, PasswordField, Spacing, TextField} from 'molecules';
 import { Formik } from 'formik';
 import { forgotChangePasswordValidationScheme } from './validations.ts';
 import { useTranslation } from 'react-i18next';
@@ -97,7 +96,7 @@ const ForgotChangePassword: FC<SignUpProps> = ({ navigation, route }) => {
 
             <View style={forgotChangePasswordStyles().container}>
 
-              <Image source={theme === 'dark' ? LogoWhiteWord : Logo} style={forgotChangePasswordStyles().logo} />
+              <GoodKidLogo size={70} variant="stacked" />
 
               <TextField
                 size="large"

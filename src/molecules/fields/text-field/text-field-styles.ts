@@ -21,13 +21,13 @@ export const textFStyles = ({
   textWidth?: number;
 }) => {
   const sharedStyles = {
-    paddingHorizontal: 12,
-    borderWidth: !readOnly ? 1 : readOnly && error ? 1 : 0,
-    borderRadius: size === 'small' ? 8 : 12,
+    paddingHorizontal: 16,
+    borderWidth: !readOnly ? 1.5 : readOnly && error ? 1.5 : 0,
+    borderRadius: size === 'small' ? 8 : 18,
     borderColor: !error
-      ? color?.(focused ? 'controls_border_focus' : 'controls_border_default')
+      ? color?.(focused ? 'accent_active' : 'surface_stroke')
       : color?.(
-          focused && !value ? 'controls_border_focus' : 'accent_negative',
+          focused && !value ? 'accent_active' : 'accent_negative',
         ),
     backgroundColor: readOnly
       ? color?.(
@@ -35,7 +35,7 @@ export const textFStyles = ({
             ? 'controls_disabled_primary'
             : 'controls_disabled_secondary',
         )
-      : color?.('surface_primary', type === 'primary' ? 0 : 1),
+      : color?.('surface_primary'),
   };
 
   const getInputHeight = () => {

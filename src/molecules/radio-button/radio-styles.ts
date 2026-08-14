@@ -7,7 +7,7 @@ export const radioStyles = ({
   selected,
   color,
   inactiveBorderColor = 'controls_selector_default',
-  activeBorderColor = 'red_500',
+  activeBorderColor = 'accent_active',
 
   inactiveBackgroundColor = 'controls_primary_default',
   activeBackgroundColor = 'grey_0',

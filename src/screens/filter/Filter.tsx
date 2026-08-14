@@ -2,13 +2,13 @@ import {NavigationProp} from '@react-navigation/native';
 import {BackgroundWrapper, Button, Spacing, Typography} from 'molecules';
 import {FC, useCallback, useEffect, useState} from 'react';
 import {filterStyles} from './filter-styles.ts';
-import {ScrollView, View} from 'react-native';
+import {Pressable, ScrollView, View} from 'react-native';
 import Badge from '../../molecules/badge/Badge.tsx';
 import {t} from 'i18next';
 import Toast from 'react-native-toast-message';
 import {AgeFilter, CategoriesFilter, LanguageFilter} from 'app-constants/shared.ts';
 import {
-  getSubscriptionUserState,
+  getContentLockedState,
   getUserState,
   isLoggedInSelector,
   setFilterData,
@@ -44,7 +44,7 @@ const Filter: FC<FilterProps> = () => {
   const [categoryOptions, setCategoryOptions] = useState<IFilterData[]>([])
   const isLoggedIn = useSelector(isLoggedInSelector);
   const user = useSelector(getUserState);
-  const subscriptionState = useSelector(getSubscriptionUserState);
+  const contentLocked = useSelector(getContentLockedState);
   const {startPinAction} = usePinAction();
   const dispatch = useDispatch();
 
@@ -164,8 +164,14 @@ const Filter: FC<FilterProps> = () => {
       {isLoggedIn ?
 
         <ScrollView contentContainerStyle={filterStyles().scrollContainer}>
+          <View style={filterStyles().resetRow}>
+            <Pressable onPress={() => { setLanguage(''); setAges(null); setCategories([]); }}>
+              <Typography type={'bodySBold'} textColor={'accent_active'}>{t('filter_reset')}</Typography>
+            </Pressable>
+          </View>
+
           <View>
-            <Typography type={'bodyL'}>{t('language_title')}</Typography>
+            <Typography type={'captionBold'} textColor={'text_secondary'}>{t('language_title').toUpperCase()}</Typography>
 
             <Spacing size={16}/>
 
@@ -176,18 +182,18 @@ const Filter: FC<FilterProps> = () => {
                 const isSelected = language === (lng.key || lng.name);
                 return (
                   <Badge
-                  //  iconName={index === 0 || subscriptionState ? undefined : 'Lock'}
+                    iconName={index === 0 || !contentLocked ? undefined : 'Lock'}
                     key={lng?.id}
                     title={t(lng?.name)}
                     size={'large'}
                     onPress={() => {
-                      // if (index !== 0 && !subscriptionState) {
-                      //   return purchase()
-                      // }
+                      if (index !== 0 && contentLocked) {
+                        return purchase()
+                      }
                       chooseFilterLanguage(lng)
                     }}
-                    borderWidth={isSelected ? 0 : 1}
-                    backgroundColor={isSelected ? 'red_500' : undefined}
+                    borderWidth={0}
+                    backgroundColor={isSelected ? 'accent_active' : 'surface_primary'}
                     badgeColor={isSelected ? 'text_inverted' : undefined}
                   />
                 )
@@ -199,7 +205,7 @@ const Filter: FC<FilterProps> = () => {
           <Spacing size={24}/>
 
           <View>
-            <Typography type={'bodyL'}>{t('filter_items_title')}</Typography>
+            <Typography type={'captionBold'} textColor={'text_secondary'}>{t('filter_items_title').toUpperCase()}</Typography>
 
             <Spacing size={16}/>
 
@@ -209,18 +215,18 @@ const Filter: FC<FilterProps> = () => {
                 const isSelected = ages === age.id;
                 return (
                   <Badge
-                   // iconName={index === 0 || subscriptionState ? undefined : 'Lock'}
+                    iconName={index === 0 || !contentLocked ? undefined : 'Lock'}
                     key={age?.id}
                     title={`${age?.name} ${t('age')}`}
                     size={'large'}
                     onPress={() => {
-                      // if (index !== 0 && !subscriptionState) {
-                      //   return purchase()
-                      // }
+                      if (index !== 0 && contentLocked) {
+                        return purchase()
+                      }
                       chooseFilterAge(age)
                     }}
-                    borderWidth={isSelected ? 0 : 1}
-                    backgroundColor={isSelected ? 'red_500' : undefined}
+                    borderWidth={0}
+                    backgroundColor={isSelected ? 'accent_active' : 'surface_primary'}
                     badgeColor={isSelected ? 'text_inverted' : undefined}
                   />
                 )
@@ -229,7 +235,7 @@ const Filter: FC<FilterProps> = () => {
           </View>
 
           <View>
-            <Typography type={'bodyL'}>{t('filter_items_title')}</Typography>
+            <Typography type={'captionBold'} textColor={'text_secondary'}>{t('filter_items_title').toUpperCase()}</Typography>
 
             <Spacing size={16}/>
 
@@ -239,19 +245,19 @@ const Filter: FC<FilterProps> = () => {
                 const isSelected = categories.includes(filter.id);
                 return (
                   <Badge
-                    //iconName={index === 0 || subscriptionState ? undefined : 'Lock'}
+                    iconName={index === 0 || !contentLocked ? undefined : 'Lock'}
                     disabled={true}
                     key={filter?.id}
                     title={t(filter?.name)}
                     size={'large'}
                     onPress={() => {
-                      // if (index !== 0 && !subscriptionState) {
-                      //   return purchase()
-                      // }
+                      if (index !== 0 && contentLocked) {
+                        return purchase()
+                      }
                       chooseFilter(filter)
                     }}
-                    borderWidth={isSelected ? 0 : 1}
-                    backgroundColor={isSelected ? 'red_500' : undefined}
+                    borderWidth={0}
+                    backgroundColor={isSelected ? 'accent_active' : 'surface_primary'}
                     badgeColor={isSelected ? 'text_inverted' : undefined}
                   />
                 )

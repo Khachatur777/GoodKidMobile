@@ -1,13 +1,16 @@
-import { Image, ScrollView, TouchableOpacity, View } from 'react-native';
+import { Image, Pressable, ScrollView, TouchableOpacity, View } from 'react-native';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { NavigationProp, RouteProp } from '@react-navigation/native';
 import {
   BackgroundWrapper,
   Button,
   CardWrapper,
+  Icon,
   Spacing,
   Typography,
 } from 'molecules';
+import { ThemeContext } from 'theme';
+import { useContext } from 'react';
 import { learnExplanationStyles } from './learn-explanation-styles.ts';
 import { useTranslation } from 'react-i18next';
 import { ILearnCategoryItem, ILearnCategoryItems } from 'models';
@@ -36,7 +39,8 @@ export interface LearnProps {
 
 const LearnExplanation: FC<LearnProps> = ({ route }) => {
   const { t } = useTranslation();
-  const styles = useMemo(() => learnExplanationStyles(), []);
+  const { color } = useContext(ThemeContext);
+  const styles = useMemo(() => learnExplanationStyles(color), [color]);
   const category = route?.params?.category;
   const { play, playing } = useAudioPlayer();
 
@@ -118,18 +122,34 @@ const LearnExplanation: FC<LearnProps> = ({ route }) => {
 
   if (!data?.success) return null;
 
+  const progress = learnData.length
+    ? (activeIndex + 1) / learnData.length
+    : 0;
+
   return (
     <BackgroundWrapper containerStyles={{ paddingBottom: 80 }}>
+      <View style={styles.progressRow}>
+        <View style={styles.progressTrack}>
+          <View style={[styles.progressFill, {width: `${Math.round(progress * 100)}%`}]} />
+        </View>
+        <Typography type="bodySBold" textColor="text_secondary">
+          {`${learnData.length ? activeIndex + 1 : 0} / ${learnData.length}`}
+        </Typography>
+      </View>
+
       <CardWrapper containerStyles={styles.cardContainer}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View>
             <TouchableOpacity
+              style={styles.languageRow}
               onPress={() => setChangeLanguageLearnModalVisible(true)}
             >
-              <Typography type={'caption'}>
+              <Typography type={'caption'} textColor={'text_secondary'}>
                 {t('choose_learn_language')}
               </Typography>
-              <Typography>{language === 'hy' ? t('change_language_armenian') : language === 'en' ? t('change_language_english') : t('change_language_russian')}</Typography>
+              <View style={styles.languageChip}>
+                <Typography type={'bodySBold'} textColor={'accent_active'}>{language === 'hy' ? t('change_language_armenian') : language === 'en' ? t('change_language_english') : t('change_language_russian')}</Typography>
+              </View>
             </TouchableOpacity>
 
             <Spacing size={12} />
@@ -161,22 +181,23 @@ const LearnExplanation: FC<LearnProps> = ({ route }) => {
             <Spacing size={24} />
           </View>
 
-          <View>
-            <Button
-              title={t('voice_playing')}
-              onPress={onPressVoice}
-              startIconName={'SoundIcon'}
-              disabled={!activeLearnData?.audio?.[language]?.path || playing}
-            />
+          <View style={styles.actionsRow}>
+            <View style={styles.listenButton}>
+              <Button
+                title={t('voice_playing')}
+                onPress={onPressVoice}
+                startIconName={'SoundIcon'}
+                disabled={!activeLearnData?.audio?.[language]?.path || playing}
+              />
+            </View>
 
-            <Spacing size={16} />
-
-            <Button
-              disabled={!activeLearnData?.audio?.[language]?.path || playing}
-              variant={'outline'}
-              title={t('next')}
+            <Pressable
+              style={styles.nextButton}
+              disabled={playing}
               onPress={onPressNext}
-            />
+            >
+              <Icon name="ChevronRight" color="icon_primary" />
+            </Pressable>
           </View>
 
           <ChangeLanguageLearnModal

@@ -5,23 +5,27 @@ import {
   Image,
   Pressable,
   RefreshControl,
+  ScrollView,
   useWindowDimensions,
   View,
 } from 'react-native';
 import {
   NavigationProp,
   RouteProp,
-  useFocusEffect,
 } from '@react-navigation/native';
-import {BackgroundWrapper, Icon, Typography} from 'molecules';
+import {BackgroundWrapper, GoodKidLogo, Icon, Typography} from 'molecules';
 import {homeStyles} from './home-styles';
 import {VideoItem} from './components';
 import {useGetAllHomeVideosMutation} from 'rtk/api/home.ts';
 import {KidsVideoItem} from 'models';
 import {useSelector} from 'react-redux';
-import {getFilterDataState, isLoggedInSelector} from 'rtk';
+import {getFilterDataState, getUserState, isLoggedInSelector} from 'rtk';
 import {t} from 'i18next';
 import { isTablet, thumbHeight } from 'utils';
+import { CategoriesFilter } from 'app-constants/shared.ts';
+
+import {useContext} from 'react';
+import {ThemeContext} from 'theme';
 
 export interface HomeProps {
   navigation: NavigationProp<any>;
@@ -39,8 +43,11 @@ const Home: FC<HomeProps> = ({navigation}) => {
   const [videosGet] = useGetAllHomeVideosMutation();
   const isLoggedIn = useSelector(isLoggedInSelector);
   const filter = useSelector(getFilterDataState);
+  const user = useSelector(getUserState);
+  const {color} = useContext(ThemeContext);
 
   const [cursor, setCursor] = useState<string>('');
+  const [chipCategory, setChipCategory] = useState<number | null>(null);
   const [videos, setVideos] = useState<KidsVideoItem[]>([]);
   const [hasMore, setHasMore] = useState<boolean>(false);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
@@ -52,8 +59,8 @@ const Home: FC<HomeProps> = ({navigation}) => {
 
   const prefetchedRef = useRef<Set<string>>(new Set());
 
-  const styles = useMemo(() => homeStyles({width, height, isTablet, thumbHeight}),
-    [ width, height, isTablet, thumbHeight]);
+  const styles = useMemo(() => homeStyles({color, width, height, isTablet, thumbHeight}),
+    [color, width, height, isTablet, thumbHeight]);
 
   const getVideos = useCallback(
     async (options?: {
@@ -98,6 +105,11 @@ const Home: FC<HomeProps> = ({navigation}) => {
           filter.language && (data.language = filter.language);
         }
 
+        // Чип категории на главной перекрывает категории из фильтра
+        if (chipCategory) {
+          data.categories = [chipCategory];
+        }
+
         const response: any = await videosGet(data);
 
         if (response?.data?.success) {
@@ -140,7 +152,7 @@ const Home: FC<HomeProps> = ({navigation}) => {
         }
       }
     },
-    [videosGet, isLoggedIn, filter],
+    [videosGet, isLoggedIn, filter, chipCategory],
   );
 
   useEffect(() => {
@@ -179,19 +191,9 @@ const Home: FC<HomeProps> = ({navigation}) => {
     getVideos({isRefresh: true, cursorParam: ''});
   }, [getVideos]);
 
-  useFocusEffect(
-    useCallback(() => {
-      navigation.setOptions({
-        renderRightSection: () => (
-          <View style={styles.rightHeaderContainer}>
-            <Pressable onPress={() => navigation.navigate('SearchScreen')}>
-              <Icon name="SearchLgIcon" color="icon_inverted_header" />
-            </Pressable>
-          </View>
-        ),
-      });
-    }, [navigation]),
-  );
+  const greetingName = user?.profile?.firstName
+    ? `${t('home_greeting')}, ${user.profile.firstName}`
+    : t('home_greeting');
 
   const renderVideItem = useCallback(
     ({item}: {item: KidsVideoItem}) => (
@@ -213,10 +215,10 @@ const Home: FC<HomeProps> = ({navigation}) => {
 
     return (
       <View style={styles.activeIndicatorContainer}>
-        <ActivityIndicator size="small" color="#007AFF" />
+        <ActivityIndicator size="small" color={color('accent_active')} />
       </View>
     );
-  }, [isLoadingMore, styles.activeIndicatorContainer]);
+  }, [isLoadingMore, styles.activeIndicatorContainer, color]);
 
   // Prefetch thumbnails AHEAD of current visible index (scroll-based)
   const viewabilityConfig = useRef({
@@ -247,8 +249,67 @@ const Home: FC<HomeProps> = ({navigation}) => {
   return (
     <BackgroundWrapper
       backgroundColor="bg_primary"
-      containerStyles={{paddingBottom: 80}}
+      includesSafeArea
     >
+      <View style={styles.headerRow}>
+        <View style={styles.logoRow}>
+          <GoodKidLogo size={34} />
+          <Typography type="title3">GoodKid</Typography>
+        </View>
+
+        <Pressable
+          style={styles.searchButton}
+          onPress={() => navigation.navigate('SearchScreen')}
+        >
+          <Icon name="SearchLgIcon" color="icon_secondary" width={22} height={22} />
+        </Pressable>
+      </View>
+
+      <View style={styles.greetingContainer}>
+        <Typography type="bodyM" textColor="text_secondary">
+          {greetingName}
+        </Typography>
+        <Typography type="titleL">{t('home_picked_today')}</Typography>
+      </View>
+
+      <View>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.chipsRow}
+        >
+          <Pressable
+            style={[styles.chip, chipCategory === null && styles.chipActive]}
+            onPress={() => setChipCategory(null)}
+          >
+            <Typography
+              type={chipCategory === null ? 'bodySBold' : 'bodyS'}
+              textColor={chipCategory === null ? 'text_inverted' : 'text_secondary'}
+            >
+              {t('all')}
+            </Typography>
+          </Pressable>
+
+          {CategoriesFilter.map(category => {
+            const isActive = chipCategory === category.id;
+            return (
+              <Pressable
+                key={category.id}
+                style={[styles.chip, isActive && styles.chipActive]}
+                onPress={() => setChipCategory(isActive ? null : category.id)}
+              >
+                <Typography
+                  type={isActive ? 'bodySBold' : 'bodyS'}
+                  textColor={isActive ? 'text_inverted' : 'text_secondary'}
+                >
+                  {t(category.name)}
+                </Typography>
+              </Pressable>
+            );
+          })}
+        </ScrollView>
+      </View>
+
       {isInitialLoading && !videos.length ? null : videos.length ? (
         <FlatList
           data={videos}
@@ -263,13 +324,19 @@ const Home: FC<HomeProps> = ({navigation}) => {
           windowSize={10}
           onViewableItemsChanged={onViewableItemsChanged}
           viewabilityConfig={viewabilityConfig}
+          contentContainerStyle={styles.listContent}
           refreshControl={
-            <RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} />
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={onRefresh}
+              tintColor={color('accent_active')}
+              colors={[color('accent_active')]}
+            />
           }
         />
       ) : (
         <View style={styles.emptyContainer}>
-          <Typography type="bodyL" textColor="red_500">
+          <Typography type="bodyL" textColor="text_secondary">
             {t('video_empty_data')}
           </Typography>
         </View>

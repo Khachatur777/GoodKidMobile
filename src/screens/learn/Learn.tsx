@@ -5,7 +5,7 @@ import { BackgroundWrapper, Icon, Typography } from 'molecules';
 import { learnStyles } from './learn-styles.ts';
 import { useTranslation } from 'react-i18next';
 import {
-  getSubscriptionUserState,
+  getContentLockedState,
   getUserState,
   isLoggedInSelector,
   setSubscriptionUserData,
@@ -14,6 +14,8 @@ import {
 import { ILearnCategoryItem } from 'models';
 import { getFileUri } from 'utils';
 import { useDispatch, useSelector } from 'react-redux';
+import { useContext } from 'react';
+import { ThemeContext } from 'theme';
 import { NoSignIn } from 'organisms';
 import Toast from 'react-native-toast-message';
 import { purchaseUser } from 'hooks/usePurchase.ts';
@@ -30,9 +32,10 @@ export interface LearnProps {
 }
 
 const Learn: FC<LearnProps> = ({ navigation }) => {
-  const subscriptionState = useSelector(getSubscriptionUserState);
+  const contentLocked = useSelector(getContentLockedState);
+  const { color } = useContext(ThemeContext);
   const { t } = useTranslation();
-  const styles = useMemo(() => learnStyles(), []);
+  const styles = useMemo(() => learnStyles(color), [color]);
   const isLoggedIn = useSelector(isLoggedInSelector);
   const { startPinAction } = usePinAction();
   const dispatch = useDispatch();
@@ -76,9 +79,9 @@ const Learn: FC<LearnProps> = ({ navigation }) => {
         <Pressable
           style={styles.categoriesItemContainer}
           onPress={() => {
-            // if (!subscriptionState && index !== 0) {
-            //   return purchase();
-            // }
+            if (contentLocked && index !== 0) {
+              return purchase();
+            }
             navigation.navigate('LearnExplanation', { category: item });
           }}
         >
@@ -87,38 +90,45 @@ const Learn: FC<LearnProps> = ({ navigation }) => {
             style={styles.image}
           />
 
-          {/*{!subscriptionState && index !== 0 ? (*/}
-          {/*  <>*/}
-          {/*    <View style={styles.overlay} />*/}
-          {/*    <Icon*/}
-          {/*      name={'Lock'}*/}
-          {/*      color={'text_secondary'}*/}
-          {/*      style={styles.lock_icon}*/}
-          {/*    />*/}
-          {/*  </>*/}
-          {/*) : null}*/}
+          {contentLocked && index !== 0 ? (
+            <>
+              <View style={styles.overlay} />
+              <Icon
+                name={'Lock'}
+                color={'text_secondary'}
+                style={styles.lock_icon}
+              />
+            </>
+          ) : null}
 
           <Typography
-            style={!subscriptionState && index !== 0 && styles.blurredText}
+            type="bodyBold"
+            textStyles={styles.cardTitle}
+            style={contentLocked && index !== 0 && styles.blurredText}
           >
             {t(item.name)}
           </Typography>
         </Pressable>
       );
     },
-    [],
+    [contentLocked, styles, t],
   );
 
   return (
     <BackgroundWrapper containerStyles={{ paddingBottom: 80 }}>
       {isLoggedIn ? (
         learnCategory?.categories?.length ? (
+          <>
+          <Typography type="bodyM" textColor="text_secondary" textStyles={styles.subtitle}>
+            {`${learnCategory.categories.length} ${t('learn_topics_label')} · ${t('learn_topics_hint')}`}
+          </Typography>
           <FlatList
             contentContainerStyle={styles.flatListContainer}
             keyExtractor={item => `${item._id}`}
             data={learnCategory?.categories}
             renderItem={_renderCategoriesItem}
           />
+          </>
         ) : null
       ) : (
         <NoSignIn typeDescription={'filter'} />

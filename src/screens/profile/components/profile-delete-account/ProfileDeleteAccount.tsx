@@ -1,6 +1,5 @@
-import {AlertModal, CardWrapper} from 'molecules';
+import {AlertModal} from 'molecules';
 import {Cell} from 'organisms';
-import {profileStyle} from '../../profile-styles.ts';
 import {useCallback, useState} from 'react';
 import {signOut} from 'helpers';
 import {useTranslation} from 'react-i18next';
@@ -48,15 +47,15 @@ const ProfileDeleteAccount = () => {
 
   return (
     <>
-      <CardWrapper containerStyles={profileStyle({}).personalManager}>
-        <Cell
-          type="icon"
-          iconName="CloseRed"
-          title={t('profile_delete_account')}
-          showArrowIcon={false}
-          onPress={() => setIsVisible(true)}
-        />
-      </CardWrapper>
+      <Cell
+        type="icon"
+        iconName="CloseRed"
+        title={t('profile_delete_account')}
+        titleProps={{textColor: 'accent_negative'}}
+        description={t('profile_delete_account_subtitle')}
+        showArrowIcon={false}
+        onPress={() => setIsVisible(true)}
+      />
 
       <AlertModal
         isVisible={isVisible}

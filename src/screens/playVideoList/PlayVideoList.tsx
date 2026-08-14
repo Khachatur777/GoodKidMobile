@@ -8,14 +8,20 @@ import {useSelector} from 'react-redux';
 import {
   ActivityIndicator,
   FlatList,
+  Pressable,
   useWindowDimensions,
   View,
 } from 'react-native';
-import {YoutubeItemSkeleton} from "organisms";
+import {YoutubeItemSkeleton, VideoRow} from "organisms";
 import {NavigationProp, RouteProp, useFocusEffect} from "@react-navigation/native";
-import {VideoItem} from "screens";
 import {usePreventSwipeBackOnAndroid} from "hooks";
-import { isTablet } from 'utils';
+import { formatTime, isTablet } from 'utils';
+import {Icon, Typography} from 'molecules';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {useTranslation} from 'react-i18next';
+import {AgeFilter, CategoriesFilter} from 'app-constants/shared.ts';
+import {useContext} from 'react';
+import {ThemeContext} from 'theme';
 
 export interface PlayVideoListProps {
   navigation: NavigationProp<any>;
@@ -32,6 +38,9 @@ export interface PlayVideoListProps {
 
 const PlayVideoList: FC<PlayVideoListProps> = ({navigation, route}) => {
   usePreventSwipeBackOnAndroid()
+  const insets = useSafeAreaInsets();
+  const {t} = useTranslation();
+  const {color} = useContext(ThemeContext);
   const isLoggedIn = useSelector(isLoggedInSelector);
   const filter = useSelector(getFilterDataState);
   const videoDataProps = route?.params?.videoDataProps;
@@ -48,8 +57,8 @@ const PlayVideoList: FC<PlayVideoListProps> = ({navigation, route}) => {
 
   const styles = useMemo(
     () =>
-      playVideoListStyles({  width, height, isTablet }),
-    [width, height, isTablet],
+      playVideoListStyles({ color, width, height, isTablet }),
+    [color, width, height, isTablet],
   );
 
   useFocusEffect(
@@ -101,8 +110,11 @@ const PlayVideoList: FC<PlayVideoListProps> = ({navigation, route}) => {
 
   const renderVideItem = useCallback(
     ({item}: { item: KidsVideoItem }) => (
-      <VideoItem
-        videoData={item}
+      <VideoRow
+        title={item?.title}
+        thumbnail={item?.thumbnail}
+        meta={formatTime(item?.duration)}
+        size="medium"
         onPress={() => {
           setVideoData(item)
           getVideos(false, item?._id);
@@ -135,10 +147,10 @@ const PlayVideoList: FC<PlayVideoListProps> = ({navigation, route}) => {
     if (!isLoadingMore) return null;
     return (
       <View style={styles.activeIndicatorContainer}>
-        <ActivityIndicator size="small" color="#007AFF"/>
+        <ActivityIndicator size="small" color={color('accent_active')}/>
       </View>
     );
-  }, [isLoadingMore]);
+  }, [isLoadingMore, color]);
 
 
   const handleEnded = useCallback(() => {
@@ -147,13 +159,64 @@ const PlayVideoList: FC<PlayVideoListProps> = ({navigation, route}) => {
 
   }, [getVideos]);
 
+  const categoryName = (() => {
+    const category = CategoriesFilter.find(
+      c => c.id === videoData?.categoryIds?.[0],
+    );
+    return category ? t(category.name) : null;
+  })();
+
+  const ageName = (() => {
+    const age = AgeFilter.find(a => a.id === videoData?.mocAgeIds?.[0]);
+    return age ? `${age.name} ${t('age')}` : null;
+  })();
+
   return (
     <BackgroundWrapper
       backgroundColor="bg_primary"
       containerStyles={styles.modalContainer}
     >
 
-      <PlayerYoutuber videoData={videoData} onEnded={handleEnded}/>
+      <View style={[styles.darkHeader, {paddingTop: insets.top}]}>
+        <Pressable style={styles.backRow} onPress={() => navigation.goBack()}>
+          <Icon name="ChevronLeft" color="grey_0" />
+          <Typography type="bodyBold" textColor="grey_0">
+            {t('back')}
+          </Typography>
+        </Pressable>
+
+        <PlayerYoutuber videoData={videoData} onEnded={handleEnded}/>
+      </View>
+
+      <View style={styles.infoContainer}>
+        <Typography type="title3" numberOfLines={2}>
+          {videoData?.title}
+        </Typography>
+
+        {categoryName || ageName ? (
+          <View style={styles.chipsRow}>
+            {categoryName ? (
+              <View style={styles.categoryChip}>
+                <Typography type="bodySBold" textColor="accent_active">
+                  {categoryName}
+                </Typography>
+              </View>
+            ) : null}
+
+            {ageName ? (
+              <View style={styles.ageChip}>
+                <Typography type="bodyS" textColor="text_secondary">
+                  {ageName}
+                </Typography>
+              </View>
+            ) : null}
+          </View>
+        ) : null}
+      </View>
+
+      <Typography type="bodyLBold" textStyles={styles.upNextLabel}>
+        {t('up_next')}
+      </Typography>
 
       {videos?.length ?
         <FlatList
@@ -168,6 +231,7 @@ const PlayVideoList: FC<PlayVideoListProps> = ({navigation, route}) => {
           maxToRenderPerBatch={10}
           windowSize={10}
           initialNumToRender={10}
+          contentContainerStyle={styles.upNextList}
         />
         :
         <YoutubeItemSkeleton count={3}/>

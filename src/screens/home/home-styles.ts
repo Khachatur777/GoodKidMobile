@@ -24,6 +24,63 @@ export const homeStyles = ({
       alignItems: 'center',
       gap: 8,
     },
+
+    // Header (in-screen, дизайн v2)
+    headerRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: 22,
+      paddingTop: 8,
+      paddingBottom: 12,
+    },
+    logoRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+    },
+    logo: {
+      width: 34,
+      height: 34,
+      resizeMode: 'contain',
+    },
+    searchButton: {
+      width: 40,
+      height: 40,
+      borderRadius: 14,
+      backgroundColor: color?.('surface_primary'),
+      alignItems: 'center',
+      justifyContent: 'center',
+      shadowColor: '#191634',
+      shadowOpacity: 0.06,
+      shadowRadius: 8,
+      shadowOffset: {width: 0, height: 2},
+      elevation: 2,
+    },
+    greetingContainer: {
+      paddingHorizontal: 22,
+      paddingBottom: 14,
+      gap: 3,
+    },
+    listContent: {
+      paddingHorizontal: 16,
+      paddingBottom: 120,
+    },
+    chipsRow: {
+      paddingHorizontal: 22,
+      paddingBottom: 16,
+      gap: 8,
+      flexDirection: 'row',
+    },
+    chip: {
+      paddingVertical: 9,
+      paddingHorizontal: 16,
+      borderRadius: 999,
+      backgroundColor: color?.('surface_primary'),
+    },
+    chipActive: {
+      backgroundColor: color?.('accent_active'),
+    },
     activeIndicatorContainer: {
       paddingVertical: 20,
       alignItems: 'center',
@@ -37,7 +94,16 @@ export const homeStyles = ({
     //VideItem
 
     videoCardContainer: {
-      marginTop: 12,
+      marginBottom: 18,
+      borderRadius: 26,
+      padding: 10,
+      paddingBottom: 16,
+      backgroundColor: color?.('surface_primary'),
+      shadowColor: '#191634',
+      shadowOpacity: 0.06,
+      shadowRadius: 16,
+      shadowOffset: {width: 0, height: 4},
+      elevation: 3,
     },
     videoThumbnailContainer: {
       position: 'relative',
@@ -45,20 +111,36 @@ export const homeStyles = ({
     videoItemThumbnail: {
       width: '100%',
       height: thumbHeight,
-      borderTopLeftRadius: 24,
-      borderTopRightRadius: 24,
+      borderRadius: 20,
     },
     duration: {
-      backgroundColor: color?.('bg_secondary'),
-      borderRadius: 4,
+      backgroundColor: 'rgba(25, 22, 52, 0.82)',
+      color: '#FFFFFF',
+      borderRadius: 8,
+      overflow: 'hidden',
       alignItems: 'center',
       position: 'absolute',
-      padding: 4,
-      right: 16,
-      bottom: 16,
+      paddingVertical: 4,
+      paddingHorizontal: 9,
+      right: 10,
+      bottom: 10,
     },
     title: {
-      padding: 16,
+      paddingTop: 14,
+      paddingHorizontal: 8,
+    },
+    metaRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      paddingTop: 8,
+      paddingHorizontal: 8,
+    },
+    categoryChip: {
+      paddingVertical: 4,
+      paddingHorizontal: 10,
+      borderRadius: 999,
+      backgroundColor: color?.('accent_active', 0.12),
     },
 
     videoYoutubeContainer: {

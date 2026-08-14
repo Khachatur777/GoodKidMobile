@@ -47,9 +47,16 @@ const ProfileInformation: FC<ProfileInformationProps> = ({
         title={t('profile_support')}
         onPress={() => {
           openWithParentGate(() => {
-            setSupportModalVisible(true);
+            navigation.navigate('SupportScreen');
           });
         }}
+      />
+
+      <Cell
+        type="icon"
+        iconName="InfoIcon"
+        title={t('about_app')}
+        onPress={() => navigation.navigate('AboutScreen')}
       />
 
       <Cell
