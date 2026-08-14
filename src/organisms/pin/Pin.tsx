@@ -69,11 +69,17 @@ const Pin: FC<PinProps> = ({children}) => {
           </Pressable>
         </View>
 
-        {isLoggedIn ? (
-          <Typography type={'title1'} textStyles={pinStyles({}).title}>{t('pin_title_login')}</Typography>
-        ) : (
-          <Typography type={'title1'} textStyles={pinStyles({}).title}>{t('pin_title')}</Typography>
-        )}
+        <View>
+          {isLoggedIn ? (
+            <Typography type={'title1'} textStyles={pinStyles({}).title}>{t('pin_title_login')}</Typography>
+          ) : (
+            <Typography type={'title1'} textStyles={pinStyles({}).title}>{t('pin_title')}</Typography>
+          )}
+
+          <Typography type={'bodyM'} textColor={'text_secondary'} textStyles={pinStyles({}).title}>
+            {t('pin_parents_only')}
+          </Typography>
+        </View>
 
         {isVisible ? (
           <PinField

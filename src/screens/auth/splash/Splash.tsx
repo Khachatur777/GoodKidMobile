@@ -9,8 +9,8 @@ import {
   getUniqueId,
 } from 'react-native-device-info';
 
-import { BackgroundWrapper } from 'molecules';
-import { LogoMin } from 'assets';
+import { BackgroundWrapper, GoodKidLogo } from 'molecules';
+
 import { splashStyles } from './splash-styles.ts';
 import {
   setConfigData,
@@ -93,6 +93,10 @@ const Splash: FC<SplashProps> = ({navigation}) => {
           const responseConfig = await fetchConfig({});
           const cfg = responseConfig?.data?.data;
 
+          if (responseConfig?.data?.success && cfg) {
+            dispatch(setConfigData(cfg));
+          }
+
           if (
             responseConfig?.data?.success &&
             cfg?.update &&
@@ -173,7 +177,7 @@ const Splash: FC<SplashProps> = ({navigation}) => {
 
   return (
     <BackgroundWrapper containerStyles={styles.container}>
-      <Image source={LogoMin} style={styles.logoMin} />
+      <GoodKidLogo size={96} variant="stacked" />
     </BackgroundWrapper>
   );
 };

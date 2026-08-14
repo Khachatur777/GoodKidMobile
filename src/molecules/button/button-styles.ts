@@ -72,12 +72,12 @@ export const btnStyles = ({
         ? color?.(
             type === 'inverted'
               ? 'controls_inverted_pressed'
-              : 'red_700',
+              : 'controls_primary_pressed',
           )
         : color?.(
             type === 'inverted'
               ? 'controls_inverted_default'
-              : 'red_500',
+              : 'controls_primary_default',
           ),
     },
 

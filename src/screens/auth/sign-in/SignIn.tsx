@@ -1,15 +1,12 @@
 import { NavigationProp } from '@react-navigation/native';
 import { Image, Keyboard, Platform, View } from 'react-native';
 import React, { FC, useCallback, useContext } from 'react';
-import {
-  BackgroundWrapper,
+import {GoodKidLogo, BackgroundWrapper,
   Button,
   KeyboardAwareScrollView,
   PasswordField,
   Spacing,
-  TextField,
-} from 'molecules';
-import { Logo, LogoWhiteWord } from 'assets';
+  TextField,} from 'molecules';
 import { t } from 'i18next';
 import { Formik } from 'formik';
 import { signInValidationScheme } from './validations.ts';
@@ -341,7 +338,7 @@ const SignIn: FC<SignInhProps> = ({navigation}) => {
           >
             <View style={signInStyles().container}>
 
-              <Image source={theme === 'dark' ? LogoWhiteWord : Logo} style={signInStyles().logo}/>
+              <GoodKidLogo size={76} variant="stacked" />
               <>
                 <TextField
                   size="large"

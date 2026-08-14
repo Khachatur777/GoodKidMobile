@@ -1,7 +1,7 @@
 import { FC } from 'react';
-import { Image, View } from 'react-native';
+import { View } from 'react-native';
 import { profileStyle } from '../../profile-styles.ts';
-import { Ladybug } from 'assets';
+import { GoodKidLogo } from 'molecules';
 
 export interface ProfileHeaderProps {}
 
@@ -14,7 +14,7 @@ const ProfileHeader: FC<ProfileHeaderProps> = () => {
         profileStyle({}).header,
       ]}
     >
-      <Image source={Ladybug} style={{width: 100, height: 100, resizeMode: 'contain'}}/>
+      <GoodKidLogo size={92} />
 
     </View>
   );

@@ -19,11 +19,22 @@ export interface IUser {
   isVerified: boolean;
 }
 
+export interface IConfigFeatures {
+  paymentsEnabled?: boolean;
+  supportChatEnabled?: boolean;
+}
+
+export interface IConfigAppearance {
+  availableAccents?: string[];
+}
+
 export interface IConfig {
   update: boolean;
   forceUpdate?: boolean;
   versionAppIos?: number;
   versionAppAndroid?: number;
+  features?: IConfigFeatures;
+  appearance?: IConfigAppearance;
 }
 
 export interface ISignInResponseModel extends IDefaultResponseModel{
@@ -52,7 +63,9 @@ export interface IConfigResponseModel extends IDefaultResponseModel{
     update: boolean,
     versionAppIos: number,
     versionAppAndroid: number,
-    iosFilterEnable?: boolean
+    iosFilterEnable?: boolean,
+    features?: IConfigFeatures,
+    appearance?: IConfigAppearance,
   }
 }
 

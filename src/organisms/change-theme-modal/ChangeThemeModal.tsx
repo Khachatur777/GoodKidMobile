@@ -14,11 +14,16 @@ const ChangeThemeModal: FC<ChangeThemeModalProps> = ({
                                                              isVisible,
                                                              setIsVisible,
                                                            }) => {
-  const {theme, toggleTheme} = useContext(ThemeContext);
+  const {themeMode, toggleTheme, useSystemTheme} = useContext(ThemeContext);
   const { t } = useTranslation();
 
   const onThemeChange = useCallback((id: any) => {
     toggleTheme(id);
+    setIsVisible(false)
+  }, []);
+
+  const onSystemTheme = useCallback(() => {
+    useSystemTheme();
     setIsVisible(false)
   }, []);
 
@@ -36,14 +41,20 @@ const ChangeThemeModal: FC<ChangeThemeModalProps> = ({
 
       <RadioSelectCell
         title={t('theme_dark')}
-        isActive={theme === 'dark'}
+        isActive={themeMode === 'dark'}
         onPress={() => onThemeChange('dark')}
       />
 
       <RadioSelectCell
         title={t('theme_light')}
-        isActive={theme === 'light'}
+        isActive={themeMode === 'light'}
         onPress={() => onThemeChange('light')}
+      />
+
+      <RadioSelectCell
+        title={t('theme_system')}
+        isActive={themeMode === 'system'}
+        onPress={onSystemTheme}
       />
 
       <Spacing size={24} />

@@ -50,6 +50,51 @@ export const playVideoListStyles = ({
       padding: 0,
     },
 
+    // Тёмный верхний блок с плеером (дизайн v2)
+    darkHeader: {
+      backgroundColor: '#191634',
+      paddingBottom: 12,
+    },
+    backRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+      paddingHorizontal: 20,
+      paddingVertical: 10,
+    },
+    infoContainer: {
+      paddingHorizontal: 22,
+      paddingTop: 18,
+      paddingBottom: 6,
+      gap: 12,
+    },
+    chipsRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+    },
+    categoryChip: {
+      paddingVertical: 7,
+      paddingHorizontal: 13,
+      borderRadius: 999,
+      backgroundColor: color?.('accent_active', 0.12),
+    },
+    ageChip: {
+      paddingVertical: 7,
+      paddingHorizontal: 13,
+      borderRadius: 999,
+      backgroundColor: color?.('surface_primary'),
+    },
+    upNextLabel: {
+      paddingHorizontal: 22,
+      paddingTop: 8,
+      paddingBottom: 8,
+    },
+    upNextList: {
+      paddingHorizontal: 16,
+      paddingBottom: 40,
+    },
+
     //PlayerYoutuber
     videoYoutubeContainer: {
       position: 'relative',

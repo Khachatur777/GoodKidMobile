@@ -1,13 +1,14 @@
 import {FC, useCallback, useContext, useEffect, useRef, useState} from 'react';
-import {ActivityIndicator, FlatList, Image, Pressable, TextInput, View} from 'react-native';
-import {NavigationProp, RouteProp, useFocusEffect,} from '@react-navigation/native';
-import {BackgroundWrapper, Icon, Spinner, Typography} from 'molecules';
+import {ActivityIndicator, FlatList, Pressable, TextInput, View} from 'react-native';
+import {NavigationProp, RouteProp} from '@react-navigation/native';
+import {BackgroundWrapper, Icon, Spinner} from 'molecules';
 import {searchStyles} from './search-styles.ts';
 import {t} from 'i18next';
 import {ThemeContext} from 'theme';
 import {useGetAllHomeVideosMutation, useGetSearchTitleVideosMutation,} from 'rtk';
-import {VideoItem} from 'screens';
-import {Cell} from 'organisms';
+import {VideoRow} from 'organisms';
+import {CategoriesFilter} from 'app-constants/shared.ts';
+import {formatTime} from 'utils';
 import {useSelector} from 'react-redux';
 import {getFilterDataState, isLoggedInSelector} from 'rtk';
 
@@ -41,6 +42,8 @@ const Search: FC<SearchProps> = ({ navigation }) => {
   const debounceRef = useRef<number | null>(null);
   const [showResults, setShowResults] = useState<boolean>(false);
   const [hasMore, setHasMore] = useState<boolean>(false);
+
+  const styles = searchStyles({color});
 
   const submitSearch = useCallback(async (term?: string) => {
     const value = (term ?? searchText).trim();
@@ -88,34 +91,6 @@ const Search: FC<SearchProps> = ({ navigation }) => {
     }
   }, [getVideos, searchText]);
 
-
-  useFocusEffect(
-    useCallback(() => {
-      navigation.setOptions({
-        renderRightSection: () => (
-          <View style={searchStyles({color}).rightHeaderContainer}>
-            <TextInput
-              value={searchText}
-              onChangeText={e => {
-                setSearchText(e);
-                setShowResults(false);
-              }}
-              placeholder={t('search_placeholder')}
-              placeholderTextColor={color?.('grey_0')}
-              style={searchStyles({color}).searchInput}
-              returnKeyType={'search'}
-              onSubmitEditing={() => submitSearch()}
-            />
-
-            <Pressable onPress={() => submitSearch()}>
-              <Icon name={'SearchLgIcon'} color={'grey_0'} />
-            </Pressable>
-          </View>
-        ),
-      });
-    }, [navigation, searchText, submitSearch]),
-  );
-
   useEffect(() => {
     if (debounceRef.current) {
       clearTimeout(debounceRef.current);
@@ -155,62 +130,90 @@ const Search: FC<SearchProps> = ({ navigation }) => {
   }, [searchText, getVideos]);
 
   return (
-    <BackgroundWrapper backgroundColor="bg_secondary" containerStyles={{paddingBottom: 80}}>
+    <BackgroundWrapper backgroundColor="bg_primary" includesSafeArea>
+      <View style={styles.headerRow}>
+        <Pressable style={styles.backButton} onPress={() => navigation.goBack()}>
+          <Icon name="ChevronLeft" color="icon_secondary" />
+        </Pressable>
+
+        <View style={styles.searchFieldContainer}>
+          <Icon name="SearchLgIcon" color="text_tertiary" width={20} height={20} />
+
+          <TextInput
+            value={searchText}
+            onChangeText={e => {
+              setSearchText(e);
+              setShowResults(false);
+            }}
+            placeholder={t('search_placeholder')}
+            placeholderTextColor={color?.('text_tertiary')}
+            style={styles.searchInput}
+            returnKeyType={'search'}
+            autoFocus
+            onSubmitEditing={() => submitSearch()}
+          />
+        </View>
+      </View>
+
       {!showResults ? (
         <FlatList
           data={suggestions}
           keyExtractor={(item: any) => `${item?.title} ${item?.thumbnail}`}
           renderItem={({ item }) => (
-            <Pressable  onPress={() => submitSearch(item?.title || '')} style={searchStyles({color}).searchItemContainer}>
-
-              <Image source={{uri: item.thumbnail}} style={searchStyles({}).searchItemImage}/>
-
-             <Typography numberOfLines={1} textStyles={{width: '90%'}}>{item.title}</Typography>
-            </Pressable>
-
+            <VideoRow
+              title={item?.title}
+              thumbnail={item?.thumbnail}
+              onPress={() => submitSearch(item?.title || '')}
+            />
           )}
           ListEmptyComponent={
             isLoading ? (
-              <View style={searchStyles({}).spinnerContainer}>
+              <View style={styles.spinnerContainer}>
                 <Spinner />
               </View>
             ) : null
           }
-          contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 12 }}
+          contentContainerStyle={styles.listContent}
           keyboardShouldPersistTaps="handled"
         />
       ) : isLoading && videos.length === 0 ? (
-        <View style={searchStyles({}).spinnerContainer}>
+        <View style={styles.spinnerContainer}>
           <Spinner />
         </View>
       ) : (
         <FlatList
           data={videos}
           keyExtractor={(item: any) => item?._id || item?.youtubeId}
-          renderItem={({ item }) => (
-            <VideoItem
-              videoData={item}
-              onPress={() => {
-                navigation.navigate('PlayVideoListScreen', {
-                  videoDataProps: item,
-                })
-              }}
-            />
-          )}
+          renderItem={({ item }) => {
+            const category = CategoriesFilter.find(c => c.id === item?.categoryIds?.[0]);
+            const meta = [category ? t(category.name) : null, formatTime(item?.duration)]
+              .filter(Boolean)
+              .join(' · ');
+
+            return (
+              <VideoRow
+                title={item?.title}
+                thumbnail={item?.thumbnail}
+                meta={meta}
+                onPress={() => {
+                  navigation.navigate('PlayVideoListScreen', {
+                    videoDataProps: item,
+                  })
+                }}
+              />
+            );
+          }}
           ListFooterComponent={
             isLoading && videos.length > 0 ? (
-              <View style={searchStyles({}).activeIndicatorContainer}>
-                <ActivityIndicator size="small" color="#007AFF" />
+              <View style={styles.activeIndicatorContainer}>
+                <ActivityIndicator size="small" color={color?.('accent_active')} />
               </View>
             ) : null
           }
-          contentContainerStyle={{ paddingTop: 12 }}
+          contentContainerStyle={styles.listContent}
           keyboardShouldPersistTaps="handled"
-
         />
       )}
-
-
     </BackgroundWrapper>
   );
 };

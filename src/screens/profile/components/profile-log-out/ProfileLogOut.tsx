@@ -1,6 +1,5 @@
-import {AlertModal, CardWrapper} from 'molecules';
+import {AlertModal} from 'molecules';
 import {Cell} from 'organisms';
-import {profileStyle} from '../../profile-styles.ts';
 import {useState} from 'react';
 import {signOut} from 'helpers';
 import {useTranslation} from 'react-i18next';
@@ -11,15 +10,13 @@ const ProfileLogOut = () => {
 
   return (
     <>
-      <CardWrapper containerStyles={profileStyle({}).personalManager}>
-        <Cell
-          type="icon"
-          iconName="LogOut01Icon"
-          title={t('profile_log_out')}
-          showArrowIcon={false}
-          onPress={() => setIsVisible(true)}
-        />
-      </CardWrapper>
+      <Cell
+        type="icon"
+        iconName="LogOut01Icon"
+        title={t('profile_log_out')}
+        showArrowIcon={false}
+        onPress={() => setIsVisible(true)}
+      />
 
       <AlertModal
         isVisible={isVisible}

@@ -4,13 +4,11 @@ import {IGetColor} from 'theme';
 export const profileStyle = ({color}: {color?: IGetColor}) => {
   return StyleSheet.create({
     scroll: {
-      marginTop: -37,
-      borderTopLeftRadius: 24,
-      borderTopRightRadius: 24,
       backgroundColor: color?.('bg_secondary'),
     },
     scrollContainer: {
-      paddingBottom: 100,
+      paddingTop: 8,
+      paddingBottom: 120,
       flexGrow: 1,
     },
     header: {

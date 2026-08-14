@@ -35,3 +35,6 @@ export {default as Google} from './google.svg';
 export {default as Apple} from './apple.svg';
 export {default as PuzzleIcon} from './puzzle.svg';
 export {default as SoundIcon} from './sound.svg';
+export {default as PaletteIcon} from './palette.svg';
+export {default as StarIcon} from './star.svg';
+export {default as ShareIcon} from './share.svg';

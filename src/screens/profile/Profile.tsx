@@ -1,9 +1,9 @@
 import { NavigationProp } from '@react-navigation/native';
-import { BackgroundWrapper } from 'molecules';
+import { BackgroundWrapper, CardWrapper } from 'molecules';
 import { FC, useContext } from 'react';
 import { ScrollView, View } from 'react-native';
 import { ThemeContext } from 'theme';
-import { ProfileHeader, ProfileInformation, ProfileLogOut, ProfileSettings, ProfileDeleteAccount, ProfileUserInfo } from './components';
+import { ProfileInformation, ProfileLogOut, ProfileSettings, ProfileDeleteAccount, ProfileUserInfo } from './components';
 import { profileStyle } from './profile-styles.ts';
 import { NoSignIn } from 'organisms';
 import { useSelector } from 'react-redux';
@@ -22,8 +22,6 @@ const Profile: FC<ProfileProps> = ({ navigation }) => {
     <BackgroundWrapper>
       {isLoggedIn ?
         <>
-          <ProfileHeader />
-
           <ScrollView
             showsVerticalScrollIndicator={false}
             style={profileStyle({ color }).scroll}
@@ -38,9 +36,11 @@ const Profile: FC<ProfileProps> = ({ navigation }) => {
 
               <ProfileInformation navigation={navigation} />
 
-              <ProfileLogOut />
+              <CardWrapper containerStyles={profileStyle({}).personalManager}>
+                <ProfileLogOut />
 
-              <ProfileDeleteAccount />
+                <ProfileDeleteAccount />
+              </CardWrapper>
             </View>
           </ScrollView>
         </>

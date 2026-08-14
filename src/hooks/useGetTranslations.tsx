@@ -1,5 +1,6 @@
 import {getItem, setItem} from 'configs';
 import i18n from 'localization/localization';
+import {localTranslations} from 'localization/local-translations';
 import {useEffect} from 'react';
 import {useSelector} from 'react-redux';
 import {
@@ -33,6 +34,11 @@ const useGetTranslations = () => {
     refetch();
   }, [getLanguageIdForRefetch]);
 
+  // Локальные строки — fallback для ключей, которых ещё нет на сервере
+  const localDefaults =
+    localTranslations[i18n.language as keyof typeof localTranslations] ||
+    localTranslations.en;
+
   useEffect(() => {
     if (translations) {
 
@@ -40,7 +46,7 @@ const useGetTranslations = () => {
       i18n.init({
         resources: {
           [i18n.language]: {
-            translation: translations?.values,
+            translation: {...localDefaults, ...translations?.values},
           },
         },
       });
@@ -51,7 +57,7 @@ const useGetTranslations = () => {
             i18n.init({
               resources: {
                 [i18n.language]: {
-                  translation: res,
+                  translation: {...localDefaults, ...res},
                 },
               },
             });

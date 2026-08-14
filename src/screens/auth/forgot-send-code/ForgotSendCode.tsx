@@ -2,8 +2,7 @@ import { NavigationProp } from '@react-navigation/native';
 import { Image, Keyboard, Platform, View } from 'react-native';
 import { forgotSendCodeStyles } from './forgot-send-code-styles.ts';
 import {FC, useCallback, useContext} from 'react';
-import { BackgroundWrapper, Button, KeyboardAwareScrollView, TextField, Typography } from 'molecules';
-import {Logo, LogoWhiteWord} from 'assets';
+import {GoodKidLogo, BackgroundWrapper, Button, KeyboardAwareScrollView, TextField, Typography} from 'molecules';
 import { Formik } from 'formik';
 import { forgotSendCodeValidationScheme } from './validations.ts';
 import { useTranslation } from 'react-i18next';
@@ -59,7 +58,7 @@ const ForgotSendCode: FC<SignUpProps> = ({ navigation }) => {
 
             <View style={forgotSendCodeStyles().container}>
 
-              <Image source={theme === 'dark' ? LogoWhiteWord : Logo} style={forgotSendCodeStyles().logo} />
+              <GoodKidLogo size={70} variant="stacked" />
 
               <TextField
                 size="large"

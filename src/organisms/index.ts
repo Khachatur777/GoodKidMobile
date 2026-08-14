@@ -14,3 +14,5 @@ export * from './skeleton';
 export * from './privacy-policy-modal';
 export * from './update-modal';
 export * from './parent-gate-modal';
+export * from './change-accent-modal';
+export * from './video-row';

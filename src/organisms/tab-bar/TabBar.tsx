@@ -35,7 +35,7 @@ const TabBar: FC<TabBarProps> = ({descriptors, state, navigation}) => {
         const routeName = getFocusedRouteNameFromRoute?.(route);
 
         if (hideTabBarFromScreens.includes(routeName || '')) {
-          translateY.value = -84;
+          translateY.value = 140;
           return false;
         } else {
           translateY.value = 0;
@@ -48,9 +48,13 @@ const TabBar: FC<TabBarProps> = ({descriptors, state, navigation}) => {
 
   const animatedStyle = useAnimatedStyle(() => {
     return {
-      bottom: withTiming(translateY.value, {
-        duration: 300,
-      }),
+      transform: [
+        {
+          translateY: withTiming(translateY.value, {
+            duration: 300,
+          }),
+        },
+      ],
     };
   });
 
@@ -66,7 +70,7 @@ const TabBar: FC<TabBarProps> = ({descriptors, state, navigation}) => {
 
     const showSubscription = Keyboard.addListener('keyboardDidShow', () => {
       //Whenever keyboard did show make it invisible
-      translateY.value = -84;
+      translateY.value = 140;
     });
     const hideSubscription = Keyboard.addListener('keyboardDidHide', () => {
       translateY.value = 0;
@@ -104,28 +108,28 @@ const TabBar: FC<TabBarProps> = ({descriptors, state, navigation}) => {
               case 'HomeTab':
                 return (
                   <Icon
-                    color={isFocused ? 'red_500' : 'controls_tab_bar_inactive'}
+                    color={isFocused ? 'controls_tab_bar_active' : 'controls_tab_bar_inactive'}
                     name="Home04Icon"
                   />
                 );
               case 'FilterTab':
                 return (
                   <Icon
-                    color={isFocused ? 'red_500' : 'controls_tab_bar_inactive'}
+                    color={isFocused ? 'controls_tab_bar_active' : 'controls_tab_bar_inactive'}
                     name="Sliders04Icon"
                   />
                 );
               case 'LearnTab':
                 return (
                   <Icon
-                    color={isFocused ? 'red_500' : 'controls_tab_bar_inactive'}
+                    color={isFocused ? 'controls_tab_bar_active' : 'controls_tab_bar_inactive'}
                     name="PuzzleIcon"
                   />
                 );
               case 'ProfileTab':
                 return (
                   <Icon
-                    color={isFocused ? 'red_500' : 'controls_tab_bar_inactive'}
+                    color={isFocused ? 'controls_tab_bar_active' : 'controls_tab_bar_inactive'}
                     name="User02Icon"
                   />
                 );
@@ -195,7 +199,7 @@ const TabBar: FC<TabBarProps> = ({descriptors, state, navigation}) => {
                   numberOfLines={1}
                   textColor={
                     isFocused
-                      ? 'red_500'
+                      ? 'controls_tab_bar_active'
                       : 'controls_tab_bar_inactive'
                   }>
                   {getTabTranslation()}
