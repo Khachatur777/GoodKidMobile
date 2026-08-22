@@ -41,13 +41,17 @@ export const kidProfileStyles = (color?: IGetColor) =>
       gap: 6,
       alignItems: 'center',
     },
+    // Кольцо рисуется отдельной обёрткой: обводка на самой точке была белой
+    // на белой карточке, то есть невидимой.
+    accentDotRing: {
+      padding: 2,
+      borderRadius: 999,
+      borderWidth: 2,
+      borderColor: 'transparent',
+    },
     accentDot: {
       width: 22,
       height: 22,
       borderRadius: 11,
-    },
-    accentDotSelected: {
-      borderWidth: 2,
-      borderColor: color?.('surface_primary'),
     },
   });

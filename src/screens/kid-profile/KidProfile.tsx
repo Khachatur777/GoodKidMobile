@@ -93,11 +93,14 @@ const KidProfile: FC<KidProfileProps> = ({ navigation }) => {
                     <View
                       key={item}
                       style={[
-                        styles.accentDot,
-                        { backgroundColor: item },
-                        item === accent ? styles.accentDotSelected : null,
+                        styles.accentDotRing,
+                        item?.toLowerCase?.() === accent?.toLowerCase?.()
+                          ? { borderColor: item }
+                          : null,
                       ]}
-                    />
+                    >
+                      <View style={[styles.accentDot, { backgroundColor: item }]} />
+                    </View>
                   ))}
                 </View>
               )}
