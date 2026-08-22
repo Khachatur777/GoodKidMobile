@@ -69,14 +69,6 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({navigation}) => {
   // Лимит приходит с сервера: включат подписку — число поменяется без релиза
   const maxChildren = configData?.features?.maxChildren ?? 3;
 
-  // В строке помещаются три точки, а акцентов восемь. Выбранный ставим первым,
-  // иначе при седьмом-восьмом цвете в профиле не видно, что вообще выбрано.
-  const accentDots = useMemo(() => {
-    const selected = accents.find(item => item?.toLowerCase?.() === accent?.toLowerCase?.());
-    const rest = accents.filter(item => item !== selected);
-
-    return (selected ? [selected, ...rest] : accents).slice(0, 3);
-  }, [accents, accent]);
 
   // Счётчик «2/3» рядом со строкой должен быть свежим при каждом заходе в профиль
   const {data: childrenResponse} = useGetChildrenQuery(undefined, {
@@ -89,6 +81,16 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({navigation}) => {
     }
   }, [childrenResponse?.data?.children, dispatch]);
   const {accent, themeMode} = useContext(ThemeContext);
+
+  // В строке помещаются три точки, а акцентов восемь. Выбранный ставим первым,
+  // иначе при седьмом-восьмом цвете в профиле не видно, что вообще выбрано.
+  const accentDots = useMemo(() => {
+    const selected = accents.find(item => item?.toLowerCase?.() === accent?.toLowerCase?.());
+    const rest = accents.filter(item => item !== selected);
+
+    return (selected ? [selected, ...rest] : accents).slice(0, 3);
+  }, [accents, accent]);
+
 
   const languageValue =
     i18n.language === 'ru'
