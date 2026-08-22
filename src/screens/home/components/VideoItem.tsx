@@ -1,7 +1,7 @@
-import {FC, useContext, useMemo} from 'react';
+import {FC, useContext, useMemo, useState} from 'react';
 import {Image, Pressable, View, useWindowDimensions} from 'react-native';
 import {Typography} from 'molecules';
-import { formatTime, isTablet, thumbHeight } from 'utils';
+import { formatTime, isTablet, thumbHeight, thumbnailFallback } from 'utils';
 import {ThemeContext} from 'theme';
 import {KidsVideoItem} from 'models';
 import {homeStyles} from '../home-styles';
@@ -17,6 +17,10 @@ const VideoItem: FC<IVideoItemProps> = ({videoData, onPress}) => {
   const {color} = useContext(ThemeContext);
   const {width, height} = useWindowDimensions();
   const {t} = useTranslation();
+
+  // Если maxresdefault не открылся, переключаемся на hqdefault — иначе
+  // у части роликов карточка остаётся с пустым превью
+  const [thumbnail, setThumbnail] = useState<string | undefined>(videoData?.thumbnail);
 
   const styles = useMemo(
     () => homeStyles({color, width, height, isTablet, thumbHeight}),
@@ -39,9 +43,10 @@ const VideoItem: FC<IVideoItemProps> = ({videoData, onPress}) => {
     <Pressable onPress={onPress} style={styles.videoCardContainer}>
       <View style={styles.videoThumbnailContainer}>
         <Image
-          source={{uri: videoData?.thumbnail}}
+          source={{uri: thumbnail}}
           style={styles.videoItemThumbnail}
           fadeDuration={0}
+          onError={() => setThumbnail(prev => thumbnailFallback(prev))}
         />
         <Typography type="bodySBold" textStyles={styles.duration}>
           {formatTime(videoData?.duration)}

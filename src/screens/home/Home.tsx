@@ -133,7 +133,7 @@ const Home: FC<HomeProps> = ({navigation}) => {
             const url = v?.thumbnail;
             if (url && !prefetchedRef.current.has(url)) {
               prefetchedRef.current.add(url);
-              Image.prefetch(url);
+              Image.prefetch(url).catch(() => null);
             }
           });
         }
@@ -244,7 +244,7 @@ const Home: FC<HomeProps> = ({navigation}) => {
 
       if (!prefetchedRef.current.has(url)) {
         prefetchedRef.current.add(url);
-        Image.prefetch(url);
+        Image.prefetch(url).catch(() => null);
       }
     }
   }).current;
