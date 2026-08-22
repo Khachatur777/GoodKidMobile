@@ -61,10 +61,26 @@ const SignUpVerify: FC<SignUpProps> = ({ navigation, route }) => {
     });
   }, [navigation]);
 
+  // Сразу после регистрации ведём родителя добавлять первого ребёнка: без
+  // ребёнка ни фильтр, ни история смысла не имеют, а пустые экраны ничего не
+  // объясняют. Экран можно пропустить — тогда останется обычный Home.
   const goHome = useCallback(() => {
     navigation.reset({
-      routes: [{name: 'TabScreens', params: {screen: 'HomeTab'}}],
       index: 0,
+      routes: [
+        {
+          name: 'TabScreens',
+          state: {
+            index: 0,
+            routes: [
+              {
+                name: 'ProfileTab',
+                state: {index: 0, routes: [{name: 'AddFirstChildScreen'}]},
+              },
+            ],
+          },
+        },
+      ],
     });
   }, [navigation]);
 

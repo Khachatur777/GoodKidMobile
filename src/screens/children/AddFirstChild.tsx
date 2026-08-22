@@ -42,7 +42,12 @@ const AddFirstChild: FC<AddFirstChildProps> = ({ navigation }) => {
         <Button
           variant="ghost"
           title={t('add_child_maybe_later')}
-          onPress={() => navigation.goBack()}
+          onPress={() =>
+            navigation.reset({
+              index: 0,
+              routes: [{name: 'TabScreens', params: {screen: 'HomeTab'}}],
+            })
+          }
         />
       </View>
     </BackgroundWrapper>
