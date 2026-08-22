@@ -127,6 +127,8 @@ const TabBar: FC<TabBarProps> = ({descriptors, state, navigation}) => {
                   />
                 );
               case 'ProfileTab':
+              // У ребёнка свой профиль-таб, но иконка та же
+              case 'KidProfileTab':
                 return (
                   <Icon
                     color={isFocused ? 'controls_tab_bar_active' : 'controls_tab_bar_inactive'}
@@ -147,6 +149,8 @@ const TabBar: FC<TabBarProps> = ({descriptors, state, navigation}) => {
                 return t('learn_tab');
               case 'ProfileTab':
                 return t('profile_tab');
+              case 'KidProfileTab':
+                return t('kid_profile_header');
               default:
                 break;
             }
