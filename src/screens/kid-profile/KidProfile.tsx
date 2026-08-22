@@ -23,6 +23,14 @@ const KidProfile: FC<KidProfileProps> = ({ navigation }) => {
   const user = useSelector(getUserState);
   const accents = useSelector(getAvailableAccentsState);
 
+  // Выбранный цвет всегда первым: точек три, а акцентов восемь
+  const accentDots = useMemo(() => {
+    const selected = accents.find(item => item?.toLowerCase?.() === accent?.toLowerCase?.());
+    const rest = accents.filter(item => item !== selected);
+
+    return (selected ? [selected, ...rest] : accents).slice(0, 3);
+  }, [accents, accent]);
+
   const [themeModal, setThemeModal] = useState(false);
   const [logOutVisible, setLogOutVisible] = useState(false);
 
@@ -81,7 +89,7 @@ const KidProfile: FC<KidProfileProps> = ({ navigation }) => {
               onPress={() => navigation.navigate('AppColourScreen')}
               renderRightContent={() => (
                 <View style={styles.accentDotsRow}>
-                  {accents.slice(0, 3).map(item => (
+                  {accentDots.map(item => (
                     <View
                       key={item}
                       style={[

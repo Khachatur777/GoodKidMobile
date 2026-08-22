@@ -1,4 +1,4 @@
-import {FC, useCallback, useEffect, useState} from 'react';
+import {FC, useCallback, useEffect, useMemo, useState} from 'react';
 import {NavigationProp} from '@react-navigation/native';
 import {CardWrapper, AlertModal, Typography} from 'molecules';
 import {
@@ -68,6 +68,15 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({navigation}) => {
   const configData = useSelector(getConfigDataState);
   // Лимит приходит с сервера: включат подписку — число поменяется без релиза
   const maxChildren = configData?.features?.maxChildren ?? 3;
+
+  // В строке помещаются три точки, а акцентов восемь. Выбранный ставим первым,
+  // иначе при седьмом-восьмом цвете в профиле не видно, что вообще выбрано.
+  const accentDots = useMemo(() => {
+    const selected = accents.find(item => item?.toLowerCase?.() === accent?.toLowerCase?.());
+    const rest = accents.filter(item => item !== selected);
+
+    return (selected ? [selected, ...rest] : accents).slice(0, 3);
+  }, [accents, accent]);
 
   // Счётчик «2/3» рядом со строкой должен быть свежим при каждом заходе в профиль
   const {data: childrenResponse} = useGetChildrenQuery(undefined, {
@@ -176,7 +185,7 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({navigation}) => {
         onPress={() => navigation.navigate('AppColourScreen')}
         renderRightContent={() => (
           <View style={accentDotsStyles.row}>
-            {accents.slice(0, 3).map(item => (
+            {accentDots.map(item => (
               <View
                 key={item}
                 style={[
