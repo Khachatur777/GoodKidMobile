@@ -16,7 +16,7 @@ import {
   useLazyGetChildFilterQuery,
 } from 'rtk';
 import { useDispatch, useSelector } from 'react-redux';
-import { ChildSelector, NoSignIn } from 'organisms';
+import { ChildSelector } from 'organisms';
 import { ThemeContext } from 'theme';
 import Badge from '../../molecules/badge/Badge.tsx';
 import { filterStyles } from './filter-styles.ts';
@@ -146,14 +146,6 @@ const Filter: FC<FilterProps> = ({ navigation }) => {
       }, 200);
     }
   }, [activeChildId, ages, categories, editChildFilter, language]);
-
-  if (!isLoggedIn) {
-    return (
-      <BackgroundWrapper>
-        <NoSignIn typeDescription={'filter'} />
-      </BackgroundWrapper>
-    );
-  }
 
   // Фильтр принадлежит ребёнку, поэтому без детей настраивать нечего
   if (!childrenLoading && children.length === 0) {

@@ -5,9 +5,6 @@ import { ScrollView, View } from 'react-native';
 import { ThemeContext } from 'theme';
 import { ProfileInformation, ProfileLogOut, ProfileSettings, ProfileDeleteAccount, ProfileUserInfo } from './components';
 import { profileStyle } from './profile-styles.ts';
-import { NoSignIn } from 'organisms';
-import { useSelector } from 'react-redux';
-import { isLoggedInSelector } from 'rtk';
 
 export interface ProfileProps {
   navigation: NavigationProp<any>;
@@ -15,14 +12,11 @@ export interface ProfileProps {
 
 const Profile: FC<ProfileProps> = ({ navigation }) => {
   const { color } = useContext(ThemeContext);
-  const isLoggedIn = useSelector(isLoggedInSelector);
 
 
   return (
     <BackgroundWrapper>
-      {isLoggedIn ?
-        <>
-          <ScrollView
+      <ScrollView
             showsVerticalScrollIndicator={false}
             style={profileStyle({ color }).scroll}
             contentContainerStyle={profileStyle({}).scrollContainer}
@@ -42,14 +36,7 @@ const Profile: FC<ProfileProps> = ({ navigation }) => {
                 <ProfileDeleteAccount />
               </CardWrapper>
             </View>
-          </ScrollView>
-        </>
-
-        :
-        <NoSignIn
-          typeDescription={'profile'}
-        />
-      }
+      </ScrollView>
     </BackgroundWrapper>
   );
 };

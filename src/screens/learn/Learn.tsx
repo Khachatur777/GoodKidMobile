@@ -16,7 +16,6 @@ import { getFileUri } from 'utils';
 import { useDispatch, useSelector } from 'react-redux';
 import { useContext } from 'react';
 import { ThemeContext } from 'theme';
-import { NoSignIn } from 'organisms';
 import Toast from 'react-native-toast-message';
 import { purchaseUser } from 'hooks/usePurchase.ts';
 
@@ -114,9 +113,7 @@ const Learn: FC<LearnProps> = ({ navigation }) => {
           />
           </>
         ) : null
-      ) : (
-        <NoSignIn typeDescription={'filter'} />
-      )}
+      ) : null}
     </BackgroundWrapper>
   );
 };

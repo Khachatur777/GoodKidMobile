@@ -10,6 +10,10 @@ export const signOut = async () => {
   // и звать logOut там не за чем — он только ругается в консоль.
   const wasParent = createStore.getState()?.shared?.user?.role !== 'child';
 
+  // Сначала уводим на экран входа и только потом чистим состояние: иначе
+  // текущий экран успевает перерисоваться в «не вошёл» и это видно как мигание.
+  resetToSignIn();
+
   createStore.dispatch(setIsLoggedIn(false));
   createStore.dispatch(setUser(null));
   createStore.dispatch(setLanguageId(null));
@@ -34,7 +38,4 @@ export const signOut = async () => {
   }
 
   await removeItem('tokenData');
-
-  // Возвращаем на вход: гостевого режима нет, без роли смотреть нечего
-  resetToSignIn();
 };
