@@ -11,28 +11,33 @@ const Title: FC<INavigationHeaderProps> = ({options, navigation}) => {
     titleProps,
     leftIcon,
     renderRightSection,
+    // Экраны, на которые попадают сбросом стека (например, вход), возвращаться
+    // никуда не должны — там стрелку прячем
+    showBackIcon = true,
   } = options;
 
   return (
     <View style={navBarStyles({}).titleContainer}>
       <View style={navBarStyles({}).titleTop}>
         <View style={navBarStyles({}).sectionLeftIconContainer}>
-          <Pressable
-            hitSlop={10}
-            style={navBarStyles({}).leftIcon}
-            onPress={e => {
-              e.preventDefault();
-              navigation.goBack();
-            }}
-          >
-            <Icon
-              color="icon_secondary"
-              name="ChevronLeft"
-              width={24}
-              height={24}
-              {...leftIcon}
-            />
-          </Pressable>
+          {showBackIcon && navigation.canGoBack() ? (
+            <Pressable
+              hitSlop={10}
+              style={navBarStyles({}).leftIcon}
+              onPress={e => {
+                e.preventDefault();
+                navigation.goBack();
+              }}
+            >
+              <Icon
+                color="icon_secondary"
+                name="ChevronLeft"
+                width={24}
+                height={24}
+                {...leftIcon}
+              />
+            </Pressable>
+          ) : null}
         </View>
 
         {renderRightSection ? (

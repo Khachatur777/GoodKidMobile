@@ -32,7 +32,9 @@ export const authScreens: IScreens[] = [
     options: () => ({
       title: i18n.t('sign_in_title'),
       type: 'title',
-      showBackIcon: true,
+      // Возвращаться отсюда некуда: на вход попадают сбросом стека — после
+      // выхода, с онбординга или при запуске без сессии
+      showBackIcon: false,
       showIconInTabScreen: true,
       backgroundColor: 'bg_primary'
     }),
