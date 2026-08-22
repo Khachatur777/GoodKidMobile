@@ -6,7 +6,6 @@ import {
   configureReanimatedLogger,
   ReanimatedLogLevel,
 } from 'react-native-reanimated';
-import { Settings } from 'react-native-fbsdk-next';
 import { Provider } from 'react-redux';
 import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
 import Orientation from 'react-native-orientation-locker';
@@ -20,12 +19,6 @@ configureReanimatedLogger({
 });
 
 function App(): React.JSX.Element {
-  Settings.initializeSDK();
-
-  Settings.setAdvertiserTrackingEnabled(false);
-  Settings.setAutoLogAppEventsEnabled(false);
-  Settings.setAdvertiserIDCollectionEnabled(false);
-
   useEffect(() => {
     Orientation.lockToPortrait();
 
