@@ -7,12 +7,14 @@ export const playVideoListStyles = ({
   width,
   height,
   playerHeightWithControls,
+  playerHeight,
 }: {
   color?: IGetColor;
   isTablet?: boolean;
   width: number;
   height: number;
   playerHeightWithControls?: number;
+  playerHeight?: number;
 }) =>
   StyleSheet.create({
     activeIndicatorContainer: {
@@ -98,15 +100,17 @@ export const playVideoListStyles = ({
     },
 
     //PlayerYoutuber
+    // Ровно 16:9 без запаса: панель управления YouTube рисуется поверх видео,
+    // и лишняя высота оставалась пустой тёмной полосой под картинкой
     videoYoutubeContainer: {
       position: 'relative',
-      height: isTablet ? playerHeightWithControls : 230,
+      height: playerHeight,
       overflow: 'hidden',
     },
 
     videoThumbnail: {
       width: '100%',
-      height: isTablet ? playerHeightWithControls : 230,
+      height: playerHeight,
       borderRadius: 12,
     },
 

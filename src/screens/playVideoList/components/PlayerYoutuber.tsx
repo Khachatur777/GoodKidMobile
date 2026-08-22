@@ -31,6 +31,7 @@ const PlayerYoutuber: FC<IPlayerYoutuberProps> = ({ videoData, onEnded }) => {
         width,
         height,
         playerHeightWithControls,
+        playerHeight,
         isTablet,
       }),
     [width, height, playerHeightWithControls, isTablet],
@@ -90,7 +91,7 @@ const PlayerYoutuber: FC<IPlayerYoutuberProps> = ({ videoData, onEnded }) => {
         {!!videoData?.youtubeId && (
           <YoutubePlayer
             key={playerKey}
-            height={playerHeightWithControls}
+            height={playerHeight}
             play={playing}
             mute={muted}
             videoId={videoData.youtubeId}
@@ -118,9 +119,9 @@ const PlayerYoutuber: FC<IPlayerYoutuberProps> = ({ videoData, onEnded }) => {
                     position: 'absolute',
                     opacity: 0,
                     width: '100%',
-                    height: playerHeightWithControls,
+                    height: playerHeight,
                   }
-                : { width: '100%', height: playerHeightWithControls }
+                : { width: '100%', height: playerHeight }
             }
           />
         )}
@@ -136,23 +137,6 @@ const PlayerYoutuber: FC<IPlayerYoutuberProps> = ({ videoData, onEnded }) => {
         ) : null}
       </View>
 
-      <View style={styles.videoInfoContainer}>
-        <Typography type="bodyLBold">{videoData?.title}</Typography>
-
-        {/*<Spacing size={4} />*/}
-
-        {/*<View>*/}
-        {/*  <Typography type="description" textColor="text_tertiary">*/}
-        {/*    {t('source_title')}*/}
-        {/*  </Typography>*/}
-        {/*  <Typography type="description" textColor="text_tertiary">*/}
-        {/*    {t('source_description')}*/}
-        {/*  </Typography>*/}
-        {/*  <Typography type="description" textColor="text_tertiary">*/}
-        {/*    {t('source_note')}*/}
-        {/*  </Typography>*/}
-        {/*</View>*/}
-      </View>
     </Fragment>
   );
 };
