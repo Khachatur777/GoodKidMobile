@@ -19,7 +19,7 @@ import {VideoItem} from './components';
 import {useGetAllHomeVideosMutation} from 'rtk/api/home.ts';
 import {KidsVideoItem} from 'models';
 import {useSelector} from 'react-redux';
-import {getFilterDataState, getUserState, isLoggedInSelector} from 'rtk';
+import {getFilterDataState, getIsChildState, getUserState, isLoggedInSelector} from 'rtk';
 import {t} from 'i18next';
 import { isTablet, thumbHeight } from 'utils';
 import { CategoriesFilter } from 'app-constants/shared.ts';
@@ -42,6 +42,7 @@ const PREFETCH_AHEAD = 10;
 const Home: FC<HomeProps> = ({navigation}) => {
   const [videosGet] = useGetAllHomeVideosMutation();
   const isLoggedIn = useSelector(isLoggedInSelector);
+  const isChild = useSelector(getIsChildState);
   const filter = useSelector(getFilterDataState);
   const user = useSelector(getUserState);
   const {color} = useContext(ThemeContext);
@@ -99,7 +100,7 @@ const Home: FC<HomeProps> = ({navigation}) => {
           data.cursor = cursorParam;
         }
 
-        if (isLoggedIn) {
+        if (isLoggedIn && !isChild) {
           filter.categories?.length && (data.categories = filter.categories);
           filter.age && (data.age = filter.age);
           filter.language && (data.language = filter.language);
@@ -191,9 +192,11 @@ const Home: FC<HomeProps> = ({navigation}) => {
     getVideos({isRefresh: true, cursorParam: ''});
   }, [getVideos]);
 
-  const greetingName = user?.profile?.firstName
-    ? `${t('home_greeting')}, ${user.profile.firstName}`
-    : t('home_greeting');
+  const greetingName = isChild
+    ? t('kid_home_greeting', {name: user?.name})
+    : user?.profile?.firstName
+      ? `${t('home_greeting')}, ${user.profile.firstName}`
+      : t('home_greeting');
 
   const renderVideItem = useCallback(
     ({item}: {item: KidsVideoItem}) => (
@@ -272,6 +275,7 @@ const Home: FC<HomeProps> = ({navigation}) => {
         <Typography type="titleL">{t('home_picked_today')}</Typography>
       </View>
 
+      {isChild ? null : (
       <View>
         <ScrollView
           horizontal
@@ -309,6 +313,7 @@ const Home: FC<HomeProps> = ({navigation}) => {
           })}
         </ScrollView>
       </View>
+      )}
 
       {isInitialLoading && !videos.length ? null : videos.length ? (
         <FlatList

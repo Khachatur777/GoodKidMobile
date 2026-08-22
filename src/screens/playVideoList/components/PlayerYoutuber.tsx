@@ -5,6 +5,7 @@ import { Typography } from 'molecules';
 import { playVideoListStyles } from '../play-video-list-styles';
 import { KidsVideoItem } from 'models';
 import { controlsExtra, isTablet, playerHeight } from 'utils';
+import { useWatchActivity } from 'hooks';
 
 export interface IPlayerYoutuberProps {
   videoData: KidsVideoItem | null;
@@ -17,6 +18,9 @@ const PlayerYoutuber: FC<IPlayerYoutuberProps> = ({ videoData, onEnded }) => {
   const [isPlayerReady, setIsPlayerReady] = useState(false);
 
   const { width, height } = useWindowDimensions();
+
+  // Что смотрел ребёнок, родитель видит в его активности
+  useWatchActivity(videoData?._id, playing);
 
 
   const playerHeightWithControls = playerHeight + controlsExtra;
