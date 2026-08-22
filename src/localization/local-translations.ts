@@ -137,6 +137,9 @@ export const localTranslations = {
     onboarding_3_description: 'Bite-sized learning cards next to every video.',
     onboarding_4_title: 'See what they watched',
     onboarding_4_description: 'A simple day-by-day history of videos and learning cards.',
+    filter_discard_title: 'Discard changes?',
+    filter_discard_description: 'You have unsaved filter changes for this child.',
+    filter_discard_btn: 'Discard',
 },
   ru: {
     theme_system: 'Системная',
@@ -274,6 +277,9 @@ export const localTranslations = {
     onboarding_3_description: 'Короткие обучающие карточки рядом с каждым видео.',
     onboarding_4_title: 'Видно, что смотрел ребёнок',
     onboarding_4_description: 'Простая история по дням: видео и обучающие карточки.',
+    filter_discard_title: 'Сбросить изменения?',
+    filter_discard_description: 'Фильтр этого ребёнка изменён и не сохранён.',
+    filter_discard_btn: 'Сбросить',
 },
   hy: {
     theme_system: 'Համակարգային',

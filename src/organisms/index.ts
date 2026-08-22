@@ -14,3 +14,4 @@ export * from './update-modal';
 export * from './parent-gate-modal';
 export * from './change-accent-modal';
 export * from './video-row';
+export * from './child-selector';

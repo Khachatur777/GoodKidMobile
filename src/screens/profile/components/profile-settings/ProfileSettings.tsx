@@ -1,4 +1,4 @@
-import {FC, useCallback, useState} from 'react';
+import {FC, useCallback, useEffect, useState} from 'react';
 import {NavigationProp} from '@react-navigation/native';
 import {CardWrapper, AlertModal, Typography} from 'molecules';
 import {
@@ -11,7 +11,16 @@ import {profileStyle} from '../../profile-styles.ts';
 import {useTranslation} from 'react-i18next';
 import Toast from "react-native-toast-message";
 import {purchaseUser} from "hooks/usePurchase.ts";
-import {getPaymentsEnabledState, getSubscriptionUserState, getUserState, setSubscriptionUserData} from "rtk";
+import {
+  getChildrenState,
+  getConfigDataState,
+  getPaymentsEnabledState,
+  getSubscriptionUserState,
+  getUserState,
+  setChildren,
+  setSubscriptionUserData,
+  useGetChildrenQuery,
+} from "rtk";
 import {useDispatch, useSelector} from "react-redux";
 import {useContext} from 'react';
 import {StyleSheet, View} from 'react-native';
@@ -55,6 +64,21 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({navigation}) => {
   const subscriptionState = useSelector(getSubscriptionUserState);
   const paymentsEnabled = useSelector(getPaymentsEnabledState);
   const accents = useSelector(getAvailableAccentsState);
+  const children = useSelector(getChildrenState);
+  const configData = useSelector(getConfigDataState);
+  // Лимит приходит с сервера: включат подписку — число поменяется без релиза
+  const maxChildren = configData?.features?.maxChildren ?? 3;
+
+  // Счётчик «2/3» рядом со строкой должен быть свежим при каждом заходе в профиль
+  const {data: childrenResponse} = useGetChildrenQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
+
+  useEffect(() => {
+    if (childrenResponse?.data?.children) {
+      dispatch(setChildren(childrenResponse.data.children));
+    }
+  }, [childrenResponse?.data?.children, dispatch]);
   const {accent, themeMode} = useContext(ThemeContext);
 
   const languageValue =
@@ -101,6 +125,21 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({navigation}) => {
       title={t('profile_settings')}
       containerStyles={profileStyle({}).profileWrapper}
     >
+      {/* Раздел с данными детей открывается только через parental gate */}
+      <Cell
+        type="icon"
+        iconName="User02Icon"
+        title={t('children_title')}
+        onPress={() => {
+          openWithParentGate(() => navigation.navigate('ChildrenScreen'));
+        }}
+        renderRightContent={() => (
+          <Typography type="bodyS" textColor="text_tertiary">
+            {t('children_count_value', {count: children.length, max: maxChildren})}
+          </Typography>
+        )}
+      />
+
       {paymentsEnabled || subscriptionState ? (
         <Cell
           type="icon"

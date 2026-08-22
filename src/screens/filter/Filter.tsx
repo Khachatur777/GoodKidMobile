@@ -1,25 +1,25 @@
-import {NavigationProp} from '@react-navigation/native';
-import {BackgroundWrapper, Button, Spacing, Typography} from 'molecules';
-import {FC, useCallback, useEffect, useState} from 'react';
-import {filterStyles} from './filter-styles.ts';
-import {Pressable, ScrollView, View} from 'react-native';
-import Badge from '../../molecules/badge/Badge.tsx';
-import {t} from 'i18next';
+import { NavigationProp } from '@react-navigation/native';
+import { AlertModal, BackgroundWrapper, Button, KidAvatar, Spacing, Typography } from 'molecules';
+import { FC, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { ScrollView, View } from 'react-native';
+import { t } from 'i18next';
 import Toast from 'react-native-toast-message';
-import {AgeFilter, CategoriesFilter, LanguageFilter} from 'app-constants/shared.ts';
+import { AgeFilter, CategoriesFilter, LanguageFilter } from 'app-constants/shared.ts';
 import {
-  getContentLockedState,
-  getUserState,
+  getActiveChildIdState,
+  getChildrenState,
   isLoggedInSelector,
-  setFilterData,
-  setSubscriptionUserData,
-  useEditFilterMutation,
-  useGetFilterQuery
+  setActiveChildId,
+  setChildren,
+  useEditChildFilterMutation,
+  useGetChildrenQuery,
+  useLazyGetChildFilterQuery,
 } from 'rtk';
-import {useDispatch, useSelector} from 'react-redux';
-import {NoSignIn} from 'organisms';
-import {purchaseUser} from "hooks/usePurchase.ts";
-import AlertModal from "../../molecules/alert-modal/AlertModal.tsx";
+import { useDispatch, useSelector } from 'react-redux';
+import { ChildSelector, NoSignIn } from 'organisms';
+import { ThemeContext } from 'theme';
+import Badge from '../../molecules/badge/Badge.tsx';
+import { filterStyles } from './filter-styles.ts';
 
 export interface FilterProps {
   navigation: NavigationProp<any>;
@@ -32,235 +32,278 @@ interface IFilterData {
   check?: boolean;
 }
 
-
-const Filter: FC<FilterProps> = () => {
-  const [subscriptionAskModalVisible, setSubscriptionAskModalVisible] = useState<boolean>(false)
-  const [language, setLanguage] = useState<string>('')
-  const [ages, setAges] = useState<number | null>(null)
-  const [categories, setCategories] = useState<number[]>([])
-  const [languageOptions, setLanguageOptions] = useState<IFilterData[]>([])
-  const [ageOptions, setAgeOptions] = useState<IFilterData[]>([])
-  const [categoryOptions, setCategoryOptions] = useState<IFilterData[]>([])
-  const isLoggedIn = useSelector(isLoggedInSelector);
-  const user = useSelector(getUserState);
-  const contentLocked = useSelector(getContentLockedState);
+// Фильтр настраивается на каждого ребёнка отдельно. Своей ленты родитель здесь
+// не фильтрует — для неё есть чипсы категорий на Home.
+const Filter: FC<FilterProps> = ({ navigation }) => {
+  const { color } = useContext(ThemeContext);
+  const styles = useMemo(() => filterStyles(color), [color]);
   const dispatch = useDispatch();
+  const isLoggedIn = useSelector(isLoggedInSelector);
+  const children = useSelector(getChildrenState);
+  const activeChildId = useSelector(getActiveChildIdState);
 
-  const {data: getUserFilter} = useGetFilterQuery({showModal: true, showLoader: true}, {
+  const [language, setLanguage] = useState<string>('');
+  const [ages, setAges] = useState<number | null>(null);
+  const [categories, setCategories] = useState<number[]>([]);
+  const [dirty, setDirty] = useState(false);
+  const [pendingChildId, setPendingChildId] = useState<string | null>(null);
+
+  const { data: childrenResponse, isFetching: childrenLoading } = useGetChildrenQuery(undefined, {
     refetchOnMountOrArgChange: true,
-    skip: !isLoggedIn
-  },)
-  const [editFilter] = useEditFilterMutation()
+    skip: !isLoggedIn,
+  });
+
+  const [loadChildFilter] = useLazyGetChildFilterQuery();
+  const [editChildFilter] = useEditChildFilterMutation();
 
   useEffect(() => {
-    if (getUserFilter?.success) {
-      setCategories(getUserFilter?.filter?.categories)
-      setAges(getUserFilter?.filter?.age)
-      setLanguage(getUserFilter?.filter?.language)
+    if (childrenResponse?.data?.children) {
+      dispatch(setChildren(childrenResponse.data.children));
     }
-  }, [getUserFilter?.filter]);
+  }, [childrenResponse?.data?.children, dispatch]);
+
+  const applyFilter = useCallback(
+    async (childId: string) => {
+      const response = await loadChildFilter({ id: childId });
+
+      setCategories(response?.data?.filter?.categories || []);
+      setAges(response?.data?.filter?.age ?? null);
+      setLanguage(response?.data?.filter?.language || '');
+      setDirty(false);
+    },
+    [loadChildFilter],
+  );
 
   useEffect(() => {
-    setAgeOptions(AgeFilter)
-    setLanguageOptions(LanguageFilter)
-    setCategoryOptions(CategoriesFilter)
-  }, []);
+    if (activeChildId) {
+      applyFilter(activeChildId);
+    }
+  }, [activeChildId, applyFilter]);
+
+  // Переключение ребёнка с несохранёнными правками сначала спрашивает
+  const onSelectChild = useCallback(
+    (childId: string) => {
+      if (childId === activeChildId) return;
+
+      if (dirty) {
+        return setPendingChildId(childId);
+      }
+
+      dispatch(setActiveChildId(childId));
+    },
+    [activeChildId, dirty, dispatch],
+  );
 
   const chooseFilterLanguage = useCallback((lng: IFilterData) => {
     const selectedKey = lng.key || lng.name;
-    setLanguage(prev => prev === selectedKey ? '' : selectedKey);
+    setLanguage(prev => (prev === selectedKey ? '' : selectedKey));
+    setDirty(true);
   }, []);
 
   const chooseFilterAge = useCallback((age: IFilterData) => {
-    setAges(prev => prev === age.id ? null : age.id);
+    setAges(prev => (prev === age.id ? null : age.id));
+    setDirty(true);
   }, []);
 
   const chooseFilter = useCallback((filter: IFilterData) => {
-    setCategories(prev => {
-      const isSelected = prev.includes(filter.id);
-      if (isSelected) {
-        return prev.filter(item => item !== filter.id);
-      } else {
-        return [...prev, filter.id];
-      }
-    });
+    setCategories(prev =>
+      prev.includes(filter.id)
+        ? prev.filter(item => item !== filter.id)
+        : [...prev, filter.id],
+    );
+    setDirty(true);
   }, []);
 
-  const onEditFilter = useCallback(async () => {
-    try {
-      if (!user?.id) return;
+  const onReset = useCallback(() => {
+    setLanguage('');
+    setAges(null);
+    setCategories([]);
+    setDirty(true);
+  }, []);
 
-      const filterData = {
-        categories,
-        age: ages || '',
-        language: language || '',
-        showLoader: true,
-        showModal: true
-      };
-      const response = await editFilter(filterData);
+  const onSave = useCallback(async () => {
+    if (!activeChildId) return;
 
-      if (response?.data?.success) {
-        setTimeout(() => {
-          Toast.show({
-            type: 'info',
-            text1: t('filter_change_successfully_title'),
-            text2: t('filter_change_successfully_description'),
-            onPress: () => Toast.hide(),
-          });
-          dispatch(setFilterData(response?.data?.filter))
-        }, 200);
-      }
-    } catch (e) {
-      console.error('Error saving filters:', e);
+    const response = await editChildFilter({
+      id: activeChildId,
+      categories,
+      age: ages,
+      language: language || null,
+      showLoader: true,
+      showModal: true,
+    });
+
+    if (response?.data?.success) {
+      setDirty(false);
+
+      setTimeout(() => {
+        Toast.show({
+          type: 'info',
+          text1: t('filter_change_successfully_title'),
+          text2: t('filter_change_successfully_description'),
+          onPress: () => Toast.hide(),
+        });
+      }, 200);
     }
-  }, [ages, categories, language, user?.id, editFilter])
+  }, [activeChildId, ages, categories, editChildFilter, language]);
 
-  const purchase = useCallback(async () => {
+  if (!isLoggedIn) {
+    return (
+      <BackgroundWrapper>
+        <NoSignIn typeDescription={'filter'} />
+      </BackgroundWrapper>
+    );
+  }
 
-    purchaseUser()
-      .then(res => {
-        dispatch(setSubscriptionUserData(res?.isSubscribed!))
-      })
-      .catch(e => {
-        console.log(e, 'rrrr');
-      })
-  }, [])
+  // Фильтр принадлежит ребёнку, поэтому без детей настраивать нечего
+  if (!childrenLoading && children.length === 0) {
+    return (
+      <BackgroundWrapper>
+        <View style={styles.emptyContainer}>
+          <View style={styles.emptyCircle}>
+            <KidAvatar size={120} />
+          </View>
 
+          <Typography type="title3" alignment="center">
+            {t('filter_no_children_title')}
+          </Typography>
+
+          <Typography type="bodyM" textColor="text_secondary" alignment="center">
+            {t('filter_no_children_description')}
+          </Typography>
+
+          <View style={styles.emptyButton}>
+            <Button
+              title={t('children_add')}
+              onPress={() =>
+                navigation.navigate('ProfileTab', { screen: 'AddChildScreen' })
+              }
+            />
+          </View>
+        </View>
+      </BackgroundWrapper>
+    );
+  }
 
   return (
     <BackgroundWrapper>
-      {isLoggedIn ?
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <Typography type="bodyM" textColor="text_secondary">
+          {t('filter_choose_child')}
+        </Typography>
 
-        <ScrollView contentContainerStyle={filterStyles().scrollContainer}>
-          <View style={filterStyles().resetRow}>
-            <Pressable onPress={() => { setLanguage(''); setAges(null); setCategories([]); }}>
-              <Typography type={'bodySBold'} textColor={'accent_active'}>{t('filter_reset')}</Typography>
-            </Pressable>
-          </View>
+        <Spacing size={16} />
 
-          <View>
-            <Typography type={'captionBold'} textColor={'text_secondary'}>{t('language_title').toUpperCase()}</Typography>
-
-            <Spacing size={16}/>
-
-            <View style={filterStyles().filterItemsContainer}>
-
-              {languageOptions.map((lng, index) => {
-
-                const isSelected = language === (lng.key || lng.name);
-                return (
-                  <Badge
-                    iconName={index === 0 || !contentLocked ? undefined : 'Lock'}
-                    key={lng?.id}
-                    title={t(lng?.name)}
-                    size={'large'}
-                    onPress={() => {
-                      if (index !== 0 && contentLocked) {
-                        return purchase()
-                      }
-                      chooseFilterLanguage(lng)
-                    }}
-                    borderWidth={0}
-                    backgroundColor={isSelected ? 'accent_active' : 'surface_primary'}
-                    badgeColor={isSelected ? 'text_inverted' : undefined}
-                  />
-                )
-              })}
-            </View>
-
-          </View>
-
-          <Spacing size={24}/>
-
-          <View>
-            <Typography type={'captionBold'} textColor={'text_secondary'}>{t('filter_items_title').toUpperCase()}</Typography>
-
-            <Spacing size={16}/>
-
-            <View style={filterStyles().filterItemsContainer}>
-
-              {ageOptions.map((age, index) => {
-                const isSelected = ages === age.id;
-                return (
-                  <Badge
-                    iconName={index === 0 || !contentLocked ? undefined : 'Lock'}
-                    key={age?.id}
-                    title={`${age?.name} ${t('age')}`}
-                    size={'large'}
-                    onPress={() => {
-                      if (index !== 0 && contentLocked) {
-                        return purchase()
-                      }
-                      chooseFilterAge(age)
-                    }}
-                    borderWidth={0}
-                    backgroundColor={isSelected ? 'accent_active' : 'surface_primary'}
-                    badgeColor={isSelected ? 'text_inverted' : undefined}
-                  />
-                )
-              })}
-            </View>
-          </View>
-
-          <View>
-            <Typography type={'captionBold'} textColor={'text_secondary'}>{t('filter_items_title').toUpperCase()}</Typography>
-
-            <Spacing size={16}/>
-
-            <View style={filterStyles().filterItemsContainer}>
-
-              {categoryOptions.map((filter, index) => {
-                const isSelected = categories.includes(filter.id);
-                return (
-                  <Badge
-                    iconName={index === 0 || !contentLocked ? undefined : 'Lock'}
-                    disabled={true}
-                    key={filter?.id}
-                    title={t(filter?.name)}
-                    size={'large'}
-                    onPress={() => {
-                      if (index !== 0 && contentLocked) {
-                        return purchase()
-                      }
-                      chooseFilter(filter)
-                    }}
-                    borderWidth={0}
-                    backgroundColor={isSelected ? 'accent_active' : 'surface_primary'}
-                    badgeColor={isSelected ? 'text_inverted' : undefined}
-                  />
-                )
-              })}
-            </View>
-          </View>
-
-          <Spacing size={24}/>
-
-          <Button title={t('save')} onPress={onEditFilter}/>
-
-          <AlertModal
-            title={t('subscription')}
-            description={t('open_subscription')}
-            isVisible={subscriptionAskModalVisible}
-            setIsVisible={setSubscriptionAskModalVisible}
-            buttons={[
-              {
-                title: t('subscription'),
-                onPress: () => purchase()
-              },
-              {
-                title: t('cancel'),
-                onPress: () => setSubscriptionAskModalVisible(false),
-                variant: 'outline'
-              }
-            ]}
-          />
-
-        </ScrollView>
-        :
-        <NoSignIn
-          typeDescription={'filter'}
+        <ChildSelector
+          children={children}
+          selectedId={activeChildId}
+          onSelect={onSelectChild}
         />
-      }
+
+        <View style={styles.section}>
+          <Typography type="captionBold" textColor="text_secondary">
+            {t('filter_items_title').toUpperCase()}
+          </Typography>
+
+          <View style={styles.filterItemsContainer}>
+            {CategoriesFilter.map(filter => {
+              const isSelected = categories.includes(filter.id);
+
+              return (
+                <Badge
+                  key={filter.id}
+                  title={t(filter.name)}
+                  size="large"
+                  onPress={() => chooseFilter(filter)}
+                  borderWidth={0}
+                  backgroundColor={isSelected ? 'accent_active' : 'surface_primary'}
+                  badgeColor={isSelected ? 'text_inverted' : undefined}
+                />
+              );
+            })}
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <Typography type="captionBold" textColor="text_secondary">
+            {t('age').toUpperCase()}
+          </Typography>
+
+          <View style={styles.filterItemsContainer}>
+            {AgeFilter.map(age => {
+              const isSelected = ages === age.id;
+
+              return (
+                <Badge
+                  key={age.id}
+                  title={`${age.name} ${t('age')}`}
+                  size="large"
+                  onPress={() => chooseFilterAge(age)}
+                  borderWidth={0}
+                  backgroundColor={isSelected ? 'accent_active' : 'surface_primary'}
+                  badgeColor={isSelected ? 'text_inverted' : undefined}
+                />
+              );
+            })}
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <Typography type="captionBold" textColor="text_secondary">
+            {t('language_title').toUpperCase()}
+          </Typography>
+
+          <View style={styles.filterItemsContainer}>
+            {LanguageFilter.map(lng => {
+              const isSelected = language === (lng.key || lng.name);
+
+              return (
+                <Badge
+                  key={lng.id}
+                  title={t(lng.name)}
+                  size="large"
+                  onPress={() => chooseFilterLanguage(lng)}
+                  borderWidth={0}
+                  backgroundColor={isSelected ? 'accent_active' : 'surface_primary'}
+                  badgeColor={isSelected ? 'text_inverted' : undefined}
+                />
+              );
+            })}
+          </View>
+        </View>
+      </ScrollView>
+
+      <View style={styles.footer}>
+        <View style={styles.footerReset}>
+          <Button variant="outline" title={t('filter_reset')} onPress={onReset} />
+        </View>
+
+        <View style={styles.footerSave}>
+          <Button title={t('save')} onPress={onSave} />
+        </View>
+      </View>
+
+      <AlertModal
+        isVisible={!!pendingChildId}
+        setIsVisible={() => setPendingChildId(null)}
+        title={t('filter_discard_title')}
+        description={t('filter_discard_description')}
+        buttons={[
+          {
+            title: t('filter_discard_btn'),
+            variant: 'negative',
+            onPress: () => {
+              dispatch(setActiveChildId(pendingChildId));
+              setPendingChildId(null);
+            },
+          },
+          {
+            title: t('cancel'),
+            variant: 'secondary',
+            onPress: () => setPendingChildId(null),
+          },
+        ]}
+      />
     </BackgroundWrapper>
   );
 };

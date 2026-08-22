@@ -64,7 +64,7 @@ const KidProfile: FC<KidProfileProps> = ({ navigation }) => {
           <CardWrapper showArrowBtn={false}>
             <Cell
               type="icon"
-              iconName="Moon01Icon"
+              iconName="Contrast02Icon"
               title={t('profile_theme')}
               onPress={() => setThemeModal(true)}
               renderRightContent={() => (
@@ -97,7 +97,7 @@ const KidProfile: FC<KidProfileProps> = ({ navigation }) => {
 
             <Cell
               type="icon"
-              iconName="InformationCircleIcon"
+              iconName="InfoIcon"
               title={t('about_app')}
               onPress={() => navigation.navigate('AboutScreen')}
             />

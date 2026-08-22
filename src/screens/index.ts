@@ -13,3 +13,5 @@ export * from './app-colour';
 export * from './about';
 export * from './support';
 export * from './kid-profile';
+export * from './children';
+export * from './child-activity';
