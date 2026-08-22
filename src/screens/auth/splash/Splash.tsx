@@ -42,16 +42,18 @@ const Splash: FC<SplashProps> = ({navigation}) => {
 
   const productVersion = getBuildNumber();
 
-  const resetTo = (name: string) => {
-    navigation.reset({index: 0, routes: [{name}]});
+  const resetTo = (name: string, params?: object) => {
+    navigation.reset({index: 0, routes: [{name, params}]});
   };
 
 
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
-    const safeGoTabsWithDelay = () => {
-      timeoutId = setTimeout(() => resetTo('TabScreens'), 1500);
+    // Гостевого режима больше нет: без аккаунта роли неизвестны, а значит
+    // неизвестно и что показывать — поэтому всегда на вход.
+    const safeGoSignInWithDelay = () => {
+      timeoutId = setTimeout(() => resetTo('AuthNavigation', {screen: 'SignIn'}), 1500);
     };
 
     const init = async () => {
@@ -85,14 +87,14 @@ const Splash: FC<SplashProps> = ({navigation}) => {
             dispatch(setUpdateIsVisibleData(true));
           }
 
-          safeGoTabsWithDelay();
+          safeGoSignInWithDelay();
           return;
         }
 
         const response = await authorization({});
 
         if (!response?.data?.success) {
-          safeGoTabsWithDelay();
+          safeGoSignInWithDelay();
           return;
         }
 
@@ -131,7 +133,7 @@ const Splash: FC<SplashProps> = ({navigation}) => {
         resetTo('TabScreens');
       } catch (e) {
         console.error('Splash init error:', e);
-        safeGoTabsWithDelay();
+        safeGoSignInWithDelay();
       }
     };
 

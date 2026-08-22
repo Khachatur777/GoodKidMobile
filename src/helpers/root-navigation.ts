@@ -8,3 +8,14 @@ export function navigateFromRoot(name: string, params?: object) {
     navigationRef.navigate(name, params);
   }
 }
+
+// Сброс на экран входа: после выхода гостевого режима нет, и без роли внутри
+// приложения смотреть нечего — лента, Learn и фильтр требуют аккаунта.
+export function resetToSignIn() {
+  if (navigationRef.isReady()) {
+    navigationRef.reset({
+      index: 0,
+      routes: [{name: 'AuthNavigation', params: {screen: 'SignIn'}}],
+    });
+  }
+}
