@@ -14,7 +14,7 @@ import { BackgroundWrapper, GoodKidLogo } from 'molecules';
 import { splashStyles } from './splash-styles.ts';
 import {
   setConfigData,
-  setFilterData,
+  setOnboardingSeen,
   setIsLoggedIn,
   setLanguageId,
   setSubscriptionUserData,
@@ -22,7 +22,6 @@ import {
   setUser,
   useAuthorizationMutation,
   useConfigMutation,
-  useFilterMutation,
 } from 'rtk';
 import { getItem, setItem } from 'configs';
 import i18n from 'localization/localization.ts';
@@ -37,7 +36,6 @@ const Splash: FC<SplashProps> = ({navigation}) => {
   const styles = splashStyles();
 
   const [authorization] = useAuthorizationMutation();
-  const [filter] = useFilterMutation();
   const [fetchConfig] = useConfigMutation();
 
   const productVersion = getBuildNumber();
@@ -46,22 +44,33 @@ const Splash: FC<SplashProps> = ({navigation}) => {
     navigation.reset({index: 0, routes: [{name, params}]});
   };
 
+  // Splash живёт внутри auth-стека, поэтому переход на его же экраны делаем
+  // напрямую, а не через корневой сброс.
+  const resetToAuthScreen = (screen: string) => {
+    navigation.reset({index: 0, routes: [{name: screen}]});
+  };
+
 
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
     // Гостевого режима больше нет: без аккаунта роли неизвестны, а значит
     // неизвестно и что показывать — поэтому всегда на вход.
-    const safeGoSignInWithDelay = () => {
-      timeoutId = setTimeout(() => resetTo('AuthNavigation', {screen: 'SignIn'}), 1500);
+    const safeGoSignInWithDelay = (seenOnboarding: boolean) => {
+      const screen = seenOnboarding ? 'SignIn' : 'Onboarding';
+
+      timeoutId = setTimeout(() => resetToAuthScreen(screen), 1500);
     };
 
     const init = async () => {
       try {
-        const [tokenData, language] = await Promise.all([
+        const [tokenData, language, onboardingSeen] = await Promise.all([
           getItem('tokenData'),
           getItem('language'),
+          getItem('onboardingSeen'),
         ]);
+
+        dispatch(setOnboardingSeen(!!onboardingSeen));
 
         await i18n.changeLanguage(language || 'en');
 
@@ -87,14 +96,14 @@ const Splash: FC<SplashProps> = ({navigation}) => {
             dispatch(setUpdateIsVisibleData(true));
           }
 
-          safeGoSignInWithDelay();
+          safeGoSignInWithDelay(!!onboardingSeen);
           return;
         }
 
         const response = await authorization({});
 
         if (!response?.data?.success) {
-          safeGoSignInWithDelay();
+          safeGoSignInWithDelay(!!onboardingSeen);
           return;
         }
 
@@ -122,18 +131,13 @@ const Splash: FC<SplashProps> = ({navigation}) => {
 
         dispatch(setIsLoggedIn(true));
         dispatch(setUser(user));
-        dispatch(setLanguageId(user?.profile?.preferredLanguages));
+        dispatch(setLanguageId(user?.role === 'child' ? user?.language : user?.profile?.preferredLanguages));
         dispatch(setConfigData(config));
-
-        const responseFilter = await filter({});
-        if (responseFilter?.data?.success) {
-          dispatch(setFilterData(responseFilter.data.filter));
-        }
 
         resetTo('TabScreens');
       } catch (e) {
         console.error('Splash init error:', e);
-        safeGoSignInWithDelay();
+        safeGoSignInWithDelay(!!onboardingSeen);
       }
     };
 
@@ -145,7 +149,6 @@ const Splash: FC<SplashProps> = ({navigation}) => {
   }, [
     authorization,
     dispatch,
-    filter,
     fetchConfig,
     navigation,
     productVersion,

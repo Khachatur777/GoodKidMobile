@@ -13,9 +13,16 @@ export function navigateFromRoot(name: string, params?: object) {
 // приложения смотреть нечего — лента, Learn и фильтр требуют аккаунта.
 export function resetToSignIn() {
   if (navigationRef.isReady()) {
+    // Вложенному стеку нужно именно состояние: с params он открывался на своём
+    // первом экране (Splash), а не на входе.
     navigationRef.reset({
       index: 0,
-      routes: [{name: 'AuthNavigation', params: {screen: 'SignIn'}}],
+      routes: [
+        {
+          name: 'AuthNavigation',
+          state: {index: 0, routes: [{name: 'SignIn'}]},
+        },
+      ],
     });
   }
 }

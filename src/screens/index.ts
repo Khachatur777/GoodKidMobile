@@ -15,3 +15,4 @@ export * from './support';
 export * from './kid-profile';
 export * from './children';
 export * from './child-activity';
+export * from './onboarding';

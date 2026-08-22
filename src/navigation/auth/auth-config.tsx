@@ -1,5 +1,6 @@
 import {IScreens} from 'navigation/tabs';
 import {
+  Onboarding,
   Splash,
   SignIn,
   SignUp,
@@ -14,6 +15,13 @@ export const authScreens: IScreens[] = [
   {
     name: 'Splash',
     component: Splash,
+    options: {
+      headerShown: false,
+    },
+  },
+  {
+    name: 'Onboarding',
+    component: Onboarding,
     options: {
       headerShown: false,
     },
