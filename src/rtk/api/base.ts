@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import {baseUrl, baseUrlIp, getItem} from 'configs';
+import {baseUrl, baseUrlDev, getItem} from 'configs';
 import { ReduxStore } from 'rtk/types';
 import { baseQueryWithReAuth } from '../config';
 import { Platform } from 'react-native';
@@ -14,7 +14,9 @@ import {
 import { getTokenDataState, isLoggedInSelector } from 'rtk';
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: __DEV__ ? baseUrlIp : baseUrl,
+  // Отладочные сборки ходят на дев-стенд (apidev), релизные — в прод.
+  // Роли, дети и история живут пока только на дев-бэкенде.
+  baseUrl: __DEV__ ? baseUrlDev : baseUrl,
   prepareHeaders: async (headers, { getState }) => {
     const state = getState() as ReduxStore;
     const tokenData = await getItem('tokenData');

@@ -2,8 +2,9 @@ import {useFocusEffect} from '@react-navigation/native';
 import {ForwardedRef, forwardRef, useCallback, useState} from 'react';
 import {
   NativeSyntheticEvent,
+  StyleProp,
   TextInput,
-  TextInputFocusEventData, View,
+  TextInputFocusEventData, View, ViewStyle,
 } from 'react-native';
 import {TextField, TextFieldProps} from 'molecules';
 import {IIcons} from 'assets';
@@ -11,11 +12,14 @@ import {IIcons} from 'assets';
 export interface PasswordFiledProps extends TextFieldProps {
   isVisible?: boolean;
   showCleanBtn?: boolean;
+  // Обёртка по умолчанию поджимает поле на 20 с каждой стороны. На экранах,
+  // где рядом стоят обычные поля, это заметно — там отступ переопределяется.
+  wrapperStyles?: StyleProp<ViewStyle>;
 }
 
 const PasswordField = forwardRef(
   (
-    {isVisible = false, showCleanBtn = false, ...props}: PasswordFiledProps,
+    {isVisible = false, showCleanBtn = false, wrapperStyles, ...props}: PasswordFiledProps,
     ref: ForwardedRef<TextInput>,
   ) => {
     const [visible, setVisible] = useState<boolean>(isVisible);
@@ -61,7 +65,7 @@ const PasswordField = forwardRef(
     );
 
     return (
-      <View style={{paddingHorizontal: 20}}>
+      <View style={[{paddingHorizontal: 20}, wrapperStyles]}>
         <TextField
           ref={ref}
           {...props}

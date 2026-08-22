@@ -66,13 +66,14 @@ const ChildForm: FC<ChildFormProps> = ({
           flexDirection: 'row',
           gap: 12,
         },
+        // Пароли должны стоять по той же линии, что Name, Age и Login
+        fieldWrapper: {
+          paddingHorizontal: 0,
+        },
         nameField: {
           flex: 1.5,
         },
         ageField: {
-          flex: 1,
-        },
-        halfField: {
           flex: 1,
         },
       }),
@@ -168,26 +169,26 @@ const ChildForm: FC<ChildFormProps> = ({
         explanation={loginError || t('child_login_hint')}
       />
 
+      {/* Пароли — на всю ширину и друг под другом: рядом они слишком узкие,
+          в них не помещается ни подпись, ни сам ввод */}
       {showPasswordFields ? (
-        <View style={styles.row}>
-          <View style={styles.halfField}>
-            <PasswordField
-              size="large"
-              value={values.password}
-              onChangeText={password => onChange({ password })}
-              label={t('child_password_label')}
-            />
-          </View>
+        <>
+          <PasswordField
+            size="large"
+            value={values.password}
+            onChangeText={password => onChange({ password })}
+            label={t('child_password_label')}
+            wrapperStyles={styles.fieldWrapper}
+          />
 
-          <View style={styles.halfField}>
-            <PasswordField
-              size="large"
-              value={values.confirmPassword}
-              onChangeText={confirmPassword => onChange({ confirmPassword })}
-              label={t('child_password_confirm_label')}
-            />
-          </View>
-        </View>
+          <PasswordField
+            size="large"
+            value={values.confirmPassword}
+            onChangeText={confirmPassword => onChange({ confirmPassword })}
+            label={t('child_password_confirm_label')}
+            wrapperStyles={styles.fieldWrapper}
+          />
+        </>
       ) : null}
     </View>
   );
