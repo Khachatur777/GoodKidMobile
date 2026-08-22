@@ -38,3 +38,5 @@ export {default as SoundIcon} from './sound.svg';
 export {default as PaletteIcon} from './palette.svg';
 export {default as StarIcon} from './star.svg';
 export {default as ShareIcon} from './share.svg';
+export {default as WavingHandIcon} from './waving-hand.svg';
+export {default as LightbulbIcon} from './lightbulb.svg';

@@ -1,7 +1,7 @@
 import React, { Dispatch, FC, SetStateAction, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, Text, View } from 'react-native';
-import { Button, Modal, Spacing, Typography } from 'molecules';
+import { Pressable, View } from 'react-native';
+import { Button, Icon, Modal, Spacing, Typography } from 'molecules';
 import { ThemeContext } from 'theme';
 import { parentGateStyles } from './parent-gate-modal-styles';
 
@@ -78,9 +78,13 @@ const ParentGateModal: FC<ParentGateModalProps> = ({
     >
       <View style={styles.content}>
         <View style={[styles.iconTile, error ? styles.iconTileError : null]}>
-          {/* Заглушки вместо иконок: в наборе приложения нет ни машущей руки,
-              ни лампочки — их нужно дорисовать вместе с остальными ассетами */}
-          <Text style={styles.iconGlyph}>{error ? '💡' : '👋'}</Text>
+          {/* Иконка красится акцентом приложения: он у каждого свой */}
+          <Icon
+            name={error ? 'LightbulbIcon' : 'WavingHandIcon'}
+            color={error ? 'accent_warning' : 'accent_active'}
+            width={32}
+            height={32}
+          />
         </View>
 
         <Spacing size={14} />
