@@ -4,7 +4,7 @@ import {
   DefaultTheme,
   NavigationContainer,
 } from '@react-navigation/native';
-import {GlobalErrorModal, Pin, UpdateModal} from 'organisms';
+import {GlobalErrorModal, UpdateModal} from 'organisms';
 import {Loader} from 'molecules';
 import {useSelector} from 'react-redux';
 import {getMainLoadingState, getNetInfo} from 'rtk';
@@ -50,9 +50,7 @@ const AppBuilder = () => {
         ref={navigationRef}
         theme={theme === 'dark' ? DarkTheme : DefaultTheme}>
 
-        <Pin>
-          <RootNavigator/>
-        </Pin>
+        <RootNavigator/>
 
         <Toast config={toastConfig} position="bottom" bottomOffset={60}/>
 

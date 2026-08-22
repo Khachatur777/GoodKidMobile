@@ -23,7 +23,6 @@ import {
   useAuthorizationMutation,
   useConfigMutation,
   useFilterMutation,
-  useSignInUpGuestMutation,
 } from 'rtk';
 import { getItem, setItem } from 'configs';
 import i18n from 'localization/localization.ts';
@@ -40,7 +39,6 @@ const Splash: FC<SplashProps> = ({navigation}) => {
   const [authorization] = useAuthorizationMutation();
   const [filter] = useFilterMutation();
   const [fetchConfig] = useConfigMutation();
-  const [signInUpGuestRequest] = useSignInUpGuestMutation();
 
   const productVersion = getBuildNumber();
 
@@ -56,28 +54,6 @@ const Splash: FC<SplashProps> = ({navigation}) => {
       timeoutId = setTimeout(() => resetTo('TabScreens'), 1500);
     };
 
-    const ensureGuest = async () => {
-      const guestId = await getItem('guestId');
-      if (guestId) return;
-
-      const deviceId = await getUniqueId();
-      const dataGuest = {
-        deviceId: deviceId!,
-        deviceModel: getModel(),
-        osVersion: getSystemVersion(),
-        productVersion,
-      };
-
-      try {
-        const response = await signInUpGuestRequest(dataGuest);
-        if(response?.data?.success){
-          await setItem('guestId', response?.data?.guest_id);
-        }
-      } catch (e) {
-        console.warn('Guest signInUp failed:', e);
-      }
-    };
-
     const init = async () => {
       try {
         const [tokenData, language] = await Promise.all([
@@ -87,7 +63,6 @@ const Splash: FC<SplashProps> = ({navigation}) => {
 
         await i18n.changeLanguage(language || 'en');
 
-        await ensureGuest();
 
         if (!tokenData) {
           const responseConfig = await fetchConfig({});
@@ -172,7 +147,6 @@ const Splash: FC<SplashProps> = ({navigation}) => {
     fetchConfig,
     navigation,
     productVersion,
-    signInUpGuestRequest,
   ]);
 
   return (

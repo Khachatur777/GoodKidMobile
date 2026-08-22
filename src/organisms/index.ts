@@ -5,8 +5,6 @@ export * from './cell';
 export * from './no-sign-in';
 export * from './change-language-modal';
 export * from './radio-select-cell';
-export * from './pin-field';
-export * from './pin';
 export * from './change-theme-modal';
 export * from './terms-modal';
 export * from './support-modal';

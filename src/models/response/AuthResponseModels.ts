@@ -5,23 +5,41 @@ export interface IDefaultResponseModel {
   appleSignUp?: boolean;
 }
 
+export type UserRole = 'parent' | 'child';
+
 export interface IUser {
   id: string;
-  email: string;
-  profile: {
+  role: UserRole;
+  email?: string;
+  profile?: {
     firstName: string;
     lastName: string;
     preferredLanguages: string;
     preferredCategories: string[];
   };
   subscription: string;
-  pinCode: number;
-  isVerified: boolean;
+  isVerified?: boolean;
+  // Поля ребёнка: приходят, когда role === 'child'
+  parentId?: string;
+  name?: string;
+  age?: number;
+  avatar?: string;
+  login?: string;
+  language?: string;
+  appearance?: {
+    accent?: string | null;
+    themeMode?: 'light' | 'dark' | 'system';
+  };
 }
 
 export interface IConfigFeatures {
   paymentsEnabled?: boolean;
   supportChatEnabled?: boolean;
+  // Лимиты приходят с сервера, приложение их не зашивает
+  maxChildren?: number;
+  maxChildrenFree?: number;
+  activityDays?: number;
+  activityDaysFree?: number;
 }
 
 export interface IConfigAppearance {
@@ -46,10 +64,6 @@ export interface ISignInResponseModel extends IDefaultResponseModel{
     expiresIn: number;
     config?: IConfig
   }
-}
-
-export interface ISignInUpGuestResponseModel extends IDefaultResponseModel{
-  guest_id: string
 }
 
 export interface IAuthorizationResponseModel extends IDefaultResponseModel{

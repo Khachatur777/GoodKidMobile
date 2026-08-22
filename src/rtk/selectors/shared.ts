@@ -8,11 +8,6 @@ export const getGlobalError = createSelector(
   data => data.globalErrorModal,
 );
 
-export const getPinState = createSelector(
-  getSharedState,
-  data => data.isPinVisible,
-);
-
 export const getMainLoadingState = createSelector(
   getSharedState,
   data => data.isLoading,
@@ -21,11 +16,6 @@ export const getMainLoadingState = createSelector(
 export const isLoggedInSelector = createSelector(
   getSharedState,
   data => data.isLoggedIn,
-);
-
-export const pinAsyncFnSelector = createSelector(
-  getSharedState,
-  data => data.pinAsyncFn,
 );
 
 export const getIsTabBarHiddenState = createSelector(
@@ -89,4 +79,40 @@ export const getAvailableAccentsState = createSelector(
 export const getUpdateState = createSelector(
   getSharedState,
   data => data.updateIsVisible,
+);
+
+export const getRoleState = createSelector(
+  getSharedState,
+  data => data.role,
+);
+
+// Детский интерфейс: три таба, без фильтров и без родительских разделов
+export const getIsChildState = createSelector(
+  getSharedState,
+  data => data.role === 'child',
+);
+
+export const getChildrenState = createSelector(
+  getSharedState,
+  data => data.children,
+);
+
+export const getActiveChildIdState = createSelector(
+  getSharedState,
+  data => data.activeChildId,
+);
+
+export const getOnboardingSeenState = createSelector(
+  getSharedState,
+  data => data.onboardingSeen,
+);
+
+export const getParentalGatePassedAtState = createSelector(
+  getSharedState,
+  data => data.parentalGatePassedAt,
+);
+
+export const getRememberedKidLoginState = createSelector(
+  getSharedState,
+  data => data.rememberedKidLogin,
 );

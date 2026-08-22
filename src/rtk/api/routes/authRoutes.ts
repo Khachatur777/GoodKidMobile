@@ -4,7 +4,7 @@ export const authRoutes = (version: string = 'v1') => {
     signUpGoogle: `/${version}/auth/sign-up/google`,
     signUpApple: `/${version}/auth/sign-up/apple`,
     signIn: `/${version}/auth/sign-in`,
-    signInUpGuest: `/${version}/auth/guest/sign-up-in`,
+    signInChild: `/${version}/auth/sign-in/child`,
     signInGoogle: `/${version}/auth/sign-in/google`,
     signInApple: `/${version}/auth/sign-in/apple`,
     authorization: `/${version}/auth/authorization`,

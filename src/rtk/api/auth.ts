@@ -6,7 +6,7 @@ import {
   IForgotSendCodeRequestModel, ISignInAppleRequestModel, ISignInGoogleRequestModel,
   ISignInRequestModel,
   ISignInResponseModel,
-  ISignInUpGuestRequestModel, ISignInUpGuestResponseModel, ISignUpAppleRequestModel, ISignUpGoogleRequestModel,
+  ISignInChildRequestModel, ISignUpAppleRequestModel, ISignUpGoogleRequestModel,
   ISignUpRequestModel,
   ISignUpVerifyRequestModel,
   IVerifyEmailAgainRequestModel,
@@ -54,13 +54,15 @@ export const authApi = baseApi
           };
         },
       }),
-      signInUpGuest: builder.mutation<
-        ISignInUpGuestResponseModel,
-        ISignInUpGuestRequestModel
+      // Вход ребёнка: логин и пароль, которые ему завёл родитель.
+      // Ни Google/Apple, ни восстановления пароля здесь нет.
+      signInChild: builder.mutation<
+        ISignInResponseModel,
+        ISignInChildRequestModel
       >({
         query: (body) => {
           return {
-            url: authRoutes().signInUpGuest,
+            url: authRoutes().signInChild,
             method: 'POST',
             body,
           };
@@ -204,6 +206,6 @@ export const {
   useSignUpGoogleMutation,
   useConfigMutation,
   useSignUpAppleMutation,
-  useSignInUpGuestMutation
+  useSignInChildMutation
 } = authApi;
 

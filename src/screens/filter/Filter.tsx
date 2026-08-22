@@ -18,7 +18,6 @@ import {
 } from 'rtk';
 import {useDispatch, useSelector} from 'react-redux';
 import {NoSignIn} from 'organisms';
-import {usePinAction} from 'hooks';
 import {purchaseUser} from "hooks/usePurchase.ts";
 import AlertModal from "../../molecules/alert-modal/AlertModal.tsx";
 
@@ -45,7 +44,6 @@ const Filter: FC<FilterProps> = () => {
   const isLoggedIn = useSelector(isLoggedInSelector);
   const user = useSelector(getUserState);
   const contentLocked = useSelector(getContentLockedState);
-  const {startPinAction} = usePinAction();
   const dispatch = useDispatch();
 
   const {data: getUserFilter} = useGetFilterQuery({showModal: true, showLoader: true}, {
@@ -92,21 +90,6 @@ const Filter: FC<FilterProps> = () => {
     try {
       if (!user?.id) return;
 
-      const pinRes = await startPinAction();
-      const pinCode = pinRes?.data;
-
-      if (+pinCode !== user?.pinCode) {
-
-        return setTimeout(() => {
-          Toast.show({
-            type: 'error',
-            text1: t('pin_code_incorrect_title'),
-            text2: t('pin_code_incorrect_description'),
-            onPress: () => Toast.hide(),
-          });
-        }, 200);
-      }
-
       const filterData = {
         categories,
         age: ages || '',
@@ -130,24 +113,9 @@ const Filter: FC<FilterProps> = () => {
     } catch (e) {
       console.error('Error saving filters:', e);
     }
-  }, [ages, categories, language, user?.id, editFilter, user?.pinCode])
+  }, [ages, categories, language, user?.id, editFilter])
 
   const purchase = useCallback(async () => {
-
-    const pinRes = await startPinAction();
-    const pinCode = pinRes?.data;
-
-    if (+pinCode !== user?.pinCode) {
-
-      return setTimeout(() => {
-        Toast.show({
-          type: 'error',
-          text1: t('pin_code_incorrect_title'),
-          text2: t('pin_code_incorrect_description'),
-          onPress: () => Toast.hide(),
-        });
-      }, 200);
-    }
 
     purchaseUser()
       .then(res => {

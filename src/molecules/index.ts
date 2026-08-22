@@ -14,3 +14,5 @@ export * from './keyboard-aware-scroll-view'
 export * from './badge'
 export * from './radio-button'
 export * from './goodkid-logo'
+export * from './kid-avatar';
+export * from './segmented-control';

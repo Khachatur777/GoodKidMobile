@@ -1,4 +1,4 @@
-import { IConfig, IUser } from 'models';
+import { IChild, IConfig, IUser, UserRole } from 'models';
 
 export interface ISharedTokenDataState {
   accessToken: string,
@@ -15,7 +15,6 @@ export interface ISharedFilterDaraState {
 export type SharedState = {
   showSplashScreen: boolean;
   isLoading: boolean;
-  isPinVisible: boolean;
   theme: string;
   isLoggedIn: boolean | null;
   languageId: string | null;
@@ -24,13 +23,23 @@ export type SharedState = {
   netInfo: boolean;
   updateIsVisible: boolean;
   user: IUser | null;
+  // Кто вошёл. От этого зависит, какой интерфейс и какие табы показывать.
+  role: UserRole | null;
+  // Дети родителя и выбранный в фильтре ребёнок
+  children: IChild[];
+  activeChildId: string | null;
+  // Онбординг показывается один раз на устройство
+  onboardingSeen: boolean;
+  // Пройденный parental gate действует до конца сессии
+  parentalGatePassedAt: number | null;
+  // Логин ребёнка запоминается на устройстве, пароль — никогда
+  rememberedKidLogin: string | null;
   tokenData: ISharedTokenDataState | null;
   globalErrorModal: {
     title: string;
     description: string;
     isVisible: boolean;
   };
-  pinAsyncFn: any;
   filterData: ISharedFilterDaraState,
   configData: IConfig | null
 };
@@ -38,7 +47,6 @@ export type SharedState = {
 export const sharedReducerInitialState: SharedState = {
   showSplashScreen: false,
   isLoading: false,
-  isPinVisible: false,
   subscriptionStatus: false,
   theme: '',
   isLoggedIn: null,
@@ -47,8 +55,13 @@ export const sharedReducerInitialState: SharedState = {
   updateIsVisible: false,
   netInfo: true,
   user: null,
+  role: null,
+  children: [],
+  activeChildId: null,
+  onboardingSeen: false,
+  parentalGatePassedAt: null,
+  rememberedKidLogin: null,
   tokenData: null,
-  pinAsyncFn: null!,
   globalErrorModal: {
     title: '',
     description: '',

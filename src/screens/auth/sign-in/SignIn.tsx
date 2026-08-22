@@ -1,32 +1,36 @@
 import { NavigationProp } from '@react-navigation/native';
 import { Image, Keyboard, Platform, View } from 'react-native';
-import React, { FC, useCallback, useContext } from 'react';
+import React, { FC, useCallback, useContext, useState } from 'react';
 import {GoodKidLogo, BackgroundWrapper,
   Button,
   KeyboardAwareScrollView,
+  KidAvatar,
   PasswordField,
+  SegmentedControl,
   Spacing,
-  TextField,} from 'molecules';
+  TextField,
+  Typography,} from 'molecules';
 import { t } from 'i18next';
 import { Formik } from 'formik';
 import { signInValidationScheme } from './validations.ts';
 import { signInStyles } from './sign-in-styles.ts';
 import {
   setConfigData,
-  setFilterData,
   setIsLoggedIn,
   setLanguageId,
   setSubscriptionUserData,
   setTokenData,
+  getRememberedKidLoginState,
+  setRememberedKidLogin,
   setUser,
-  useFilterMutation,
   useSignInAppleMutation,
+  useSignInChildMutation,
   useSignInGoogleMutation,
   useSignInMutation,
   useSignUpAppleMutation,
   useSignUpGoogleMutation,
 } from 'rtk';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setItem } from 'configs';
 import {
   getBuildNumber,
@@ -38,7 +42,7 @@ import {
 import { ThemeContext } from 'theme';
 import Purchases from 'react-native-purchases';
 import { checkUserSubscription } from 'hooks/usePurchase.ts';
-import { signInWithGoogle, usePinAction } from 'hooks';
+import { signInWithGoogle } from 'hooks';
 import { IConfig, IUser } from 'models';
 import { appleAuth } from '@invertase/react-native-apple-authentication';
 
@@ -52,11 +56,17 @@ const SignIn: FC<SignInhProps> = ({navigation}) => {
   const [signInApple] = useSignInAppleMutation();
   const [signUpGoogle] = useSignUpGoogleMutation();
   const [signUpApple] = useSignUpAppleMutation();
-  const [filter] = useFilterMutation();
+  const [signInChild] = useSignInChildMutation();
 
   const {theme} = useContext(ThemeContext);
   const dispatch = useDispatch();
-  const {startPinAction} = usePinAction();
+
+  // Роль выбирается переключателем: у родителя почта и соцвход, у ребёнка —
+  // только логин с паролем, которые ему завёл родитель.
+  const [role, setRole] = useState<'parent' | 'child'>('parent');
+  const rememberedKidLogin = useSelector(getRememberedKidLoginState);
+  const [kidLogin, setKidLogin] = useState(rememberedKidLogin || '');
+  const [kidPassword, setKidPassword] = useState('');
 
   const initialValues = {email: '', password: ''};
 
@@ -80,6 +90,11 @@ const SignIn: FC<SignInhProps> = ({navigation}) => {
   const setRevenueCatUser = useCallback(
     async (user?: IUser) => {
       if (!user?.id) return;
+
+      // Покупки принадлежат родителю. Под детским аккаунтом RevenueCat не
+      // логиним вовсе: иначе подписка родителя не увидится, а покупка уехала
+      // бы не на тот аккаунт. Статус подписки ребёнку приходит с сервера.
+      if (user.role === 'child') return;
       await Purchases.setAttributes({
         'E-mail': user?.email || '',
         'Name': `${user?.profile?.firstName || ''} ${user?.profile?.lastName || ''}`.trim(),
@@ -110,7 +125,8 @@ const SignIn: FC<SignInhProps> = ({navigation}) => {
       // Redux
       dispatch(setIsLoggedIn(true));
       dispatch(setUser(user));
-      dispatch(setLanguageId(user?.profile?.preferredLanguages));
+      // Язык ребёнка задаёт родитель и он приходит в его карточке
+      dispatch(setLanguageId(user?.role === 'child' ? user?.language : user?.profile?.preferredLanguages));
       dispatch(setConfigData(config as any));
 
       dispatch(
@@ -128,13 +144,10 @@ const SignIn: FC<SignInhProps> = ({navigation}) => {
         refreshToken: tokenData?.refreshToken,
       });
 
-      // Filters
-      const responseFilter = await filter({});
-      if (responseFilter?.data?.success) {
-        dispatch(setFilterData(responseFilter?.data?.filter));
-      }
+      // Фильтр к аккаунту больше не привязан: он живёт у ребёнка, и сервер
+      // применяет его сам, что бы ни прислал клиент.
     },
-    [dispatch, filter, setRevenueCatUser],
+    [dispatch, setRevenueCatUser],
   );
 
   const finalizeAuth = useCallback(
@@ -174,9 +187,6 @@ const SignIn: FC<SignInhProps> = ({navigation}) => {
 
   const buildGoogleSignUpPayload = useCallback(
     async (userInfo: any) => {
-      const pinRes = await startPinAction();
-      const pinCode = pinRes?.data;
-
       const deviceId = await getUniqueId();
       const deviceModel = getModel();
       const osVersion = getSystemVersion();
@@ -188,7 +198,6 @@ const SignIn: FC<SignInhProps> = ({navigation}) => {
         deviceModel,
         osVersion,
         productVersion,
-        pinCode,
         profile: {
           firstName: userInfo?.data?.user?.givenName,
           lastName: userInfo?.data?.user?.familyName,
@@ -197,14 +206,11 @@ const SignIn: FC<SignInhProps> = ({navigation}) => {
         showModal: true,
       };
     },
-    [startPinAction],
+    [],
   );
 
   const buildAppleSignUpPayload = useCallback(
     async (userInfo: any) => {
-      const pinRes = await startPinAction();
-      const pinCode = pinRes?.data;
-
       const deviceId = await getUniqueId();
       const deviceModel = getModel();
       const osVersion = getSystemVersion();
@@ -217,7 +223,6 @@ const SignIn: FC<SignInhProps> = ({navigation}) => {
         deviceModel,
         osVersion,
         productVersion,
-        pinCode,
         profile: {
           firstName: userInfo?.fullName?.givenName,
           lastName: userInfo?.fullName?.familyName,
@@ -226,7 +231,7 @@ const SignIn: FC<SignInhProps> = ({navigation}) => {
         showModal: true,
       };
     },
-    [startPinAction],
+    [],
   );
 
   const handleGoogleSignIn = useCallback(async () => {
@@ -324,6 +329,27 @@ const SignIn: FC<SignInhProps> = ({navigation}) => {
 
   };
 
+  const handleKidSignIn = useCallback(async () => {
+    Keyboard.dismiss();
+
+    const login = kidLogin.trim().toLowerCase();
+    if (login.length < 4 || kidPassword.length < 6) return;
+
+    const response = await signInChild({
+      login,
+      password: kidPassword,
+      showModal: true,
+      showLoader: true,
+    });
+
+    if (response?.data?.success) {
+      // Запоминаем только логин: пароль на устройстве не храним никогда.
+      dispatch(setRememberedKidLogin(login));
+      await setItem('kidLogin', login);
+      await finalizeAuth(response?.data as any);
+    }
+  }, [dispatch, finalizeAuth, kidLogin, kidPassword, signInChild]);
+
   return (
     <BackgroundWrapper includesSafeArea backgroundColor="bg_primary">
       <Formik
@@ -339,6 +365,60 @@ const SignIn: FC<SignInhProps> = ({navigation}) => {
             <View style={signInStyles().container}>
 
               <GoodKidLogo size={76} variant="stacked" />
+
+              <Spacing size={16} />
+
+              <SegmentedControl
+                items={[
+                  {value: 'parent', title: t('sign_in_role_parent')},
+                  {value: 'child', title: t('sign_in_role_kid')},
+                ]}
+                value={role}
+                onChange={value => setRole(value as 'parent' | 'child')}
+              />
+
+              <Spacing size={20} />
+
+              {role === 'child' ? (
+                <>
+                  {rememberedKidLogin ? (
+                    <>
+                      <KidAvatar size={84} />
+                      <Spacing size={12} />
+                      <Typography type="title3">
+                        {t('sign_in_welcome_back', {name: rememberedKidLogin})}
+                      </Typography>
+                      <Spacing size={16} />
+                    </>
+                  ) : null}
+
+                  <TextField
+                    size="large"
+                    value={kidLogin}
+                    onChangeText={setKidLogin}
+                    autoCapitalize="none"
+                    label={t('sign_in_login_label')}
+                    placeholder={t('sign_in_login_placeholder')}
+                  />
+
+                  <PasswordField
+                    size="large"
+                    value={kidPassword}
+                    onChangeText={setKidPassword}
+                    label={t('password_sign_in')}
+                  />
+
+                  <Spacing size={8} />
+
+                  <View style={signInStyles().btnContainer}>
+                    <Button
+                      size="large"
+                      title={t('sign_in_btn')}
+                      onPress={handleKidSignIn}
+                    />
+                  </View>
+                </>
+              ) : (
               <>
                 <TextField
                   size="large"
@@ -417,16 +497,20 @@ const SignIn: FC<SignInhProps> = ({navigation}) => {
 
                 </View>
               </>
+              )}
             </View>
           </KeyboardAwareScrollView>
         )}
       </Formik>
 
-      <Button
-        variant="ghost"
-        title={t('sign_up_text')}
-        onPress={() => navigation.navigate('SignUp')}
-      />
+      {/* Регистрируется только родитель */}
+      {role === 'parent' ? (
+        <Button
+          variant="ghost"
+          title={t('sign_up_text')}
+          onPress={() => navigation.navigate('SignUp')}
+        />
+      ) : null}
     </BackgroundWrapper>
   );
 };

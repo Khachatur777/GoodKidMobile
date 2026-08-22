@@ -14,20 +14,12 @@ export interface ISignUpRequestModel extends IBaseRequestModel {
   };
 }
 
-export interface ISignInUpGuestRequestModel extends IBaseRequestModel {
-  deviceId: string;
-  deviceModel: string;
-  osVersion: string;
-  productVersion: string;
-}
-
 export interface ISignUpGoogleRequestModel extends IBaseRequestModel {
   email: string;
   deviceId: string;
   deviceModel: string;
   osVersion: string;
   productVersion: string;
-  pinCode: number;
   profile: {
     firstName: string;
     lastName: string;
@@ -42,7 +34,6 @@ export interface ISignUpAppleRequestModel extends IBaseRequestModel {
   appleId: string;
   osVersion: string;
   productVersion: string;
-  pinCode: number;
   profile: {
     firstName: string;
     lastName: string;

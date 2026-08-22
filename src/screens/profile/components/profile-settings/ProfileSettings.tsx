@@ -12,7 +12,6 @@ import {useTranslation} from 'react-i18next';
 import Toast from "react-native-toast-message";
 import {purchaseUser} from "hooks/usePurchase.ts";
 import {getPaymentsEnabledState, getSubscriptionUserState, getUserState, setSubscriptionUserData} from "rtk";
-import {usePinAction} from "hooks";
 import {useDispatch, useSelector} from "react-redux";
 import {useContext} from 'react';
 import {StyleSheet, View} from 'react-native';
@@ -51,7 +50,6 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({navigation}) => {
   const [subscriptionInfoModalVisible, setSubscriptionInfoModalVisible] = useState<boolean>(false);
   const [parentGateVisible, setParentGateVisible] = useState(false);
   const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
-  const {startPinAction} = usePinAction();
   const dispatch = useDispatch();
   const user = useSelector(getUserState);
   const subscriptionState = useSelector(getSubscriptionUserState);
@@ -83,21 +81,6 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({navigation}) => {
   };
 
   const purchase = useCallback(async () => {
-
-    const pinRes = await startPinAction();
-    const pinCode = pinRes?.data;
-
-    if (+pinCode !== user?.pinCode) {
-
-      return setTimeout(() => {
-        Toast.show({
-          type: 'error',
-          text1: t('pin_code_incorrect_title'),
-          text2: t('pin_code_incorrect_description'),
-          onPress: () => Toast.hide(),
-        });
-      }, 200);
-    }
 
     purchaseUser()
       .then(res => {

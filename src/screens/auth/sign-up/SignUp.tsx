@@ -20,7 +20,6 @@ import {
   getVersion,
 } from 'react-native-device-info';
 import { validateThen } from 'utils';
-import { usePinAction } from 'hooks';
 import { useTranslation } from 'react-i18next';
 import { TermsModal } from 'organisms';
 import { showGlobalError } from 'rtk';
@@ -40,7 +39,6 @@ const SignUp: FC<SignUpProps> = ({ navigation }) => {
   const [termsModal, setTermsModal] = useState<boolean>(false);
   const [termsSelected, setTermsSelected] = useState<boolean>(false);
 
-  const {startPinAction} = usePinAction();
 
   const initialValues = {
     firstName: '',
@@ -63,9 +61,6 @@ const SignUp: FC<SignUpProps> = ({ navigation }) => {
         );
       }
 
-      const pinRes = await startPinAction();
-      const pinCode = pinRes?.data;
-
       const deviceId = await getUniqueId();
       const deviceModel = getModel();
       const osVersion = getSystemVersion();
@@ -78,7 +73,6 @@ const SignUp: FC<SignUpProps> = ({ navigation }) => {
         deviceModel,
         osVersion,
         productVersion,
-        pinCode,
         profile: {
           firstName: values.firstName,
           lastName: values.lastName,
@@ -96,7 +90,7 @@ const SignUp: FC<SignUpProps> = ({ navigation }) => {
     } catch (err) {
       console.error('Sign up failed:', err);
     }
-  }, [navigation, signUpReq, termsSelected, startPinAction]);
+  }, [navigation, signUpReq, termsSelected]);
 
 
 

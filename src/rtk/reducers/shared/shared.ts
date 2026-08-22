@@ -4,7 +4,7 @@ import {
   SharedState,
   ISharedTokenDataState, ISharedFilterDaraState,
 } from './shared-state';
-import { IConfig, IUser } from 'models';
+import { IChild, IConfig, IUser, UserRole } from 'models';
 
 export const sharedSlice = createSlice({
   name: 'shared',
@@ -31,10 +31,6 @@ export const sharedSlice = createSlice({
       state.globalErrorModal = action.payload;
     },
 
-    setPinVisible: (state, action: PayloadAction<boolean>) => {
-      state.isPinVisible = action.payload;
-    },
-
     setNetInfo: (state, action: PayloadAction<boolean>) => {
       state.netInfo = action.payload;
     },
@@ -49,14 +45,42 @@ export const sharedSlice = createSlice({
 
     setUser: (state, action: PayloadAction<IUser | null>) => {
       state.user = action.payload;
+      // Роль всегда едет вместе с пользователем, чтобы они не разъезжались
+      state.role = action.payload?.role ?? null;
+    },
+
+    setRole: (state, action: PayloadAction<UserRole | null>) => {
+      state.role = action.payload;
+    },
+
+    setChildren: (state, action: PayloadAction<IChild[]>) => {
+      state.children = action.payload;
+
+      // Выбранного ребёнка могли удалить — тогда встаём на первого
+      const stillExists = state.children.some(child => child.id === state.activeChildId);
+      if (!stillExists) {
+        state.activeChildId = state.children[0]?.id ?? null;
+      }
+    },
+
+    setActiveChildId: (state, action: PayloadAction<string | null>) => {
+      state.activeChildId = action.payload;
+    },
+
+    setOnboardingSeen: (state, action: PayloadAction<boolean>) => {
+      state.onboardingSeen = action.payload;
+    },
+
+    setParentalGatePassedAt: (state, action: PayloadAction<number | null>) => {
+      state.parentalGatePassedAt = action.payload;
+    },
+
+    setRememberedKidLogin: (state, action: PayloadAction<string | null>) => {
+      state.rememberedKidLogin = action.payload;
     },
 
     setTokenData: (state, action: PayloadAction<ISharedTokenDataState | null>) => {
       state.tokenData = action.payload;
-    },
-
-    setPinAsyncFn: (state, action: PayloadAction<any>) => {
-      state.pinAsyncFn = action.payload;
     },
 
     setLanguageId: (state, action: PayloadAction<string | null>) => {
@@ -88,13 +112,17 @@ export const {
   showGlobalError,
   hideTabBar,
   updateTheme,
-  setPinVisible,
   setIsLoggedIn,
   setUser,
+  setRole,
+  setChildren,
+  setActiveChildId,
+  setOnboardingSeen,
+  setParentalGatePassedAt,
+  setRememberedKidLogin,
   setTokenData,
   showSplashScreen,
   setLanguageId,
-  setPinAsyncFn,
   setFilterData,
   setConfigData,
   setSubscriptionUserData,

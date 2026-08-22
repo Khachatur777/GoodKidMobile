@@ -32,7 +32,7 @@ import {
   GestureHandlerRootView,
 } from 'react-native-gesture-handler';
 import { useSelector } from 'react-redux';
-import { getMainLoadingState, getPinState } from 'rtk';
+import { getMainLoadingState } from 'rtk';
 import { IColor, ThemeContext } from 'theme';
 import { eventEmitter } from 'utils';
 import { modalStyles } from './modal-styles';
@@ -51,7 +51,6 @@ export interface ModalProps extends ReactNativeModalProps {
   contentContainerStyles?: StyleProp<ViewStyle>;
   containerStyles?: StyleProp<ViewStyle>;
   activateAfterLongPress?: number;
-  hideModalWhenPinIsVisible?: boolean;
   keyboardAvoidingView?: boolean;
   disableOnBackgroundPress?: boolean;
   onCloseModal?: () => void;
@@ -66,7 +65,6 @@ const Modal: FC<ModalProps> = ({
                                  showCloseButton = false,
                                  closeIconColor = 'icon_secondary',
                                  showGrabber = true,
-                                 hideModalWhenPinIsVisible = true,
                                  disableOnBackgroundPress = false,
                                  backgroundColor = 'surface_overlay',
                                  type = 'modal',
@@ -82,9 +80,7 @@ const Modal: FC<ModalProps> = ({
   const isLoading = useSelector(getMainLoadingState);
 
   // In Ios We Cannot Open Multiple Modals
-  // Our Pin Menu Is Inside A Modal And When We Open Pin Modal Over Another Opened Modal, It Will Not Work On IOS
 
-  const isPinVisible = useSelector(getPinState);
 
   const translateY = useSharedValue(0);
 
@@ -150,7 +146,7 @@ const Modal: FC<ModalProps> = ({
       animationType="fade"
       presentationStyle="overFullScreen"
       visible={
-        hideModalWhenPinIsVisible ? !isPinVisible && isVisible : isVisible
+        isVisible
       }
       transparent>
       <Animated.View

@@ -19,7 +19,6 @@ import { ThemeContext } from 'theme';
 import { NoSignIn } from 'organisms';
 import Toast from 'react-native-toast-message';
 import { purchaseUser } from 'hooks/usePurchase.ts';
-import { usePinAction } from 'hooks';
 
 export interface LearnProps {
   navigation: NavigationProp<any>;
@@ -37,7 +36,6 @@ const Learn: FC<LearnProps> = ({ navigation }) => {
   const { t } = useTranslation();
   const styles = useMemo(() => learnStyles(color), [color]);
   const isLoggedIn = useSelector(isLoggedInSelector);
-  const { startPinAction } = usePinAction();
   const dispatch = useDispatch();
   const user = useSelector(getUserState);
 
@@ -49,20 +47,6 @@ const Learn: FC<LearnProps> = ({ navigation }) => {
   );
 
   const purchase = useCallback(async () => {
-    const pinRes = await startPinAction();
-    const pinCode = pinRes?.data;
-
-    if (+pinCode !== user?.pinCode) {
-      return setTimeout(() => {
-        Toast.show({
-          type: 'error',
-          text1: t('pin_code_incorrect_title'),
-          text2: t('pin_code_incorrect_description'),
-          onPress: () => Toast.hide(),
-        });
-      }, 200);
-    }
-
     purchaseUser()
       .then(res => {
 

@@ -11,6 +11,7 @@ import {HomeTab} from './home';
 import {FilterTab} from './filter';
 import {ProfileTab} from './profile';
 import { LearnTab } from './learn';
+import { KidProfileTab } from './kid-profile';
 
 export type ScreenTypes = RouteConfig<ParamListBase, any, any, {}, EventMapBase, any>;
 
@@ -25,7 +26,8 @@ export interface IScreens {
       }) => INavigationHeaderProps['options']);
 }
 
-export const tabScreens: ScreenTypes[] = [
+// Родитель: Home, Filter, Learn, Profile
+export const parentTabScreens: ScreenTypes[] = [
   {
     name: 'HomeTab',
     component: HomeTab,
@@ -73,6 +75,50 @@ export const tabScreens: ScreenTypes[] = [
         e.preventDefault();
         navigation.navigate('ProfileTab', {
           screen: 'Profile',
+        });
+      },
+    }),
+  },
+];
+
+// Ребёнок: Home, Learn, Me. Фильтра у него нет — выдачу настроил родитель,
+// и сервер применяет её сам, что бы ни прислал клиент.
+export const kidTabScreens: ScreenTypes[] = [
+  {
+    name: 'HomeTab',
+    component: HomeTab,
+    listeners: ({ navigation }: { navigation: NavigationProp<any> }) => ({
+      tabPress: (e: any) => {
+        e.preventDefault();
+        navigation.navigate('HomeTab', {
+          screen: 'Search',
+        });
+      },
+    }),
+  },
+  {
+    name: 'LearnTab',
+    component: LearnTab,
+    listeners: ({ navigation }: { navigation: NavigationProp<any> }) => ({
+      tabPress: (e: any) => {
+        e.preventDefault();
+        navigation.navigate('LearnTab', {
+          screen: 'LearnScreen',
+        });
+      },
+    }),
+  },
+  {
+    name: 'KidProfileTab',
+    component: KidProfileTab,
+    options: {
+      unmountOnBlur: true,
+    },
+    listeners: ({ navigation }: { navigation: NavigationProp<any> }) => ({
+      tabPress: (e: any) => {
+        e.preventDefault();
+        navigation.navigate('KidProfileTab', {
+          screen: 'KidProfileScreen',
         });
       },
     }),

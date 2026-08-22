@@ -12,3 +12,4 @@ export * from './learn-explanation';
 export * from './app-colour';
 export * from './about';
 export * from './support';
+export * from './kid-profile';
