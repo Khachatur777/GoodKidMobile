@@ -62,11 +62,13 @@ export const playVideoListStyles = ({
       paddingHorizontal: 20,
       paddingVertical: 10,
     },
+    // Блок под плеером держим компактным: заголовок, чипсы и «дальше» должны
+    // помещаться так, чтобы следующее видео уже виднелось на экране
     infoContainer: {
       paddingHorizontal: 22,
-      paddingTop: 18,
-      paddingBottom: 6,
-      gap: 12,
+      paddingTop: 12,
+      paddingBottom: 2,
+      gap: 8,
     },
     chipsRow: {
       flexDirection: 'row',
@@ -74,21 +76,21 @@ export const playVideoListStyles = ({
       gap: 8,
     },
     categoryChip: {
-      paddingVertical: 7,
+      paddingVertical: 5,
       paddingHorizontal: 13,
       borderRadius: 999,
       backgroundColor: color?.('accent_active', 0.12),
     },
     ageChip: {
-      paddingVertical: 7,
+      paddingVertical: 5,
       paddingHorizontal: 13,
       borderRadius: 999,
       backgroundColor: color?.('surface_primary'),
     },
     upNextLabel: {
       paddingHorizontal: 22,
-      paddingTop: 8,
-      paddingBottom: 8,
+      paddingTop: 6,
+      paddingBottom: 4,
     },
     upNextList: {
       paddingHorizontal: 16,
