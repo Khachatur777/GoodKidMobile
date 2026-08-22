@@ -1,4 +1,5 @@
 import React, { Dispatch, FC, SetStateAction, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Button, Modal, Spacing, TextField, Typography } from 'molecules';
 
 interface ParentGateModalProps {
@@ -12,6 +13,7 @@ const ParentGateModal: FC<ParentGateModalProps> = ({
   setIsVisible,
   onSuccess,
 }) => {
+  const { t } = useTranslation();
   const [value, setValue] = useState('');
 
   const numbers = useMemo(() => {
@@ -40,12 +42,12 @@ const ParentGateModal: FC<ParentGateModalProps> = ({
       setIsVisible={setIsVisible}
       showCloseButton
     >
-      <Typography type="title3">For parents only</Typography>
+      <Typography type="title3">{t('parent_gate_title')}</Typography>
 
       <Spacing size={16} />
 
       <Typography type="bodyM">
-        What is {numbers.first} + {numbers.second} ?
+        {t('parent_gate_question', {first: numbers.first, second: numbers.second})}
       </Typography>
 
       <Spacing size={16} />
@@ -54,12 +56,12 @@ const ParentGateModal: FC<ParentGateModalProps> = ({
         keyboardType="number-pad"
         value={value}
         onChangeText={setValue}
-        label="Answer"
+        label={t('parent_gate_answer_label')}
       />
 
       <Spacing size={24} />
 
-      <Button title="Continue" onPress={onSubmit} />
+      <Button title={t('parent_gate_continue')} onPress={onSubmit} />
 
       <Spacing size={16} />
     </Modal>
