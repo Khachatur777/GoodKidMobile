@@ -10,6 +10,7 @@ import {
 import { profileStyle } from '../../profile-styles.ts';
 import { NavigationProp } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
+import { useParentGate } from 'hooks';
 import {Linking} from "react-native";
 
 interface ProfileInformationProps {
@@ -22,14 +23,9 @@ const ProfileInformation: FC<ProfileInformationProps> = ({
   const [termsModal, setTermsModal] = useState<boolean>(false);
   const [supportModalVisible, setSupportModalVisible] = useState<boolean>(false);
   const [privacyModal, setPrivacyModal] = useState<boolean>(false);
-  const [parentGateVisible, setParentGateVisible] = useState(false);
-  const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
   const { t } = useTranslation();
+  const {runBehindGate, gateProps} = useParentGate();
 
-  const openWithParentGate = (callback: () => void) => {
-    setPendingAction(() => callback);
-    setParentGateVisible(true);
-  };
 
   return (
     <CardWrapper
@@ -46,7 +42,7 @@ const ProfileInformation: FC<ProfileInformationProps> = ({
         iconName="MessageChatSquareIcon"
         title={t('profile_support')}
         onPress={() => {
-          openWithParentGate(() => {
+          runBehindGate(() => {
             navigation.navigate('SupportScreen');
           });
         }}
@@ -64,7 +60,7 @@ const ProfileInformation: FC<ProfileInformationProps> = ({
         iconName="DocumentIcon"
         title={t('privacy_policy_conditions')}
         onPress={() => {
-          openWithParentGate(() => {
+          runBehindGate(() => {
             Linking.openURL('https://goodkid.app/privacy');
           });
         }}
@@ -75,7 +71,7 @@ const ProfileInformation: FC<ProfileInformationProps> = ({
         iconName="DocumentIcon"
         title={t('profile_terms_conditions')}
         onPress={() => {
-          openWithParentGate(() => {
+          runBehindGate(() => {
             Linking.openURL('https://goodkid.app/terms');
           });
         }}
@@ -99,14 +95,7 @@ const ProfileInformation: FC<ProfileInformationProps> = ({
         />
       ) : null}
 
-      <ParentGateModal
-        isVisible={parentGateVisible}
-        setIsVisible={setParentGateVisible}
-        onSuccess={() => {
-          pendingAction?.();
-          setPendingAction(null);
-        }}
-      />
+      <ParentGateModal {...gateProps} />
     </CardWrapper>
   );
 };

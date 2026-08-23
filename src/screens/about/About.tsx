@@ -3,8 +3,9 @@ import {Linking, ScrollView, Share, View} from 'react-native';
 import {NavigationProp} from '@react-navigation/native';
 import {getVersion, getBuildNumber} from 'react-native-device-info';
 import {BackgroundWrapper, GoodKidLogo, Typography} from 'molecules';
-import {Cell} from 'organisms';
+import {Cell, ParentGateModal} from 'organisms';
 import {useTranslation} from 'react-i18next';
+import {useParentGate} from 'hooks';
 
 import {ThemeContext} from 'theme';
 import {aboutStyles} from './about-styles.ts';
@@ -19,6 +20,10 @@ const About: FC<AboutProps> = () => {
   const {t} = useTranslation();
   const {color} = useContext(ThemeContext);
   const styles = useMemo(() => aboutStyles(color), [color]);
+
+  // Экран открыт и ребёнку, поэтому всё, что уводит из приложения — сайт,
+  // оценка в сторе, «поделиться» — закрыто вопросом для взрослого.
+  const {runBehindGate, gateProps} = useParentGate();
 
   const onShare = () => {
     Share.share({message: `GoodKid — ${t('about_share_message')} ${SITE_URL}`}).catch(() => null);
@@ -47,19 +52,19 @@ const About: FC<AboutProps> = () => {
             type="icon"
             iconName="StarIcon"
             title={t('about_rate')}
-            onPress={() => Linking.openURL(SITE_URL)}
+            onPress={() => runBehindGate(() => Linking.openURL(SITE_URL))}
           />
           <Cell
             type="icon"
             iconName="ShareIcon"
             title={t('about_share')}
-            onPress={onShare}
+            onPress={() => runBehindGate(onShare)}
           />
           <Cell
             type="icon"
             iconName="GlobeIcon"
             title="goodkid.app"
-            onPress={() => Linking.openURL(SITE_URL)}
+            onPress={() => runBehindGate(() => Linking.openURL(SITE_URL))}
           />
         </View>
 
@@ -67,6 +72,8 @@ const About: FC<AboutProps> = () => {
           {t('about_footer')}
         </Typography>
       </ScrollView>
+
+      <ParentGateModal {...gateProps} />
     </BackgroundWrapper>
   );
 };

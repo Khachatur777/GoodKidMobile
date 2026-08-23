@@ -9,6 +9,7 @@ import {
 } from 'organisms';
 import {profileStyle} from '../../profile-styles.ts';
 import {useTranslation} from 'react-i18next';
+import {useParentGate} from 'hooks';
 import Toast from "react-native-toast-message";
 import {purchaseUser} from "hooks/usePurchase.ts";
 import {
@@ -54,11 +55,10 @@ interface ProfileSettingsProps {
 
 const ProfileSettings: FC<ProfileSettingsProps> = ({navigation}) => {
   const {t} = useTranslation();
+  const {runBehindGate, gateProps} = useParentGate();
   const [languageModal, setLanguageModal] = useState<boolean>(false);
   const [themeModal, setThemeModal] = useState<boolean>(false);
   const [subscriptionInfoModalVisible, setSubscriptionInfoModalVisible] = useState<boolean>(false);
-  const [parentGateVisible, setParentGateVisible] = useState(false);
-  const [pendingAction, setPendingAction] = useState<(() => void) | null>(null);
   const dispatch = useDispatch();
   const user = useSelector(getUserState);
   const subscriptionState = useSelector(getSubscriptionUserState);
@@ -110,10 +110,6 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({navigation}) => {
 
   const onThemeChange = useCallback(() => setThemeModal(true), []);
 
-  const openWithParentGate = (callback: () => void) => {
-    setPendingAction(() => callback);
-    setParentGateVisible(true);
-  };
 
   const purchase = useCallback(async () => {
 
@@ -142,7 +138,7 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({navigation}) => {
         iconName="User02Icon"
         title={t('children_title')}
         onPress={() => {
-          openWithParentGate(() => navigation.navigate('ChildrenScreen'));
+          runBehindGate(() => navigation.navigate('ChildrenScreen'));
         }}
         renderRightContent={() => (
           <Typography type="bodyS" textColor="text_tertiary">
@@ -157,7 +153,7 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({navigation}) => {
           iconName="CreditCardDownIcon"
           title={t('subscription')}
           onPress={() => {
-            openWithParentGate(() => {
+            runBehindGate(() => {
               if (subscriptionState) {
                 return setSubscriptionInfoModalVisible(true);
               }
@@ -236,14 +232,7 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({navigation}) => {
         ]}
       />
 
-      <ParentGateModal
-        isVisible={parentGateVisible}
-        setIsVisible={setParentGateVisible}
-        onSuccess={() => {
-          pendingAction?.();
-          setPendingAction(null);
-        }}
-      />
+      <ParentGateModal {...gateProps} />
     </CardWrapper>
   );
 };
