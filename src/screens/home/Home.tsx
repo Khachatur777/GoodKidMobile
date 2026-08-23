@@ -260,12 +260,14 @@ const Home: FC<HomeProps> = ({navigation}) => {
           <Typography type="title3">GoodKid</Typography>
         </View>
 
-        <Pressable
-          style={styles.searchButton}
-          onPress={() => navigation.navigate('SearchScreen')}
-        >
-          <Icon name="SearchLgIcon" color="icon_secondary" width={22} height={22} />
-        </Pressable>
+        {isChild ? null : (
+          <Pressable
+            style={styles.searchButton}
+            onPress={() => navigation.navigate('SearchScreen')}
+          >
+            <Icon name="SearchLgIcon" color="icon_secondary" width={22} height={22} />
+          </Pressable>
+        )}
       </View>
 
       <View style={styles.greetingContainer}>
@@ -275,7 +277,18 @@ const Home: FC<HomeProps> = ({navigation}) => {
         <Typography type="titleL">{t('home_picked_today')}</Typography>
       </View>
 
-      {isChild ? null : (
+      {isChild ? (
+        <Pressable
+          style={styles.kidSearchField}
+          onPress={() => navigation.navigate('SearchScreen')}
+        >
+          <Icon name="SearchLgIcon" color="icon_secondary" width={24} height={24} />
+
+          <Typography type="bodyL" textColor="text_tertiary">
+            {t('kid_home_search_placeholder')}
+          </Typography>
+        </Pressable>
+      ) : (
       <View>
         <ScrollView
           horizontal

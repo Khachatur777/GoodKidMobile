@@ -44,6 +44,24 @@ export const homeStyles = ({
       height: 34,
       resizeMode: 'contain',
     },
+    // Детский Home по макету: поиск не иконкой в углу, а полем во всю ширину —
+    // крупная зона нажатия и понятная подпись
+    kidSearchField: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+      height: 56,
+      borderRadius: 18,
+      paddingHorizontal: 18,
+      marginHorizontal: 16,
+      marginBottom: 8,
+      backgroundColor: color?.('surface_primary'),
+      shadowColor: '#191634',
+      shadowOpacity: 0.06,
+      shadowRadius: 10,
+      shadowOffset: {width: 0, height: 2},
+      elevation: 2,
+    },
     searchButton: {
       width: 40,
       height: 40,
