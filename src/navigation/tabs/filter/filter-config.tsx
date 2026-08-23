@@ -12,7 +12,7 @@ export const filterScreens: IScreens[] = [
     options: () => ({
      title: i18n.t('filter_header'),
       type: 'title',
-      showBackIcon: true,
+      showBackIcon: false,
       showIconInTabScreen: false,
     }),
   },

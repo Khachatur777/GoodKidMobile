@@ -19,7 +19,7 @@ export const profileScreens: IScreens[] = [
     options: () => ({
       title: i18n.t('profile_header'),
       type: 'title',
-      showBackIcon: true,
+      showBackIcon: false,
       showIconInTabScreen: false,
     }),
   },

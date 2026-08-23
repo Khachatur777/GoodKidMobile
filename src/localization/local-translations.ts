@@ -144,6 +144,7 @@ export const localTranslations = {
     parent_gate_answer_label: 'Answer',
     close: 'Close',
     title_length_is_invalid: 'Too short — add a bit more',
+    duration_minutes: '{{value}} min',
 },
   ru: {
     theme_system: 'Системная',
@@ -288,6 +289,7 @@ export const localTranslations = {
     parent_gate_answer_label: 'Ответ',
     close: 'Закрыть',
     title_length_is_invalid: 'Слишком коротко — напишите подробнее',
+    duration_minutes: '{{value}} мин',
 },
   hy: {
     theme_system: 'Համակարգային',
@@ -432,6 +434,7 @@ export const localTranslations = {
     onboarding_4_description: 'Պարզ պատմություն ըստ օրերի՝ տեսանյութեր և ուսուցողական քարտեր։',
     close: 'Փակել',
     title_length_is_invalid: 'Չափազանց կարճ է — գրեք ավելի մանրամասն',
+    duration_minutes: '{{value}} րոպե',
 },
 };
 

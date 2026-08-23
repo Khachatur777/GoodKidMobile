@@ -9,7 +9,7 @@ export const learnScreens: IScreens[] = [
     options: () => ({
       title: i18n.t('learn_header'),
       type: 'title',
-      showBackIcon: true,
+      showBackIcon: false,
       showIconInTabScreen: false,
     }),
   },

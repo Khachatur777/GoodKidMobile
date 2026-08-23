@@ -21,6 +21,8 @@ export interface ChildActivityProps {
   route: RouteProp<{ params: { childId: string } }, 'params'>;
 }
 
+// Минуты подписываем через словарь: раньше «min» было зашито по-английски
+// и оставалось таким на русском и армянском
 const minutes = (seconds?: number | null) => Math.max(1, Math.round((seconds || 0) / 60));
 
 const timeOfDay = (iso: string) =>
@@ -150,8 +152,8 @@ const ChildActivity: FC<ChildActivityProps> = ({ route }) => {
                       <View style={styles.rowMeta}>
                         <Typography type="caption" textColor="text_tertiary">
                           {t('child_activity_watched', {
-                            watched: `${minutes(item.watchedSeconds)} min`,
-                            total: `${minutes(item.durationSeconds)} min`,
+                            watched: t('duration_minutes', {value: minutes(item.watchedSeconds)}),
+                            total: t('duration_minutes', {value: minutes(item.durationSeconds)}),
                           })}
                         </Typography>
 
