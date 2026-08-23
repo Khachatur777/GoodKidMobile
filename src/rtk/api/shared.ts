@@ -13,22 +13,24 @@ export const sharedApi = baseApi
     endpoints: builder => ({
       privacy: builder.query<
         IPrivacyTermsResponseModel,
-        IBaseRequestModel
+        IBaseRequestModel & {languageId: string}
       >({
-        query: () => {
+        // Документ приходит на языке приложения: раньше сервер отдавал все три
+        // языка одним куском, и человек читал свой текст, пролистав чужие.
+        query: ({languageId}) => {
           return {
-            url: sharedRoutes().privacy,
+            url: `${sharedRoutes().privacy}?languageId=${languageId}`,
             method: 'GET',
           };
         },
       }),
       terms: builder.query<
         IPrivacyTermsResponseModel,
-        IBaseRequestModel
+        IBaseRequestModel & {languageId: string}
       >({
-        query: () => {
+        query: ({languageId}) => {
           return {
-            url: sharedRoutes().terms,
+            url: `${sharedRoutes().terms}?languageId=${languageId}`,
             method: 'GET',
           };
         },
