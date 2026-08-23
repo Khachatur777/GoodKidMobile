@@ -14,7 +14,6 @@ import {
 } from 'react-native';
 import {YoutubeItemSkeleton, VideoRow} from "organisms";
 import {NavigationProp, RouteProp, useFocusEffect} from "@react-navigation/native";
-import {usePreventSwipeBackOnAndroid} from "hooks";
 import { formatTime, isTablet } from 'utils';
 import {Icon, Typography} from 'molecules';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -37,7 +36,6 @@ export interface PlayVideoListProps {
 }
 
 const PlayVideoList: FC<PlayVideoListProps> = ({navigation, route}) => {
-  usePreventSwipeBackOnAndroid()
   const insets = useSafeAreaInsets();
   const {t} = useTranslation();
   const {color} = useContext(ThemeContext);
@@ -61,6 +59,9 @@ const PlayVideoList: FC<PlayVideoListProps> = ({navigation, route}) => {
     [color, width, height, isTablet],
   );
 
+  // Свайп назад на плеере выключен настройкой навигатора. Раньше поверх этого
+  // висел ещё хук, который на Android перехватывал любой уход с экрана —
+  // из-за него не работала и кнопка «Назад», и системная.
   useFocusEffect(
     useCallback(() => {
       navigation.setOptions({
