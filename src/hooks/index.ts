@@ -7,3 +7,4 @@ export * from './useGoogleAuth.ts';
 export * from './useAudioPlayer.ts';
 export {default as useWatchActivity} from './useWatchActivity';
 export {default as useParentGate} from './useParentGate';
+export * from './useAuthSession';

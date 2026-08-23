@@ -16,9 +16,18 @@ export const rtkQueryErrorLogger: Middleware =
       );
     }
 
+    // Лоадером управляет только тот запрос, который его и попросил: иначе
+    // фоновый ответ гасит спиннер чужого сценария
+    const ownsLoader = !!action?.meta?.arg?.originalArgs?.showLoader;
+
     // Enable Loading
-    if (action?.meta?.arg?.originalArgs?.showLoader) {
-      api.dispatch(showMainLoader(true));
+    if (ownsLoader) {
+      if (String(action?.type).endsWith('/pending')) {
+        api.dispatch(showMainLoader(true));
+      } else {
+        // Гасим и по отменённому запросу тоже, иначе спиннер останется висеть
+        api.dispatch(showMainLoader(false));
+      }
     }
 
 
@@ -68,9 +77,6 @@ export const rtkQueryErrorLogger: Middleware =
     if (isRejectedWithValue(action)) {
 
 
-      // Disable Loading
-      api.dispatch(showMainLoader(false));
-
       // Error Response Log Description
       if (__DEV__) {
         console.error(
@@ -87,9 +93,6 @@ export const rtkQueryErrorLogger: Middleware =
 
     // Log Response When Request Is Succeeded
     if (action?.meta?.baseQueryMeta?.response && !isRejectedWithValue(action)) {
-      // Disable Loading
-      api.dispatch(showMainLoader(false));
-
       // Success Log Description
       if (__DEV__) {
         console.info(

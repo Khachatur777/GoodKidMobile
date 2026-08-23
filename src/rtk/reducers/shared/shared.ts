@@ -18,6 +18,15 @@ export const sharedSlice = createSlice({
       state.isLoading = action.payload;
     },
 
+    // Удержание лоадера на весь сценарий: true — взяли, false — отпустили.
+    // Считаем, а не переключаем, чтобы вложенные сценарии не гасили друг друга.
+    holdMainLoader: (state, action: PayloadAction<boolean>) => {
+      state.loaderHold = Math.max(0, state.loaderHold + (action.payload ? 1 : -1));
+      // Сценарий закончился — снимаем и запросный флаг: если запрос по дороге
+      // отвалился, спиннер иначе останется на экране навсегда
+      if (state.loaderHold === 0) state.isLoading = false;
+    },
+
     // Mainly we are hiding TabBar from TabBar component: there is an array named as hideTabBarFromScreens , we add screen name there and it automatically hides tab bar
     // But when we add screens conditionally that method does not work that is why we created this state to hide that specific screens
     hideTabBar: (state, action: PayloadAction<boolean>) => {
@@ -109,6 +118,7 @@ export const sharedReducer = sharedSlice.reducer;
 
 export const {
   showMainLoader,
+  holdMainLoader,
   showGlobalError,
   hideTabBar,
   updateTheme,

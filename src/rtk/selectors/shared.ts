@@ -8,9 +8,10 @@ export const getGlobalError = createSelector(
   data => data.globalErrorModal,
 );
 
+// Спиннер виден, пока идёт помеченный запрос или пока его держит сценарий
 export const getMainLoadingState = createSelector(
   getSharedState,
-  data => data.isLoading,
+  data => data.isLoading || data.loaderHold > 0,
 );
 
 export const isLoggedInSelector = createSelector(

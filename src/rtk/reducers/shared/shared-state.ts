@@ -15,6 +15,10 @@ export interface ISharedFilterDaraState {
 export type SharedState = {
   showSplashScreen: boolean;
   isLoading: boolean;
+  // Сколько сценариев сейчас держат лоадер. Запрос гасит лоадер, когда пришёл
+  // ответ, а вход состоит из нескольких шагов и продолжается после ответа —
+  // счётчик не даёт спрятать спиннер посреди такого сценария.
+  loaderHold: number;
   theme: string;
   isLoggedIn: boolean | null;
   languageId: string | null;
@@ -47,6 +51,7 @@ export type SharedState = {
 export const sharedReducerInitialState: SharedState = {
   showSplashScreen: false,
   isLoading: false,
+  loaderHold: 0,
   subscriptionStatus: false,
   theme: '',
   isLoggedIn: null,

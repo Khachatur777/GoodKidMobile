@@ -152,6 +152,8 @@ const SignUp: FC<SignUpProps> = ({ navigation }) => {
                 }}
                 label={t('email_sign_up')}
                 keyboardType={'email-address'}
+                autoCapitalize="none"
+                autoCorrect={false}
                 explanation={
                   errors?.email && touched?.email
                     ? `${errors?.email}`

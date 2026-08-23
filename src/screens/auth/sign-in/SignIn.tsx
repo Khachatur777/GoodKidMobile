@@ -1,6 +1,6 @@
 import { NavigationProp } from '@react-navigation/native';
-import { Image, Keyboard, Platform, View } from 'react-native';
-import React, { FC, useCallback, useContext, useState } from 'react';
+import { Keyboard, Platform, View } from 'react-native';
+import React, { FC, useCallback, useState } from 'react';
 import {GoodKidLogo, BackgroundWrapper,
   Button,
   KeyboardAwareScrollView,
@@ -15,14 +15,8 @@ import { Formik } from 'formik';
 import { signInValidationScheme } from './validations.ts';
 import { signInStyles } from './sign-in-styles.ts';
 import {
-  setConfigData,
-  setIsLoggedIn,
-  setLanguageId,
-  setSubscriptionUserData,
-  setTokenData,
   getRememberedKidLoginState,
   setRememberedKidLogin,
-  setUser,
   useSignInAppleMutation,
   useSignInChildMutation,
   useSignInGoogleMutation,
@@ -39,11 +33,7 @@ import {
   getUniqueId,
   getVersion,
 } from 'react-native-device-info';
-import { ThemeContext } from 'theme';
-import Purchases from 'react-native-purchases';
-import { checkUserSubscription } from 'hooks/usePurchase.ts';
-import { signInWithGoogle } from 'hooks';
-import { IConfig, IUser } from 'models';
+import { signInWithGoogle, useAuthSession } from 'hooks';
 import { appleAuth } from '@invertase/react-native-apple-authentication';
 
 export interface SignInhProps {
@@ -58,7 +48,6 @@ const SignIn: FC<SignInhProps> = ({navigation}) => {
   const [signUpApple] = useSignUpAppleMutation();
   const [signInChild] = useSignInChildMutation();
 
-  const {theme} = useContext(ThemeContext);
   const dispatch = useDispatch();
 
   // Роль выбирается переключателем: у родителя почта и соцвход, у ребёнка —
@@ -69,8 +58,6 @@ const SignIn: FC<SignInhProps> = ({navigation}) => {
   const [kidPassword, setKidPassword] = useState('');
 
   const initialValues = {email: '', password: ''};
-
-  const versionNumber = getBuildNumber();
 
 
   const goForceUpdate = useCallback(() => {
@@ -87,103 +74,12 @@ const SignIn: FC<SignInhProps> = ({navigation}) => {
     });
   }, [navigation]);
 
-  const setRevenueCatUser = useCallback(
-    async (user?: IUser) => {
-      if (!user?.id) return;
-
-      // Покупки принадлежат родителю. Под детским аккаунтом RevenueCat не
-      // логиним вовсе: иначе подписка родителя не увидится, а покупка уехала
-      // бы не на тот аккаунт. Статус подписки ребёнку приходит с сервера.
-      if (user.role === 'child') return;
-      await Purchases.setAttributes({
-        'E-mail': user?.email || '',
-        'Name': `${user?.profile?.firstName || ''} ${user?.profile?.lastName || ''}`.trim(),
-        VersionNumber: String(versionNumber),
-        LoginTime: new Date().toString(),
-      });
-      await Purchases.logIn(String(user.id));
-
-    },
-    [versionNumber],
-  );
-
-  const saveAuthToStore = useCallback(
-    async (payload: {
-      user: IUser;
-      config?: IConfig;
-      tokenData: { accessToken?: string; refreshToken?: string; expiresIn?: number }
-    }) => {
-      const {user, config, tokenData} = payload;
-
-      // RevenueCat
-      await setRevenueCatUser(user);
-
-      // Subscription
-      const userSubscription = await checkUserSubscription();
-      dispatch(setSubscriptionUserData(!!userSubscription?.isSubscribed));
-
-      // Redux
-      dispatch(setIsLoggedIn(true));
-      dispatch(setUser(user));
-      // Язык ребёнка задаёт родитель и он приходит в его карточке
-      dispatch(setLanguageId(user?.role === 'child' ? user?.language : user?.profile?.preferredLanguages));
-      dispatch(setConfigData(config as any));
-
-      dispatch(
-        setTokenData({
-          accessToken: tokenData?.accessToken as any,
-          expiresIn: tokenData?.expiresIn as any,
-          refreshToken: tokenData?.refreshToken as any,
-        }),
-      );
-
-      // Storage
-      await setItem('tokenData', {
-        accessToken: tokenData?.accessToken,
-        expiresIn: tokenData?.expiresIn,
-        refreshToken: tokenData?.refreshToken,
-      });
-
-      // Фильтр к аккаунту больше не привязан: он живёт у ребёнка, и сервер
-      // применяет его сам, что бы ни прислал клиент.
-    },
-    [dispatch, setRevenueCatUser],
-  );
-
-  const finalizeAuth = useCallback(
-    async (responseData?: any) => {
-      const config = responseData?.data?.config;
-
-      if (
-        config?.forceUpdate &&
-        `${versionNumber}` !==
-          `${
-            Platform.OS === 'android'
-              ? config?.versionAppAndroid
-              : config?.versionAppIos
-          }`
-      ) {
-        goForceUpdate();
-        return;
-      }
-
-      const user = responseData?.data?.user;
-      if (!user) return;
-
-      await saveAuthToStore({
-        user,
-        config,
-        tokenData: {
-          accessToken: responseData?.data?.accessToken,
-          refreshToken: responseData?.data?.refreshToken,
-          expiresIn: responseData?.data?.expiresIn,
-        },
-      });
-
-      goHome();
-    },
-    [goForceUpdate, goHome, saveAuthToStore],
-  );
+  // Запись сессии, RevenueCat и переход живут в общем хуке: он же держит
+  // лоадер до самого Home, чтобы спиннер не пропадал на экране входа.
+  const {finalizeAuth, runAuthFlow, showAuthError} = useAuthSession({
+    onAuthorized: goHome,
+    onForceUpdate: goForceUpdate,
+  });
 
   const buildGoogleSignUpPayload = useCallback(
     async (userInfo: any) => {
@@ -235,13 +131,22 @@ const SignIn: FC<SignInhProps> = ({navigation}) => {
   );
 
   const handleGoogleSignIn = useCallback(async () => {
+    // Системное окно выбора аккаунта показываем до лоадера: под ним спиннер
+    // ни к чему, а отмена выбора — не ошибка.
+    let googleResult;
     try {
-      const {userInfo, tokens} = await signInWithGoogle();
+      googleResult = await signInWithGoogle();
+    } catch (e) {
+      console.log(e);
+      return;
+    }
 
-      const email = userInfo?.data?.user?.email;
-      const idToken = tokens?.idToken;
-      if (!email || !idToken) return;
+    const {userInfo, tokens} = googleResult || {};
+    const email = userInfo?.data?.user?.email;
+    const idToken = tokens?.idToken;
+    if (!email || !idToken) return;
 
+    await runAuthFlow(async () => {
       const loginRes = await signInGoogle({
         email,
         googleToken: idToken,
@@ -253,7 +158,8 @@ const SignIn: FC<SignInhProps> = ({navigation}) => {
         return finalizeAuth(loginRes?.data as any);
       }
 
-      if (!loginRes?.data?.success && loginRes?.data?.googleSignUp) {
+      // Аккаунта ещё нет — заводим его и входим тем же сценарием
+      if (loginRes?.data?.googleSignUp) {
         const signUpPayload = await buildGoogleSignUpPayload(userInfo);
         const signUpRes = await signUpGoogle(signUpPayload);
 
@@ -261,17 +167,24 @@ const SignIn: FC<SignInhProps> = ({navigation}) => {
           return finalizeAuth(signUpRes?.data as any);
         }
       }
-    } catch (e) {
-      console.log(e);
-    }
-  }, [buildGoogleSignUpPayload, finalizeAuth, signInGoogle, signUpGoogle]);
+
+      // Сообщение об ошибке уже показал showModal — второй раз не показываем
+      return loginRes?.error || loginRes?.data?.message ? 'silent' : false;
+    });
+  }, [
+    buildGoogleSignUpPayload,
+    finalizeAuth,
+    runAuthFlow,
+    signInGoogle,
+    signUpGoogle,
+  ]);
 
   const handleEmailSignIn = useCallback(
     async (values: typeof initialValues) => {
-      try {
-        const email = values.email?.trim?.();
-        const password = values.password;
+      const email = values.email?.trim?.().toLowerCase();
+      const password = values.password;
 
+      await runAuthFlow(async () => {
         const response = await signIn({
           email,
           password,
@@ -279,31 +192,39 @@ const SignIn: FC<SignInhProps> = ({navigation}) => {
           showLoader: true,
         });
 
-        if (!response?.data?.success) return;
+        if (!response?.data?.success) {
+          return response?.error || response?.data?.message ? 'silent' : false;
+        }
 
         if (response?.data?.checkEmail) {
-          return navigation.navigate('SignUpVerify', {email});
+          navigation.navigate('SignUpVerify', {email});
+          return true;
         }
 
         return finalizeAuth(response?.data as any);
-      } catch (e) {
-        console.log(e);
-      }
+      });
     },
-    [finalizeAuth, navigation, signIn],
+    [finalizeAuth, navigation, runAuthFlow, signIn],
   );
 
-  const signInWithApple = async () => {
+  const signInWithApple = useCallback(async () => {
+    // Как и у Google: системное окно показываем без спиннера, отмена — молча
+    let appleAuthRequestResponse;
     try {
-      const appleAuthRequestResponse = await appleAuth.performRequest({
+      appleAuthRequestResponse = await appleAuth.performRequest({
         requestedOperation: appleAuth.Operation.LOGIN,
         requestedScopes: [appleAuth.Scope.FULL_NAME, appleAuth.Scope.EMAIL],
       });
+    } catch (e) {
+      console.log(e);
+      return;
+    }
 
-      const appleId = appleAuthRequestResponse?.user;
-      const appleToken = appleAuthRequestResponse?.identityToken;
-      if (!appleId || !appleToken) return;
+    const appleId = appleAuthRequestResponse?.user;
+    const appleToken = appleAuthRequestResponse?.identityToken;
+    if (!appleId || !appleToken) return;
 
+    await runAuthFlow(async () => {
       const loginRes = await signInApple({
         appleId,
         appleToken,
@@ -314,41 +235,62 @@ const SignIn: FC<SignInhProps> = ({navigation}) => {
       if (loginRes?.data?.success) {
         return finalizeAuth(loginRes?.data as any);
       }
-      if (!loginRes?.data?.success && loginRes?.data?.appleSignUp) {
-        const signUpPayload = await buildAppleSignUpPayload(appleAuthRequestResponse);
 
+      if (loginRes?.data?.appleSignUp) {
+        const signUpPayload = await buildAppleSignUpPayload(appleAuthRequestResponse);
         const signUpRes = await signUpApple(signUpPayload);
 
         if (signUpRes?.data?.success) {
           return finalizeAuth(signUpRes?.data as any);
         }
       }
-    } catch (e) {
-      console.log(e);
-    }
 
-  };
+      return loginRes?.error || loginRes?.data?.message ? 'silent' : false;
+    });
+  }, [
+    buildAppleSignUpPayload,
+    finalizeAuth,
+    runAuthFlow,
+    signInApple,
+    signUpApple,
+  ]);
 
   const handleKidSignIn = useCallback(async () => {
     Keyboard.dismiss();
 
     const login = kidLogin.trim().toLowerCase();
-    if (login.length < 4 || kidPassword.length < 6) return;
+    // Ребёнку молчание непонятнее всего: короткий логин объясняем словами
+    if (login.length < 4 || kidPassword.length < 6) {
+      return showAuthError(t('sign_in_kid_credentials_hint'));
+    }
 
-    const response = await signInChild({
-      login,
-      password: kidPassword,
-      showModal: true,
-      showLoader: true,
-    });
+    await runAuthFlow(async () => {
+      const response = await signInChild({
+        login,
+        password: kidPassword,
+        showModal: true,
+        showLoader: true,
+      });
 
-    if (response?.data?.success) {
+      if (!response?.data?.success) {
+        return response?.error || response?.data?.message ? 'silent' : false;
+      }
+
       // Запоминаем только логин: пароль на устройстве не храним никогда.
       dispatch(setRememberedKidLogin(login));
       await setItem('kidLogin', login);
-      await finalizeAuth(response?.data as any);
-    }
-  }, [dispatch, finalizeAuth, kidLogin, kidPassword, signInChild]);
+
+      return finalizeAuth(response?.data as any);
+    });
+  }, [
+    dispatch,
+    finalizeAuth,
+    kidLogin,
+    kidPassword,
+    runAuthFlow,
+    showAuthError,
+    signInChild,
+  ]);
 
   return (
     <BackgroundWrapper includesSafeArea backgroundColor="bg_primary">
@@ -426,6 +368,9 @@ const SignIn: FC<SignInhProps> = ({navigation}) => {
                   onChangeText={e => {
                     setFieldValue('email', e);
                   }}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  keyboardType="email-address"
                   label={t('email_sign_in')}
                   explanation={
                     errors?.email && touched?.email

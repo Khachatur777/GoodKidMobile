@@ -67,6 +67,8 @@ const ForgotSendCode: FC<SignUpProps> = ({ navigation }) => {
                   setFieldValue('email', e);
                 }}
                 keyboardType={'email-address'}
+                autoCapitalize="none"
+                autoCorrect={false}
                 label={t(t('email_forgot'))}
                 explanation={
                   errors?.email && touched?.email
