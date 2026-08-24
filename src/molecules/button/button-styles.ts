@@ -110,6 +110,14 @@ export const btnStyles = ({
         : color?.('text_primary', 0),
     },
 
+    destructive: {
+      backgroundColor: disabled
+        ? color?.('controls_disabled_primary')
+        : pressed || isLoading
+        ? color?.('red_600')
+        : color?.('red_500'),
+    },
+
     negative: {
       backgroundColor: disabled
         ? color?.('controls_disabled_primary')

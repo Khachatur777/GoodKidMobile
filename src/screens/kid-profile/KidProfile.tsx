@@ -133,7 +133,7 @@ const KidProfile: FC<KidProfileProps> = ({ navigation }) => {
         setIsVisible={setLogOutVisible}
         title={t('kid_log_out_title')}
         description={t('kid_log_out_description')}
-        iconProps={{ color: 'icon_tertiary', name: 'LogOut01Icon' }}
+        iconProps={{ name: 'WavingHandIcon' }}
         buttons={[
           {
             title: t('kid_log_out_btn'),
@@ -142,7 +142,7 @@ const KidProfile: FC<KidProfileProps> = ({ navigation }) => {
           },
           {
             title: t('profile_log_out_cancel_btn'),
-            variant: 'secondary',
+            variant: 'outline',
             onPress: () => setLogOutVisible(false),
           },
         ]}

@@ -16,6 +16,8 @@ export type ButtonVariants =
   | 'secondary'
   | 'outline'
   | 'negative'
+  // Solid red with white text: the confirming button of a destructive dialog
+  | 'destructive'
   | 'ghost';
 
 export type Sizes = 'small' | 'medium' | 'large';
@@ -56,7 +58,7 @@ const Button: FC<ButtonProps> = ({
       case 'primary':
         return disabled
           ? 'text_tertiary'
-          : variant === 'primary'
+          : variant === 'primary' || variant === 'destructive'
           ? 'grey_0'
           : variant === 'negative'
           ? 'accent_negative'
@@ -64,7 +66,7 @@ const Button: FC<ButtonProps> = ({
       case 'secondary':
         return disabled
           ? 'text_tertiary'
-          : variant === 'primary'
+          : variant === 'primary' || variant === 'destructive'
           ? 'grey_0'
           : variant === 'negative'
           ? 'accent_negative'
@@ -74,6 +76,8 @@ const Button: FC<ButtonProps> = ({
           ? 'text_tertiary'
           : variant === 'primary'
           ? 'accent_active'
+          : variant === 'destructive'
+          ? 'grey_0'
           : variant === 'outline'
           ? 'text_inverted'
           : variant === 'negative'

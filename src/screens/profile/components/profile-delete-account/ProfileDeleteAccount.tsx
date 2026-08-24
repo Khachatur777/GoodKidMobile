@@ -29,7 +29,8 @@ const ProfileDeleteAccount = () => {
     <>
       <Cell
         type="icon"
-        iconName="CloseRed"
+        iconName="TrashIcon"
+        iconProps={{color: 'accent_negative'}}
         title={t('profile_delete_account')}
         titleProps={{textColor: 'accent_negative'}}
         description={t('profile_delete_account_subtitle')}
@@ -42,11 +43,12 @@ const ProfileDeleteAccount = () => {
         setIsVisible={setIsVisible}
         title={t('profile_delete_account_title')}
         description={t('profile_delete_account_description')}
-        iconProps={{ color: 'icon_tertiary', name: 'WarningCircleIcon' }}
+        tone="negative"
+        iconProps={{ name: 'TrashIcon' }}
         buttons={[
           {
             title: t('profile_delete_btn'),
-            variant: 'negative',
+            variant: 'destructive',
             onPress: async () => {
               setIsVisible(false);
               await onDelete();
@@ -54,7 +56,7 @@ const ProfileDeleteAccount = () => {
           },
           {
             title: t('profile_delete_cancel_btn'),
-            variant: 'secondary',
+            variant: 'outline',
             onPress: () => setIsVisible(false),
           },
         ]}

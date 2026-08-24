@@ -23,16 +23,16 @@ const ProfileLogOut = () => {
         setIsVisible={setIsVisible}
         title={t('profile_log_out_alert_title')}
         description={t('profile_log_out_alert_description')}
-        iconProps={{color: 'icon_tertiary', name: 'LogOut01Icon'}}
+        iconProps={{name: 'LogOut01Icon'}}
         buttons={[
           {
             title: t('profile_log_out_btn'),
-            variant: 'negative',
+            variant: 'primary',
             onPress: signOut,
           },
           {
             title: t('profile_log_out_cancel_btn'),
-            variant: 'secondary',
+            variant: 'outline',
             onPress: () => setIsVisible(false),
           },
         ]}

@@ -135,7 +135,9 @@ const EditChild: FC<EditChildProps> = ({ navigation, route }) => {
 
           <Cell
             type="icon"
-            iconName="CloseRed"
+            iconName="TrashIcon"
+            iconProps={{ color: 'accent_negative' }}
+            titleProps={{ textColor: 'accent_negative' }}
             title={t('child_delete')}
             description={t('child_delete_subtitle')}
             showArrowIcon={false}
@@ -167,7 +169,7 @@ const EditChild: FC<EditChildProps> = ({ navigation, route }) => {
           },
           {
             title: t('cancel'),
-            variant: 'secondary',
+            variant: 'outline',
             onPress: () => setPasswordModal(false),
           },
         ]}
@@ -178,16 +180,17 @@ const EditChild: FC<EditChildProps> = ({ navigation, route }) => {
         setIsVisible={setDeleteModal}
         title={t('child_delete_title', { name: child.name })}
         description={t('child_delete_description')}
-        iconProps={{ color: 'icon_tertiary', name: 'CloseRed' }}
+        tone="negative"
+        iconProps={{ name: 'TrashIcon' }}
         buttons={[
           {
             title: t('child_delete'),
-            variant: 'negative',
+            variant: 'destructive',
             onPress: onDelete,
           },
           {
             title: t('cancel'),
-            variant: 'secondary',
+            variant: 'outline',
             onPress: () => setDeleteModal(false),
           },
         ]}
