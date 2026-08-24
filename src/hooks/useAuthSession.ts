@@ -1,10 +1,10 @@
 import { useCallback } from 'react';
-import { Platform } from 'react-native';
 import { useDispatch } from 'react-redux';
 import Purchases from 'react-native-purchases';
 import { getBuildNumber } from 'react-native-device-info';
 import { t } from 'i18next';
 import { setItem } from 'configs';
+import { isForceUpdateRequired as forceUpdateRequired } from 'helpers';
 import { IConfig, IUser } from 'models';
 import {
   holdMainLoader,
@@ -60,10 +60,7 @@ export const useAuthSession = ({onAuthorized, onForceUpdate}: IAuthSessionOption
   );
 
   const isForceUpdateRequired = useCallback(
-    (config?: IConfig) =>
-      !!config?.forceUpdate &&
-      `${versionNumber}` !==
-        `${Platform.OS === 'android' ? config?.versionAppAndroid : config?.versionAppIos}`,
+    (config?: IConfig) => forceUpdateRequired(Number(versionNumber), config),
     [versionNumber],
   );
 

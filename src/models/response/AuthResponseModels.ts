@@ -51,6 +51,10 @@ export interface IConfig {
   forceUpdate?: boolean;
   versionAppIos?: number;
   versionAppAndroid?: number;
+  // What the update screens show: the numbers decide, these are read out loud
+  versionNameIos?: string;
+  versionNameAndroid?: string;
+  updateNotes?: string[];
   features?: IConfigFeatures;
   appearance?: IConfigAppearance;
 }

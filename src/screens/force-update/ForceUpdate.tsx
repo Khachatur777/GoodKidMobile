@@ -1,82 +1,132 @@
-import {FC, useCallback, useEffect} from 'react';
-import { Alert, BackHandler, Linking, Platform } from 'react-native';
-import {BackgroundWrapper, Button, Icon, Spacing, Typography} from 'molecules';
-import {useTranslation} from 'react-i18next';
+import { FC, useCallback, useContext, useEffect } from 'react';
+import { Alert, BackHandler, Linking, View } from 'react-native';
+import { BackgroundWrapper, Button, Icon, Spacing, Typography } from 'molecules';
+import { useTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
+import { getConfigDataState, getIsChildState } from 'rtk';
+import { ThemeContext } from 'theme';
+import { getVersion } from 'react-native-device-info';
+import { STORE_URL, versionNameFromConfig } from 'helpers';
 import { forceUpdateStyles } from './force-update-styles.ts';
 
-const STORE_URL = Platform.select({
-  ios: 'itms-apps://itunes.apple.com/app/id000000000?action=write-review',
-  android: 'https://play.google.com/store/apps/details?id=com.goodkid',
-});
-
 const ForceUpdate: FC = () => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
+  const { color } = useContext(ThemeContext);
+  const isChild = useSelector(getIsChildState);
+  const config = useSelector(getConfigDataState);
+
+  const styles = forceUpdateStyles({ color });
+  const nextVersion = versionNameFromConfig(config);
 
   const openStore = useCallback(async () => {
-    const url = STORE_URL || '';
-    if (!url) {
-      return;
-    }
     try {
-      await Linking.openURL(url);
+      await Linking.openURL(STORE_URL);
     } catch {
-      // ignore
+      // The store may be missing on an emulator; nothing useful to say here
     }
   }, []);
 
+  // The screen blocks the app, so Android's Back has to be answered explicitly
   useEffect(() => {
     const onBackPress = () => {
       Alert.alert(
-        'Exit App',
-        'Do you want to exit?',
+        t('force_update_exit_title'),
+        t('force_update_exit_description'),
         [
-          {
-            text: 'Cancel',
-            onPress: () => {
-            },
-            style: 'cancel',
-          },
-          { text: 'YES', onPress: () => BackHandler.exitApp() },
+          { text: t('cancel'), style: 'cancel' },
+          { text: t('force_update_exit_confirm'), onPress: () => BackHandler.exitApp() },
         ],
-        { cancelable: false }
+        { cancelable: false },
       );
 
       return true;
     };
 
-    const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      onBackPress
-    );
+    const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+    return () => subscription.remove();
+  }, [t]);
 
-    return () => backHandler.remove();
-  }, []);
+  // A child cannot install anything: they are told to fetch a grown-up.
+  if (isChild) {
+    return (
+      <BackgroundWrapper includesSafeArea backgroundColor="bg_primary" containerStyles={styles.container}>
+        <View style={styles.kidContent}>
+          <View style={styles.kidBadge}>
+            <Icon name="ToolsIcon" width={120} height={120} color="yellow_700" />
+          </View>
+
+          <View style={styles.kidTexts}>
+            <Typography type="titleL" alignment="center">
+              {t('force_update_kid_title')}
+            </Typography>
+            <Typography type="bodyM" alignment="center" textColor="text_secondary">
+              {t('force_update_kid_description')}
+            </Typography>
+          </View>
+        </View>
+
+        <View style={styles.kidFooter}>
+          <Button
+            size="large"
+            title={t('force_update_kid_button')}
+            startIconName="DownloadIcon"
+            onPress={openStore}
+          />
+        </View>
+      </BackgroundWrapper>
+    );
+  }
 
   return (
-    <BackgroundWrapper
-      backgroundColor="bg_primary"
-      containerStyles={forceUpdateStyles({}).container}>
-      <Icon name="InfoIcon" width={200} height={200} />
+    <BackgroundWrapper includesSafeArea backgroundColor="bg_primary" containerStyles={styles.container}>
+      <View style={styles.content}>
+        <View style={styles.illustration}>
+          <View style={styles.illustrationCircle} />
+          <Icon name="SystemUpdateIcon" width={120} height={120} color="accent_active" />
+        </View>
 
-      <Spacing size={38} />
+        <View style={styles.texts}>
+          <Typography type="titleL">{t('force_update_title')}</Typography>
+          <Typography type="bodyM" textColor="text_secondary">
+            {t('force_update_description')}
+          </Typography>
 
-      <Typography type="title2" alignment="center">
-        {t('force_update_title')}
-      </Typography>
+          <View style={styles.versions}>
+            <View style={styles.chip}>
+              <Typography type="bodySM" textColor="text_secondary">
+                {t('force_update_current_version', { version: getVersion() })}
+              </Typography>
+            </View>
 
-      <Spacing size={8} />
+            {!!nextVersion && (
+              <>
+                <Icon name="ChevronRight" width={18} height={18} color="icon_tertiary" />
+                <View style={[styles.chip, styles.chipNext]}>
+                  <Typography type="bodySBold" textColor="accent_active">
+                    {t('force_update_next_version', { version: nextVersion })}
+                  </Typography>
+                </View>
+              </>
+            )}
+          </View>
+        </View>
+      </View>
 
-      <Typography alignment="center" textColor="text_secondary">
-        {t('force_update_description')}
-      </Typography>
-
-      <Spacing size={32} />
-
-      <Button title={t('force_update_button')} onPress={openStore} />
+      <View style={styles.footer}>
+        <Button
+          size="large"
+          title={t('force_update_button')}
+          startIconName="DownloadIcon"
+          onPress={openStore}
+        />
+        <View style={styles.hint}>
+          <Typography type="bodySM" alignment="center" textColor="text_secondary">
+            {t('force_update_hint')}
+          </Typography>
+        </View>
+      </View>
     </BackgroundWrapper>
   );
 };
 
 export default ForceUpdate;
-
-

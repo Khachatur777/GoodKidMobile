@@ -40,3 +40,7 @@ export {default as ShareIcon} from './share.svg';
 export {default as WavingHandIcon} from './waving-hand.svg';
 export {default as LightbulbIcon} from './lightbulb.svg';
 export {default as TrashIcon} from './trash.svg';
+export {default as SystemUpdateIcon} from './system-update.svg';
+export {default as ToolsIcon} from './tools.svg';
+export {default as SparklesIcon} from './sparkles.svg';
+export {default as DownloadIcon} from './download.svg';

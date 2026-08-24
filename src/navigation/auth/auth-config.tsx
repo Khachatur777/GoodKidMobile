@@ -87,11 +87,10 @@ export const authScreens: IScreens[] = [
     name: 'ForceUpdateScreen',
     component: ForceUpdateScreen,
     options: () => ({
-      type: 'title',
-      title: i18n.t('force_update_title'),
-      showBackIcon: false,
-      showIconInTabScreen: true,
-      backgroundColor: 'bg_primary'
+      // No header: the screen carries its own title, and there is nowhere to
+      // navigate from it anyway
+      headerShown: false,
+      backgroundColor: 'bg_primary',
     }),
   },
 

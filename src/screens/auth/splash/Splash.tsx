@@ -1,5 +1,4 @@
 import { FC, useEffect } from 'react';
-import { Platform } from 'react-native';
 import { NavigationProp } from '@react-navigation/native';
 import { useDispatch } from 'react-redux';
 import {
@@ -21,6 +20,7 @@ import {
   useConfigMutation,
 } from 'rtk';
 import { getItem } from 'configs';
+import { isForceUpdateRequired, isOptionalUpdateAvailable } from 'helpers';
 import i18n from 'localization/localization.ts';
 import { checkUserSubscription } from 'hooks/usePurchase.ts';
 
@@ -80,16 +80,15 @@ const Splash: FC<SplashProps> = ({navigation}) => {
             dispatch(setConfigData(cfg));
           }
 
-          if (
-            responseConfig?.data?.success &&
-            cfg?.update &&
-            `${productVersion}` !==
-              `${
-                Platform.OS === 'android'
-                  ? cfg?.versionAppAndroid
-                  : cfg?.versionAppIos
-              }`
-          ) {
+          // A blocked version is blocked whether or not anyone is signed in.
+          // This used to be checked only after a successful authorization, so a
+          // signed-out person walked past the gate into a version we had pulled.
+          if (isForceUpdateRequired(Number(productVersion), cfg)) {
+            resetTo('ForceUpdateScreen');
+            return;
+          }
+
+          if (isOptionalUpdateAvailable(Number(productVersion), cfg)) {
             dispatch(setUpdateIsVisibleData(true));
           }
 
@@ -106,17 +105,14 @@ const Splash: FC<SplashProps> = ({navigation}) => {
 
         const {user, config} = response.data;
 
-        if (
-          config?.forceUpdate &&
-          `${productVersion}` !==
-            `${
-              Platform.OS === 'android'
-                ? config?.versionAppAndroid
-                : config?.versionAppIos
-            }`
-        ) {
+        if (isForceUpdateRequired(Number(productVersion), config)) {
+          dispatch(setUser(user));
           resetTo('ForceUpdateScreen');
           return;
+        }
+
+        if (isOptionalUpdateAvailable(Number(productVersion), config)) {
+          dispatch(setUpdateIsVisibleData(true));
         }
 
         try {
