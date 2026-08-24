@@ -47,8 +47,8 @@ export const localTranslations = {
     faq_age_a: 'Every video is reviewed by hand and tagged with an age range, language and topic. The feed shows only what matches your filter.',
     faq_report_q: 'How do I report a video?',
     faq_report_a: 'Write to us in the support chat or by email — we remove inappropriate videos within a day.',
-    refetch_net_info: 'Refetch',
-    net_info_title: 'You are offline',
+    refetch_net_info: 'Try again',
+    net_info_title: 'No internet connection',
     net_info_description:
       'Please, check your internet connection and refresh the page',
     enter_pin_code: 'Enter PIN code',
@@ -207,8 +207,8 @@ export const localTranslations = {
     faq_age_a: 'Каждое видео проверяется вручную и получает метки возраста, языка и темы. В ленте — только то, что подходит под ваш фильтр.',
     faq_report_q: 'Как пожаловаться на видео?',
     faq_report_a: 'Напишите нам в чат поддержки или на почту — неподходящие видео убираем в течение дня.',
-    refetch_net_info: 'Обновить',
-    net_info_title: 'Сеть недоступна',
+    refetch_net_info: 'Попробовать снова',
+    net_info_title: 'Нет подключения к интернету',
     net_info_description:
       'Проверьте подключение к интернету и перезагрузите страницу',
     enter_pin_code: 'Введите PIN-код',
@@ -367,8 +367,8 @@ export const localTranslations = {
     faq_age_a: 'Յուրաքանչյուր տեսանյութ ստուգվում է ձեռքով և ստանում տարիքի, լեզվի և թեմայի պիտակներ։',
     faq_report_q: 'Ինչպե՞ս բողոքել տեսանյութից։',
     faq_report_a: 'Գրեք մեզ աջակցության չաթում կամ էլ. փոստով — անհամապատասխան տեսանյութերը հեռացնում ենք մեկ օրվա ընթացքում։',
-    refetch_net_info: 'Թարմացնել',
-    net_info_title: 'Կապի խնդիր',
+    refetch_net_info: 'Փորձել կրկին',
+    net_info_title: 'Ինտերնետ կապ չկա',
     net_info_description:
       'Խնդրում ենք ստուգել ինտերնետ հասանելիությունը և թարմացնել էջը',
     enter_pin_code: 'Մուտքագրել PIN կոդը',

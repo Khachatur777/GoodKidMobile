@@ -44,3 +44,5 @@ export {default as SystemUpdateIcon} from './system-update.svg';
 export {default as ToolsIcon} from './tools.svg';
 export {default as SparklesIcon} from './sparkles.svg';
 export {default as DownloadIcon} from './download.svg';
+export {default as CloudOffIcon} from './cloud-off.svg';
+export {default as RefreshIcon} from './refresh.svg';

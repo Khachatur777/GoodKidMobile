@@ -1,41 +1,53 @@
-import {localT} from 'localization';
-import {BackgroundWrapper, Button, Icon, Spacing, Typography} from 'molecules';
-import RNRestart from 'react-native-restart';
-import {View} from "react-native";
+import { FC, useCallback, useContext, useState } from 'react';
+import { View } from 'react-native';
+import { fetch as fetchNetInfo } from '@react-native-community/netinfo';
+import { useDispatch } from 'react-redux';
+import { BackgroundWrapper, Button, Icon, Typography } from 'molecules';
+import { localT } from 'localization';
+import { setNetInfo } from 'rtk';
+import { ThemeContext } from 'theme';
+import { noInternetStyles } from './no-internet-styles';
 
-const NoInternetConnection = () => {
+// Shown over everything while the device is offline. The screen used to restart
+// the whole app to re-check; now it just asks the system again, so nothing in
+// progress is thrown away when the connection comes back.
+const NoInternetConnection: FC = () => {
+  const { color } = useContext(ThemeContext);
+  const dispatch = useDispatch();
+  const [checking, setChecking] = useState(false);
+
+  const styles = noInternetStyles({ color });
+
+  const tryAgain = useCallback(async () => {
+    setChecking(true);
+    try {
+      const state = await fetchNetInfo();
+      dispatch(setNetInfo(!!state.isConnected));
+    } finally {
+      setChecking(false);
+    }
+  }, [dispatch]);
+
   return (
-    <BackgroundWrapper
-      backgroundColor="bg_primary"
-      containerStyles={{
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingHorizontal: 32,
-      }}>
-      <Icon name="NetInfo" width={200} height={200}/>
+    <BackgroundWrapper includesSafeArea backgroundColor="bg_primary" containerStyles={styles.container}>
+      <View style={styles.content}>
+        <View style={styles.illustration}>
+          <View style={styles.illustrationCircle} />
+          <Icon name="CloudOffIcon" width={118} height={118} color="accent_active" />
+        </View>
 
-      <Spacing size={38}/>
+        <View style={styles.texts}>
+          <Typography type="titleL">{localT('net_info_title')}</Typography>
+        </View>
+      </View>
 
-      <Typography type="title2" alignment="center">
-        {localT('net_info_title')}
-      </Typography>
-
-      <Spacing size={8}/>
-
-      <Typography alignment="center" textColor="text_secondary">
-        {localT('net_info_description')}
-      </Typography>
-
-      <Spacing size={32}/>
-
-      <View style={{
-        marginTop: 12,
-        width: '100%',
-      }}>
+      <View style={styles.footer}>
         <Button
           size="large"
           title={localT('refetch_net_info')}
-          onPress={() => RNRestart.restart()}
+          startIconName="RefreshIcon"
+          isLoading={checking}
+          onPress={tryAgain}
         />
       </View>
     </BackgroundWrapper>
