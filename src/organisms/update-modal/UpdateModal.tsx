@@ -31,6 +31,7 @@ const UpdateModal = () => {
 
   return (
     <AlertModal
+      type="modal"
       showCloseBtn
       title={t('update_title')}
       description={t('update_description')}

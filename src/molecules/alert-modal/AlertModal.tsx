@@ -56,7 +56,7 @@ const AlertModal: FC<AlertModalProps> = ({
   }, [props.isVisible, props.autoCloseAfterMs, onClose]);
 
   return (
-    <Modal {...props}>
+    <Modal type="center" {...props}>
       {(iconName || iconProps) && (
         <View style={styles.iconContainer}>
           <View style={styles.iconTile}>

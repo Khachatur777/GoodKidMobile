@@ -16,9 +16,9 @@ export const modalStyles = ({
     },
     contentContainer: {
       flex: 1,
-      justifyContent: 'flex-end',
+      justifyContent: type === 'center' ? 'center' : 'flex-end',
       alignItems: 'center',
-      paddingHorizontal: type === 'modal' ? 8 : 0,
+      paddingHorizontal: type === 'center' ? 24 : type === 'modal' ? 8 : 0,
       paddingBottom: type === 'modal' ? 32 : 0,
     },
     overlay: {
@@ -30,9 +30,10 @@ export const modalStyles = ({
       position: 'relative',
       width: '100%',
       maxHeight: '93%',
-      padding: 24,
-      borderBottomLeftRadius: type === 'bottom-sheet' ? 0 : 24,
-      borderBottomRightRadius: type === 'bottom-sheet' ? 0 : 24,
+      padding: type === 'center' ? 28 : 24,
+      borderRadius: type === 'center' ? 30 : undefined,
+      borderBottomLeftRadius: type === 'bottom-sheet' ? 0 : type === 'center' ? 30 : 24,
+      borderBottomRightRadius: type === 'bottom-sheet' ? 0 : type === 'center' ? 30 : 24,
     },
     closeButton: {
       position: 'absolute',

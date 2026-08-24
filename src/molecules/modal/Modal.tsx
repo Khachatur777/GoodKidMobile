@@ -47,7 +47,9 @@ export interface ModalProps extends ReactNativeModalProps {
   closeIconColor?: IColor;
   showGrabber?: boolean;
   backgroundColor?: IColor;
-  type?: 'modal' | 'bottom-sheet';
+  // 'center' is the confirmation dialog from the handoff: a card in the middle
+  // of the screen. 'modal' floats above the bottom edge, 'bottom-sheet' sticks to it.
+  type?: 'modal' | 'bottom-sheet' | 'center';
   contentContainerStyles?: StyleProp<ViewStyle>;
   containerStyles?: StyleProp<ViewStyle>;
   activateAfterLongPress?: number;
