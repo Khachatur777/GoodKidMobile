@@ -1,6 +1,6 @@
 import { FC, useCallback, useContext, useEffect } from 'react';
 import { Alert, BackHandler, Linking, View } from 'react-native';
-import { BackgroundWrapper, Button, Icon, Spacing, Typography } from 'molecules';
+import { BackgroundWrapper, Button, Icon, Typography } from 'molecules';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { getConfigDataState, getIsChildState } from 'rtk';
