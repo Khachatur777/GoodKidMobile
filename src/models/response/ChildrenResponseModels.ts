@@ -6,7 +6,7 @@ export interface IChild {
   parentId: string;
   name: string;
   age: number;
-  // Ключ пресета из набора аватарок, файлов не храним
+  // The preset key from the avatar set; no files are stored
   avatar: string;
   login: string;
   language: string;
@@ -14,7 +14,7 @@ export interface IChild {
     accent?: string | null;
     themeMode?: 'light' | 'dark' | 'system';
   };
-  // Наследуется от родителя, своей подписки у ребёнка нет
+  // Inherited from the parent — a child has no subscription of their own
   subscription?: string;
 }
 
@@ -59,7 +59,7 @@ export interface IChildActivityItem {
 
 export interface IChildActivityResponseModel extends IDefaultResponseModel {
   data?: {
-    // Глубину показа задаёт сервер, шапка рисует то, что пришло
+    // The server sets how deep history goes; the header shows what arrived
     days: number;
     items: IChildActivityItem[];
   };

@@ -10,8 +10,8 @@ interface ChildSelectorProps {
   onSelect: (id: string) => void;
 }
 
-// Горизонтальный ряд детей над фильтром. Варианта «родитель» здесь нет:
-// свою ленту родитель фильтрует чипсами на Home, а этот экран настраивает детей.
+// A horizontal row of children above the filter. There is no 'parent' option:
+// a parent filters their own feed with the chips on Home; this screen sets up children.
 const ChildSelector: FC<ChildSelectorProps> = ({ children, selectedId, onSelect }) => {
   const { color } = useContext(ThemeContext);
 

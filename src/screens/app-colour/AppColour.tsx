@@ -12,7 +12,7 @@ export interface AppColourProps {
   navigation: NavigationProp<any>;
 }
 
-// Имена цветов из дизайна v2
+// Colour names from design v2
 const ACCENT_NAME_KEYS: {[hex: string]: string} = {
   '#6B4EE6': 'colour_grape',
   '#E14A24': 'colour_ladybug',

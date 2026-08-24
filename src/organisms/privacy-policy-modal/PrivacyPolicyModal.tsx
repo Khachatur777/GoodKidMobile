@@ -16,8 +16,8 @@ const PrivacyPolicyModal: FC<PrivacyPolicyModalProps> = ({
                                                            }) => {
   const {data} = usePrivacyQuery({languageId: i18n.language})
 
-  // Документ приходит обычным текстом: первая строка — заголовок,
-  // остальное набираем читаемым размером, а не заголовочным
+  // The document arrives as plain text: the first line is the heading, the rest
+  // is set at a readable size rather than a heading one
   const [title, ...rest] = (data?.text || '').split('\n');
   const body = rest.join('\n').trim();
 

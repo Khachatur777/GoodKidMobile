@@ -59,9 +59,9 @@ const PlayVideoList: FC<PlayVideoListProps> = ({navigation, route}) => {
     [color, width, height, isTablet],
   );
 
-  // Свайп назад на плеере выключен настройкой навигатора. Раньше поверх этого
-  // висел ещё хук, который на Android перехватывал любой уход с экрана —
-  // из-за него не работала и кнопка «Назад», и системная.
+  // Swipe-back on the player is disabled by a navigator option. A hook used to
+  // sit on top of that and intercept every attempt to leave the screen on
+  // Android — it broke the in-app Back button and the system one alike.
   useFocusEffect(
     useCallback(() => {
       navigation.setOptions({

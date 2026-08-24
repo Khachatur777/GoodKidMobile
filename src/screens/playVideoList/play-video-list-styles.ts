@@ -52,7 +52,7 @@ export const playVideoListStyles = ({
       padding: 0,
     },
 
-    // Тёмный верхний блок с плеером (дизайн v2)
+    // Dark top block with the player (design v2)
     darkHeader: {
       backgroundColor: '#191634',
       paddingBottom: 12,
@@ -64,8 +64,8 @@ export const playVideoListStyles = ({
       paddingHorizontal: 20,
       paddingVertical: 10,
     },
-    // Блок под плеером держим компактным: заголовок, чипсы и «дальше» должны
-    // помещаться так, чтобы следующее видео уже виднелось на экране
+    // The block under the player stays compact: title, chips and "next" must fit
+    // so that the following video is already visible on screen
     infoContainer: {
       paddingHorizontal: 22,
       paddingTop: 12,
@@ -100,8 +100,8 @@ export const playVideoListStyles = ({
     },
 
     //PlayerYoutuber
-    // Ровно 16:9 без запаса: панель управления YouTube рисуется поверх видео,
-    // и лишняя высота оставалась пустой тёмной полосой под картинкой
+    // Exactly 16:9 with nothing spare: YouTube draws its controls over the video,
+    // and the extra height was left as an empty dark strip under the picture
     videoYoutubeContainer: {
       position: 'relative',
       height: playerHeight,

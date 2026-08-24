@@ -84,7 +84,7 @@ const Search: FC<SearchProps> = ({ navigation }) => {
       } else {
         setVideos([]);
       }
-    } catch (e) {
+    } catch {
       setVideos([]);
     } finally {
       setIsLoading(false);
@@ -115,7 +115,7 @@ const Search: FC<SearchProps> = ({ navigation }) => {
 
         if (response?.data?.success) setSuggestions(response?.data?.items || []);
         else setSuggestions([]);
-      } catch (e) {
+      } catch {
         setSuggestions([]);
       } finally {
         setIsLoading(false);

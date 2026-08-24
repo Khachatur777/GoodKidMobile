@@ -90,7 +90,7 @@ const Home: FC<HomeProps> = ({navigation}) => {
 
         const data: any = {};
 
-        // глобальный лоадер только на самый первый/обычный запрос
+        // global loader only for the very first or ordinary request
         if (!isLoadMore && !isRefresh) {
           data.showModal = true;
           data.showLoader = true;
@@ -106,7 +106,7 @@ const Home: FC<HomeProps> = ({navigation}) => {
           filter.language && (data.language = filter.language);
         }
 
-        // Чип категории на главной перекрывает категории из фильтра
+        // A category chip on Home overrides the categories from the filter
         if (chipCategory) {
           data.categories = [chipCategory];
         }
@@ -120,15 +120,15 @@ const Home: FC<HomeProps> = ({navigation}) => {
             setVideos(prev => [...prev, ...newItems]);
           } else {
             setVideos(newItems);
-            // при полном обновлении можно очистить prefetch cache,
-            // чтобы не разрастался бесконечно при смене фильтров
+            // on a full refresh the prefetch cache can be cleared so it does not
+            // grow without end as filters change
             prefetchedRef.current = new Set();
           }
 
           setCursor(response.data.nextCursor || '');
           setHasMore(!!response.data.hasMore);
 
-          // Быстрый prefetch первых следующих (чтобы сразу не лагало при первом скролле)
+          // Prefetch the next few so the first scroll does not stutter
           newItems.slice(3, 3 + PREFETCH_AHEAD).forEach(v => {
             const url = v?.thumbnail;
             if (url && !prefetchedRef.current.has(url)) {
@@ -157,7 +157,7 @@ const Home: FC<HomeProps> = ({navigation}) => {
   );
 
   useEffect(() => {
-    // не чистим videos, чтобы не мигало пусто
+    // videos are kept so the screen does not flash empty
     setCursor('');
     setHasMore(false);
     getVideos();

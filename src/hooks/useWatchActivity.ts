@@ -4,10 +4,10 @@ import { getIsChildState, useRecordVideoActivityMutation } from 'rtk';
 
 const PROGRESS_INTERVAL_MS = 15000;
 
-// История просмотров ведётся только по детям — родителю она нужна про них,
-// а не про себя. Пишем старт, потом накопленные секунды раз в 15 секунд и
-// последний раз при уходе с видео. Сервер берёт максимум, поэтому порядок
-// доставки значения не имеет.
+// Watch history is kept for children only — a parent wants it about them, not
+// about themselves. We send a start marker, then the accumulated seconds every
+// 15 seconds, and once more when leaving the video. The server keeps the
+// maximum, so delivery order does not matter.
 const useWatchActivity = (videoId?: string | null, playing?: boolean) => {
   const isChild = useSelector(getIsChildState);
   const [recordVideoActivity] = useRecordVideoActivityMutation();
@@ -21,13 +21,13 @@ const useWatchActivity = (videoId?: string | null, playing?: boolean) => {
     recordVideoActivity({
       videoId,
       watchedSeconds: Math.round(seconds),
-      // Тихо на фоне: ошибки трекинга не должны мешать смотреть
+      // Quiet in the background: tracking errors must not interrupt watching
       showLoader: false,
       showModal: false,
     });
   };
 
-  // Новое видео — счётчик с нуля и отметка о старте
+  // A new video means the counter starts over, with a fresh start marker
   useEffect(() => {
     watchedSeconds.current = 0;
     lastSentSeconds.current = 0;

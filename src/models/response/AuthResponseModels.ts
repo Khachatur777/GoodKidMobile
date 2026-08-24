@@ -19,7 +19,7 @@ export interface IUser {
   };
   subscription: string;
   isVerified?: boolean;
-  // Поля ребёнка: приходят, когда role === 'child'
+  // Child fields: present when role === 'child'
   parentId?: string;
   name?: string;
   age?: number;
@@ -35,7 +35,7 @@ export interface IUser {
 export interface IConfigFeatures {
   paymentsEnabled?: boolean;
   supportChatEnabled?: boolean;
-  // Лимиты приходят с сервера, приложение их не зашивает
+  // Limits come from the server; the app does not bake them in
   maxChildren?: number;
   maxChildrenFree?: number;
   activityDays?: number;

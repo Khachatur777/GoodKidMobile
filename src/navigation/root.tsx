@@ -6,7 +6,7 @@ import {useGetTranslations} from "hooks";
 const RootStack = createStackNavigator();
 
 export const RootNavigator = () => {
-  const {isTranslationsLoaded} = useGetTranslations();
+  useGetTranslations();
 
 
   return (

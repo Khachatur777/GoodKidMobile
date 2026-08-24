@@ -54,8 +54,8 @@ export const authApi = baseApi
           };
         },
       }),
-      // Вход ребёнка: логин и пароль, которые ему завёл родитель.
-      // Ни Google/Apple, ни восстановления пароля здесь нет.
+      // Child sign-in: the login and password their parent created.
+      // No Google or Apple here, and no password recovery.
       signInChild: builder.mutation<
         ISignInResponseModel,
         ISignInChildRequestModel

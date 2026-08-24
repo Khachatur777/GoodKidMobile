@@ -15,8 +15,8 @@ interface SegmentedControlProps<T extends string = string> {
   containerStyle?: ViewStyle;
 }
 
-// Переключатель из макета: дорожка в мягком акценте, выбранная «пилюля» —
-// акцентом. Используется для роли на входе, языка ребёнка и вкладок активности.
+// The toggle from the design: a track in a soft accent, the selected pill in the
+// accent itself. Used for the role at sign-in, the child's language and activity tabs.
 const SegmentedControl: FC<SegmentedControlProps> = ({
   items,
   value,

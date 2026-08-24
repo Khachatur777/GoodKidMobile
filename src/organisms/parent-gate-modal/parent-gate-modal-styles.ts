@@ -1,8 +1,8 @@
 import { StyleSheet } from 'react-native';
 import { IGetColor } from 'theme';
 
-// Размеры и радиусы взяты из handoff: плитка иконки 60/20, карточка вопроса 22,
-// поле ответа 160×60/18, клавиши 56/18, кнопки низа 50/50.
+// Sizes and radii come from the handoff: icon tile 60/20, question card 22,
+// answer field 160x60/18, keys 56/18, bottom buttons 50/50.
 export const parentGateStyles = (color?: IGetColor, isDark?: boolean) =>
   StyleSheet.create({
     content: {

@@ -8,7 +8,7 @@ export const getGlobalError = createSelector(
   data => data.globalErrorModal,
 );
 
-// Спиннер виден, пока идёт помеченный запрос или пока его держит сценарий
+// The spinner shows while a flagged request runs or while a flow holds it
 export const getMainLoadingState = createSelector(
   getSharedState,
   data => data.isLoading || data.loaderHold > 0,
@@ -56,13 +56,13 @@ export const getSubscriptionUserState = createSelector(
   data => data.subscriptionStatus,
 );
 
-// Платежи включаются рубильником features.paymentsEnabled из бэкенд-конфига
+// Payments are switched on by features.paymentsEnabled in the backend config
 export const getPaymentsEnabledState = createSelector(
   getConfigDataState,
   config => config?.features?.paymentsEnabled === true,
 );
 
-// Контент заблокирован, только если платежи включены и подписки нет
+// Content is locked only when payments are on and there is no subscription
 export const getContentLockedState = createSelector(
   getPaymentsEnabledState,
   getSubscriptionUserState,
@@ -87,7 +87,7 @@ export const getRoleState = createSelector(
   data => data.role,
 );
 
-// Детский интерфейс: три таба, без фильтров и без родительских разделов
+// Child interface: three tabs, no filters and no parent sections
 export const getIsChildState = createSelector(
   getSharedState,
   data => data.role === 'child',

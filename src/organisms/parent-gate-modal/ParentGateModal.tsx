@@ -13,9 +13,9 @@ interface ParentGateModalProps {
 
 const KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', '⌫'];
 
-// Взрослый раздел закрыт примером на умножение: ребёнок его не решит, взрослому
-// он ничего не стоит. Попытки не ограничиваем и не отсчитываем время —
-// так требуют и здравый смысл, и правила детской категории.
+// The adult section is closed by a multiplication question: a child will not
+// solve it, an adult spends nothing on it. Attempts are neither limited nor
+// timed — both common sense and the Kids Category rules ask for that.
 const ParentGateModal: FC<ParentGateModalProps> = ({
   isVisible,
   setIsVisible,
@@ -29,7 +29,7 @@ const ParentGateModal: FC<ParentGateModalProps> = ({
   const [error, setError] = useState(false);
   const [attempt, setAttempt] = useState(0);
 
-  // Новый пример при каждом открытии и после каждой ошибки
+  // A fresh question on every open and after every wrong answer
   const numbers = useMemo(() => {
     const first = Math.floor(Math.random() * 8) + 2;
     const second = Math.floor(Math.random() * 8) + 2;
@@ -78,7 +78,7 @@ const ParentGateModal: FC<ParentGateModalProps> = ({
     >
       <View style={styles.content}>
         <View style={[styles.iconTile, error ? styles.iconTileError : null]}>
-          {/* Иконка красится акцентом приложения: он у каждого свой */}
+          {/* The icon takes the app's accent: everyone has their own */}
           <Icon
             name={error ? 'LightbulbIcon' : 'WavingHandIcon'}
             color={error ? 'accent_warning' : 'accent_active'}

@@ -32,8 +32,8 @@ interface IFilterData {
   check?: boolean;
 }
 
-// Фильтр настраивается на каждого ребёнка отдельно. Своей ленты родитель здесь
-// не фильтрует — для неё есть чипсы категорий на Home.
+// The filter is configured per child. A parent does not filter their own feed
+// here — the category chips on Home do that.
 const Filter: FC<FilterProps> = ({ navigation }) => {
   const { color } = useContext(ThemeContext);
   const styles = useMemo(() => filterStyles(color), [color]);
@@ -80,7 +80,7 @@ const Filter: FC<FilterProps> = ({ navigation }) => {
     }
   }, [activeChildId, applyFilter]);
 
-  // Переключение ребёнка с несохранёнными правками сначала спрашивает
+  // Switching child with unsaved edits asks first
   const onSelectChild = useCallback(
     (childId: string) => {
       if (childId === activeChildId) return;
@@ -147,7 +147,7 @@ const Filter: FC<FilterProps> = ({ navigation }) => {
     }
   }, [activeChildId, ages, categories, editChildFilter, language]);
 
-  // Фильтр принадлежит ребёнку, поэтому без детей настраивать нечего
+  // The filter belongs to a child, so with no children there is nothing to set
   if (!childrenLoading && children.length === 0) {
     return (
       <BackgroundWrapper>

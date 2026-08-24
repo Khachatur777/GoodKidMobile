@@ -18,7 +18,7 @@ export const onboardingStyles = (color?: IGetColor, width = 390) =>
       paddingHorizontal: 22,
       alignItems: 'center',
     },
-    // Блок иллюстрации из макета: во всю ширину, радиус 32, тонированный фон
+    // The illustration block from the design: full width, radius 32, tinted background
     illustration: {
       alignSelf: 'stretch',
       height: 380,

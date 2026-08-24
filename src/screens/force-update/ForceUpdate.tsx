@@ -19,7 +19,7 @@ const ForceUpdate: FC = () => {
     }
     try {
       await Linking.openURL(url);
-    } catch (e) {
+    } catch {
       // ignore
     }
   }, []);

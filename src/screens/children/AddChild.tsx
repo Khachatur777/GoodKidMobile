@@ -53,7 +53,7 @@ const AddChild: FC<AddChildProps> = ({ navigation }) => {
       login: values.login.trim().toLowerCase(),
       password: values.password,
       showLoader: true,
-      // Занятый логин показываем прямо в поле, а не общей ошибкой
+      // A taken login is shown on the field itself rather than as a general error
       showModal: false,
     });
 

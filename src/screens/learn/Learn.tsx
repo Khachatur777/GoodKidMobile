@@ -6,7 +6,6 @@ import { learnStyles } from './learn-styles.ts';
 import { useTranslation } from 'react-i18next';
 import {
   getContentLockedState,
-  getUserState,
   isLoggedInSelector,
   setSubscriptionUserData,
   useGetAllLearnCategoryQuery,
@@ -16,7 +15,6 @@ import { getFileUri } from 'utils';
 import { useDispatch, useSelector } from 'react-redux';
 import { useContext } from 'react';
 import { ThemeContext } from 'theme';
-import Toast from 'react-native-toast-message';
 import { purchaseUser } from 'hooks/usePurchase.ts';
 
 export interface LearnProps {
@@ -36,7 +34,6 @@ const Learn: FC<LearnProps> = ({ navigation }) => {
   const styles = useMemo(() => learnStyles(color), [color]);
   const isLoggedIn = useSelector(isLoggedInSelector);
   const dispatch = useDispatch();
-  const user = useSelector(getUserState);
 
   const { data: learnCategory } = useGetAllLearnCategoryQuery(
     {

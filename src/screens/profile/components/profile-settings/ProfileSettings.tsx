@@ -10,14 +10,12 @@ import {
 import {profileStyle} from '../../profile-styles.ts';
 import {useTranslation} from 'react-i18next';
 import {useParentGate} from 'hooks';
-import Toast from "react-native-toast-message";
 import {purchaseUser} from "hooks/usePurchase.ts";
 import {
   getChildrenState,
   getConfigDataState,
   getPaymentsEnabledState,
   getSubscriptionUserState,
-  getUserState,
   setChildren,
   setSubscriptionUserData,
   useGetChildrenQuery,
@@ -60,17 +58,16 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({navigation}) => {
   const [themeModal, setThemeModal] = useState<boolean>(false);
   const [subscriptionInfoModalVisible, setSubscriptionInfoModalVisible] = useState<boolean>(false);
   const dispatch = useDispatch();
-  const user = useSelector(getUserState);
   const subscriptionState = useSelector(getSubscriptionUserState);
   const paymentsEnabled = useSelector(getPaymentsEnabledState);
   const accents = useSelector(getAvailableAccentsState);
   const children = useSelector(getChildrenState);
   const configData = useSelector(getConfigDataState);
-  // Лимит приходит с сервера: включат подписку — число поменяется без релиза
+  // The limit comes from the server: turn subscriptions on and the number changes without a release
   const maxChildren = configData?.features?.maxChildren ?? 3;
 
 
-  // Счётчик «2/3» рядом со строкой должен быть свежим при каждом заходе в профиль
+  // The "2/3" counter next to the row has to be fresh on every visit to the profile
   const {data: childrenResponse} = useGetChildrenQuery(undefined, {
     refetchOnMountOrArgChange: true,
   });
@@ -82,8 +79,8 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({navigation}) => {
   }, [childrenResponse?.data?.children, dispatch]);
   const {accent, themeMode} = useContext(ThemeContext);
 
-  // В строке помещаются три точки, а акцентов восемь. Выбранный ставим первым,
-  // иначе при седьмом-восьмом цвете в профиле не видно, что вообще выбрано.
+  // Three dots fit in the row and there are eight accents. The selected one goes
+  // first, or with the seventh or eighth colour the profile shows no choice at all.
   const accentDots = useMemo(() => {
     const selected = accents.find(item => item?.toLowerCase?.() === accent?.toLowerCase?.());
     const rest = accents.filter(item => item !== selected);
@@ -132,7 +129,7 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({navigation}) => {
       title={t('profile_settings')}
       containerStyles={profileStyle({}).profileWrapper}
     >
-      {/* Раздел с данными детей открывается только через parental gate */}
+      {/* The children's section opens only through the parental gate */}
       <Cell
         type="icon"
         iconName="User02Icon"

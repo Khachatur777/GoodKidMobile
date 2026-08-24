@@ -21,15 +21,15 @@ export interface ChildActivityProps {
   route: RouteProp<{ params: { childId: string } }, 'params'>;
 }
 
-// Минуты подписываем через словарь: раньше «min» было зашито по-английски
-// и оставалось таким на русском и армянском
+// Minutes are labelled through the dictionary: 'min' used to be hardcoded in
+// English and stayed that way in Russian and Armenian
 const minutes = (seconds?: number | null) => Math.max(1, Math.round((seconds || 0) / 60));
 
 const timeOfDay = (iso: string) =>
   new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-// Дни считаем по локальному времени устройства: сервер отдаёт метки времени,
-// а группировка «Сегодня / Вчера» имеет смысл только в часовом поясе родителя.
+// Days are counted in the device's local time: the server sends timestamps, and
+// grouping into Today / Yesterday only makes sense in the parent's time zone.
 const daysAgo = (iso: string) => {
   const startOfDay = (date: Date) =>
     new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
@@ -54,7 +54,7 @@ const ChildActivity: FC<ChildActivityProps> = ({ route }) => {
   );
 
   const items = data?.data?.items || [];
-  // Глубину показа задаёт сервер — шапка рисует то, что пришло
+  // The server sets how deep history goes — the header shows what arrived
   const days = data?.data?.days ?? 3;
 
   const groups = useMemo(() => {

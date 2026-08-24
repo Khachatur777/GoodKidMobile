@@ -1,12 +1,9 @@
 import { FC, useEffect } from 'react';
-import { Image, Platform } from 'react-native';
+import { Platform } from 'react-native';
 import { NavigationProp } from '@react-navigation/native';
 import { useDispatch } from 'react-redux';
 import {
   getBuildNumber,
-  getModel,
-  getSystemVersion,
-  getUniqueId,
 } from 'react-native-device-info';
 
 import { BackgroundWrapper, GoodKidLogo } from 'molecules';
@@ -23,7 +20,7 @@ import {
   useAuthorizationMutation,
   useConfigMutation,
 } from 'rtk';
-import { getItem, setItem } from 'configs';
+import { getItem } from 'configs';
 import i18n from 'localization/localization.ts';
 import { checkUserSubscription } from 'hooks/usePurchase.ts';
 
@@ -44,8 +41,8 @@ const Splash: FC<SplashProps> = ({navigation}) => {
     navigation.reset({index: 0, routes: [{name, params}]});
   };
 
-  // Splash живёт внутри auth-стека, поэтому переход на его же экраны делаем
-  // напрямую, а не через корневой сброс.
+  // Splash lives inside the auth stack, so moving to its sibling screens is done
+  // directly rather than through a root reset.
   const resetToAuthScreen = (screen: string) => {
     navigation.reset({index: 0, routes: [{name: screen}]});
   };
@@ -54,8 +51,8 @@ const Splash: FC<SplashProps> = ({navigation}) => {
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
-    // Гостевого режима больше нет: без аккаунта роли неизвестны, а значит
-    // неизвестно и что показывать — поэтому всегда на вход.
+    // There is no guest mode any more: without an account the role is unknown, and
+    // so is what to show — hence always to sign-in.
     const safeGoSignInWithDelay = (seenOnboarding: boolean) => {
       const screen = seenOnboarding ? 'SignIn' : 'Onboarding';
 

@@ -15,9 +15,9 @@ export interface ISharedFilterDaraState {
 export type SharedState = {
   showSplashScreen: boolean;
   isLoading: boolean;
-  // Сколько сценариев сейчас держат лоадер. Запрос гасит лоадер, когда пришёл
-  // ответ, а вход состоит из нескольких шагов и продолжается после ответа —
-  // счётчик не даёт спрятать спиннер посреди такого сценария.
+  // How many flows are currently holding the loader. A request clears it when
+  // the response arrives, but signing in takes several steps and continues past
+  // that response — the counter keeps the spinner up through the whole flow.
   loaderHold: number;
   theme: string;
   isLoggedIn: boolean | null;
@@ -27,16 +27,16 @@ export type SharedState = {
   netInfo: boolean;
   updateIsVisible: boolean;
   user: IUser | null;
-  // Кто вошёл. От этого зависит, какой интерфейс и какие табы показывать.
+  // Who signed in. This decides which interface and which tabs to show.
   role: UserRole | null;
-  // Дети родителя и выбранный в фильтре ребёнок
+  // The parent's children and the one selected in the filter
   children: IChild[];
   activeChildId: string | null;
-  // Онбординг показывается один раз на устройство
+  // Onboarding is shown once per device
   onboardingSeen: boolean;
-  // Пройденный parental gate действует до конца сессии
+  // A passed parental gate lasts until the end of the session
   parentalGatePassedAt: number | null;
-  // Логин ребёнка запоминается на устройстве, пароль — никогда
+  // The child's login is remembered on the device, the password never is
   rememberedKidLogin: string | null;
   tokenData: ISharedTokenDataState | null;
   globalErrorModal: {

@@ -44,7 +44,7 @@ const SupportModal: FC<SupportModalProps> = ({
         setIsVisible(false)
       }
 
-    }catch (e){}
+    }catch {}
   }, [])
 
 

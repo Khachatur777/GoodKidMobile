@@ -14,8 +14,8 @@ export interface KidProfileProps {
   navigation: NavigationProp<any>;
 }
 
-// Детский профиль: карточка ребёнка (только чтение), тема, цвет, About и выход.
-// Языка здесь нет — его задаёт родитель. Удаления аккаунта и поддержки тоже нет.
+// The child's profile: their card (read-only), theme, colour, About and sign-out.
+// No language here — the parent sets it. No account deletion and no support either.
 const KidProfile: FC<KidProfileProps> = ({ navigation }) => {
   const { t } = useTranslation();
   const { color, accent, themeMode } = useContext(ThemeContext);
@@ -23,7 +23,7 @@ const KidProfile: FC<KidProfileProps> = ({ navigation }) => {
   const user = useSelector(getUserState);
   const accents = useSelector(getAvailableAccentsState);
 
-  // Выбранный цвет всегда первым: точек три, а акцентов восемь
+  // The chosen colour always comes first: three dots, eight accents
   const accentDots = useMemo(() => {
     const selected = accents.find(item => item?.toLowerCase?.() === accent?.toLowerCase?.());
     const rest = accents.filter(item => item !== selected);

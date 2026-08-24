@@ -26,7 +26,7 @@ export interface IScreens {
       }) => INavigationHeaderProps['options']);
 }
 
-// Родитель: Home, Filter, Learn, Profile
+// Parent: Home, Filter, Learn, Profile
 export const parentTabScreens: ScreenTypes[] = [
   {
     name: 'HomeTab',
@@ -81,8 +81,8 @@ export const parentTabScreens: ScreenTypes[] = [
   },
 ];
 
-// Ребёнок: Home, Learn, Me. Фильтра у него нет — выдачу настроил родитель,
-// и сервер применяет её сам, что бы ни прислал клиент.
+// Child: Home, Learn, Me. No filter — the parent set the feed and the server
+// applies it regardless of what the client sends.
 export const kidTabScreens: ScreenTypes[] = [
   {
     name: 'HomeTab',

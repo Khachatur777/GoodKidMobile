@@ -50,8 +50,8 @@ const SignIn: FC<SignInhProps> = ({navigation}) => {
 
   const dispatch = useDispatch();
 
-  // Роль выбирается переключателем: у родителя почта и соцвход, у ребёнка —
-  // только логин с паролем, которые ему завёл родитель.
+  // The toggle picks the role: a parent gets email and social sign-in, a child
+  // only the login and password their parent created.
   const [role, setRole] = useState<'parent' | 'child'>('parent');
   const rememberedKidLogin = useSelector(getRememberedKidLoginState);
   const [kidLogin, setKidLogin] = useState(rememberedKidLogin || '');
@@ -74,8 +74,8 @@ const SignIn: FC<SignInhProps> = ({navigation}) => {
     });
   }, [navigation]);
 
-  // Запись сессии, RevenueCat и переход живут в общем хуке: он же держит
-  // лоадер до самого Home, чтобы спиннер не пропадал на экране входа.
+  // Storing the session, RevenueCat and the navigation live in a shared hook,
+  // which also holds the loader until Home so the spinner cannot vanish here.
   const {finalizeAuth, runAuthFlow, showAuthError} = useAuthSession({
     onAuthorized: goHome,
     onForceUpdate: goForceUpdate,
@@ -131,8 +131,8 @@ const SignIn: FC<SignInhProps> = ({navigation}) => {
   );
 
   const handleGoogleSignIn = useCallback(async () => {
-    // Системное окно выбора аккаунта показываем до лоадера: под ним спиннер
-    // ни к чему, а отмена выбора — не ошибка.
+    // The system account picker comes before the loader: a spinner behind it is
+    // pointless, and cancelling the picker is not an error.
     let googleResult;
     try {
       googleResult = await signInWithGoogle();
@@ -158,7 +158,7 @@ const SignIn: FC<SignInhProps> = ({navigation}) => {
         return finalizeAuth(loginRes?.data as any);
       }
 
-      // Аккаунта ещё нет — заводим его и входим тем же сценарием
+      // No account yet — create one and sign in through the same flow
       if (loginRes?.data?.googleSignUp) {
         const signUpPayload = await buildGoogleSignUpPayload(userInfo);
         const signUpRes = await signUpGoogle(signUpPayload);
@@ -168,7 +168,7 @@ const SignIn: FC<SignInhProps> = ({navigation}) => {
         }
       }
 
-      // Сообщение об ошибке уже показал showModal — второй раз не показываем
+      // showModal has already shown the error — do not show a second one
       return loginRes?.error || loginRes?.data?.message ? 'silent' : false;
     });
   }, [
@@ -208,7 +208,7 @@ const SignIn: FC<SignInhProps> = ({navigation}) => {
   );
 
   const signInWithApple = useCallback(async () => {
-    // Как и у Google: системное окно показываем без спиннера, отмена — молча
+    // Same as Google: the system sheet without a spinner, cancelling stays silent
     let appleAuthRequestResponse;
     try {
       appleAuthRequestResponse = await appleAuth.performRequest({
@@ -259,7 +259,7 @@ const SignIn: FC<SignInhProps> = ({navigation}) => {
     Keyboard.dismiss();
 
     const login = kidLogin.trim().toLowerCase();
-    // Ребёнку молчание непонятнее всего: короткий логин объясняем словами
+    // Silence confuses a child most: explain a too-short login in words
     if (login.length < 4 || kidPassword.length < 6) {
       return showAuthError(t('sign_in_kid_credentials_hint'));
     }
@@ -276,7 +276,7 @@ const SignIn: FC<SignInhProps> = ({navigation}) => {
         return response?.error || response?.data?.message ? 'silent' : false;
       }
 
-      // Запоминаем только логин: пароль на устройстве не храним никогда.
+      // Only the login is remembered: the password never touches the device.
       dispatch(setRememberedKidLogin(login));
       await setItem('kidLogin', login);
 
@@ -448,7 +448,7 @@ const SignIn: FC<SignInhProps> = ({navigation}) => {
         )}
       </Formik>
 
-      {/* Регистрируется только родитель */}
+      {/* Only a parent registers */}
       {role === 'parent' ? (
         <Button
           variant="ghost"

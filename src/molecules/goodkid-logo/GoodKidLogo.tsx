@@ -7,12 +7,12 @@ import {goodKidLogoStyles} from './goodkid-logo-styles.ts';
 
 export interface GoodKidLogoProps {
   size?: number;
-  // mark — только божья коровка; stacked — коровка + GOODKID + слоган
+  // mark — the ladybird alone; stacked — ladybird + GOODKID + tagline
   variant?: 'mark' | 'stacked';
   containerStyles?: StyleProp<ViewStyle>;
 }
 
-// Логотип из дизайна v2 (Good Kid App v2.dc.html)
+// The logo from design v2 (Good Kid App v2.dc.html)
 const GoodKidLogo: FC<GoodKidLogoProps> = ({
   size = 34,
   variant = 'mark',

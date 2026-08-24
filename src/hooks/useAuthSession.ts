@@ -19,9 +19,9 @@ import {
 import { checkUserSubscription } from './usePurchase';
 
 export interface IAuthSessionOptions {
-  // Куда вести, когда вход состоялся
+  // Where to go once the sign-in succeeds
   onAuthorized: () => void;
-  // Куда вести, если сервер требует обновить приложение
+  // Where to go when the server demands an app update
   onForceUpdate: () => void;
 }
 
@@ -32,15 +32,15 @@ export interface IAuthTokenData {
 }
 
 /**
- * Общая часть входа для всех способов: почта, Google, Apple, ребёнок и
- * подтверждение почты после регистрации.
+ * The shared part of signing in, for every way in: email, Google, Apple, a
+ * child, and confirming an email after registration.
  *
- * Главное здесь — лоадер. Запрос гасит спиннер, как только пришёл ответ, а
- * вход на этом не заканчивается: дальше идут запись токена, RevenueCat и
- * переход на Home. Раньше спиннер пропадал посреди этой работы, и человек
- * оставался смотреть на экран входа, не понимая, идёт что-то или уже нет.
- * Поэтому сценарий целиком берёт лоадер на себя и отпускает его только в
- * самом конце — успешном или нет.
+ * The loader is the point here. A request clears the spinner the moment its
+ * response arrives, but signing in does not end there: storing the token,
+ * RevenueCat and the move to Home all follow. The spinner used to vanish in the
+ * middle of that work, leaving a person looking at the sign-in screen with no
+ * idea whether anything was still happening. So the flow takes the loader for
+ * itself and releases it only at the very end, successful or not.
  */
 export const useAuthSession = ({onAuthorized, onForceUpdate}: IAuthSessionOptions) => {
   const dispatch = useDispatch();
@@ -67,9 +67,9 @@ export const useAuthSession = ({onAuthorized, onForceUpdate}: IAuthSessionOption
     [versionNumber],
   );
 
-  // Покупки принадлежат родителю. Под детским аккаунтом RevenueCat не логиним
-  // вовсе: иначе подписка родителя не увидится, а покупка уехала бы не на тот
-  // аккаунт. Ребёнку статус приходит с сервера вместе с карточкой.
+  // Purchases belong to the parent. Under a child account we do not sign in to
+  // RevenueCat at all: the parent's subscription would go unseen and a purchase
+  // would land on the wrong account. A child's status arrives with their card.
   const refreshSubscription = useCallback(
     async (user: IUser) => {
       if (user?.role === 'child') {
@@ -101,7 +101,7 @@ export const useAuthSession = ({onAuthorized, onForceUpdate}: IAuthSessionOption
 
       dispatch(setIsLoggedIn(true));
       dispatch(setUser(user));
-      // Язык ребёнка задаёт родитель и он приходит в его карточке
+      // The parent sets the child's language and it arrives in their card
       dispatch(
         setLanguageId(
           user?.role === 'child' ? user?.language : user?.profile?.preferredLanguages,
@@ -123,19 +123,19 @@ export const useAuthSession = ({onAuthorized, onForceUpdate}: IAuthSessionOption
         refreshToken: tokenData?.refreshToken,
       });
 
-      // Подписку обновляем в фоне: поход в RevenueCat занимает секунды, и
-      // держать на его время человека на экране входа незачем.
+      // The subscription refreshes in the background: the RevenueCat round-trip
+      // takes seconds, and nobody should wait them out on the sign-in screen.
       refreshSubscription(user).catch(() => {});
 
-      // Фильтр к аккаунту больше не привязан: он живёт у ребёнка, и сервер
-      // применяет его сам, что бы ни прислал клиент.
+      // The filter is no longer tied to an account: it lives with the child, and
+      // the server applies it whatever the client sends.
     },
     [dispatch, refreshSubscription],
   );
 
   /**
-   * Доводит вход до конца по ответу сервера. Возвращает true, если человека
-   * куда-то увели: по false вызывающий показывает ошибку.
+   * Finishes signing in from the server's response. Returns true when the person
+   * was taken somewhere: on false the caller shows an error.
    */
   const finalizeAuth = useCallback(
     async (responseData?: any) => {
@@ -166,10 +166,10 @@ export const useAuthSession = ({onAuthorized, onForceUpdate}: IAuthSessionOption
   );
 
   /**
-   * Держит лоадер на весь сценарий входа. Сценарий возвращает false или
-   * ничего, если довести до конца не вышло, — тогда показываем ошибку, чтобы
-   * экран не замирал молча. Вернувший `'silent'` обрывается без сообщения:
-   * так уходит отмена системного окна Google или Apple.
+   * Holds the loader for the whole sign-in flow. A flow returns false, or
+   * nothing, when it could not finish — then we show an error so the screen does
+   * not freeze in silence. Returning `'silent'` ends it without a message: that
+   * is how cancelling the Google or Apple sheet arrives.
    */
   const runAuthFlow = useCallback(
     async (flow: () => Promise<boolean | 'silent' | void>) => {

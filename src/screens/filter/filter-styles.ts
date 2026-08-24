@@ -7,7 +7,7 @@ export const filterStyles = (color?: IGetColor) =>
       flexGrow: 1,
       paddingHorizontal: 22,
       paddingTop: 8,
-      // над липким низом и плавающим таб-баром
+      // above the sticky bottom and the floating tab bar
       paddingBottom: 190,
     },
     section: {
@@ -19,7 +19,7 @@ export const filterStyles = (color?: IGetColor) =>
       gap: 12,
       paddingTop: 16,
     },
-    // Липкая пара кнопок над таб-баром: Reset уже, Save шире
+    // The sticky pair of buttons above the tab bar: Reset narrower, Save wider
     footer: {
       position: 'absolute',
       left: 22,

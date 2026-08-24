@@ -3,15 +3,12 @@ import {Cell} from 'organisms';
 import {useCallback, useState} from 'react';
 import {signOut} from 'helpers';
 import {useTranslation} from 'react-i18next';
-import {getUserState, useUserDeleteMutation} from 'rtk';
-import {useSelector} from 'react-redux';
-import Toast from 'react-native-toast-message';
+import {useUserDeleteMutation} from 'rtk';
 
 const ProfileDeleteAccount = () => {
   const { t } = useTranslation();
   const [isVisible, setIsVisible] = useState(false);
   const [userDelete] = useUserDeleteMutation();
-  const user = useSelector(getUserState);
 
   const onDelete = useCallback(async () => {
     try {
@@ -24,7 +21,7 @@ const ProfileDeleteAccount = () => {
         await signOut();
       }
 
-    } catch (error) {
+    } catch {
     }
   }, []);
 

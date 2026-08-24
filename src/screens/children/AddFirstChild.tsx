@@ -10,8 +10,8 @@ export interface AddFirstChildProps {
   navigation: NavigationProp<any>;
 }
 
-// Показывается сразу после регистрации родителя: без ребёнка ни фильтр,
-// ни история смысла не имеют, а пустой экран фильтра ничего не объясняет.
+// Shown right after a parent registers: without a child neither filter nor
+// history means anything, and an empty filter screen explains nothing.
 const AddFirstChild: FC<AddFirstChildProps> = ({ navigation }) => {
   const { t } = useTranslation();
   const { color } = useContext(ThemeContext);

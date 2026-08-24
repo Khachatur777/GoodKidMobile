@@ -32,8 +32,8 @@ export const authScreens: IScreens[] = [
     options: () => ({
       title: i18n.t('sign_in_title'),
       type: 'title',
-      // Возвращаться отсюда некуда: на вход попадают сбросом стека — после
-      // выхода, с онбординга или при запуске без сессии
+      // There is nowhere to go back to: sign-in is reached by resetting the stack
+      // — after signing out, from onboarding, or on launch without a session
       showBackIcon: false,
       showIconInTabScreen: true,
       backgroundColor: 'bg_primary'

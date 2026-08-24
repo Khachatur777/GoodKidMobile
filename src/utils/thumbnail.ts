@@ -1,6 +1,6 @@
-// У части роликов на YouTube нет maxresdefault.jpg — он появляется только если
-// автор загрузил обложку в высоком разрешении. hqdefault есть всегда, поэтому
-// на нём и подстраховываемся, когда основной адрес не открылся.
+// Some YouTube videos have no maxresdefault.jpg — it exists only when the author
+// uploaded a high-resolution cover. hqdefault is always there, so that is the
+// fallback when the main address does not load.
 export const thumbnailFallback = (url?: string | null): string | undefined => {
   if (!url) return undefined;
 

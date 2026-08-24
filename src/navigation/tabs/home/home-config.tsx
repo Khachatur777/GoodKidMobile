@@ -5,7 +5,6 @@ import {
   Search,
   PlayVideoList
 } from 'screens';
-import i18n from "i18next";
 
 export const homeScreens: IScreens[] = [
   {

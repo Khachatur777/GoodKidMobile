@@ -16,7 +16,7 @@ export type IThemeMode = 'light' | 'dark' | 'system';
 
 export const DEFAULT_ACCENT = '#6B4EE6';
 
-// Пресеты акцентов из дизайна v2: light-вариант и осветлённый dark-вариант (rgb-триплеты)
+// Accent presets from design v2: the light variant and a lightened dark one (rgb triplets)
 const ACCENT_PRESETS: {[hex: string]: {light: string; dark: string}} = {
   '#6B4EE6': {light: '107, 78, 230', dark: '163, 139, 255'},
   '#E14A24': {light: '225, 74, 36', dark: '255, 122, 80'},
@@ -28,7 +28,7 @@ const ACCENT_PRESETS: {[hex: string]: {light: string; dark: string}} = {
   '#7B8794': {light: '123, 135, 148', dark: '166, 176, 188'},
 };
 
-// Токены, которые перекрашиваются выбранным акцентом
+// Tokens that repaint with the chosen accent
 const ACCENT_TOKENS: IColor[] = [
   'accent_active',
   'controls_primary_default',

@@ -16,8 +16,8 @@ export const rtkQueryErrorLogger: Middleware =
       );
     }
 
-    // Лоадером управляет только тот запрос, который его и попросил: иначе
-    // фоновый ответ гасит спиннер чужого сценария
+    // Only the request that asked for the loader controls it: otherwise a
+    // background response clears someone else's spinner
     const ownsLoader = !!action?.meta?.arg?.originalArgs?.showLoader;
 
     // Enable Loading
@@ -25,7 +25,7 @@ export const rtkQueryErrorLogger: Middleware =
       if (String(action?.type).endsWith('/pending')) {
         api.dispatch(showMainLoader(true));
       } else {
-        // Гасим и по отменённому запросу тоже, иначе спиннер останется висеть
+        // Clear it on a cancelled request too, or the spinner stays up
         api.dispatch(showMainLoader(false));
       }
     }

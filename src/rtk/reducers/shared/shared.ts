@@ -18,12 +18,12 @@ export const sharedSlice = createSlice({
       state.isLoading = action.payload;
     },
 
-    // Удержание лоадера на весь сценарий: true — взяли, false — отпустили.
-    // Считаем, а не переключаем, чтобы вложенные сценарии не гасили друг друга.
+    // Holds the loader for a whole flow: true takes it, false releases it.
+    // Counted rather than toggled, so nested flows do not clear each other.
     holdMainLoader: (state, action: PayloadAction<boolean>) => {
       state.loaderHold = Math.max(0, state.loaderHold + (action.payload ? 1 : -1));
-      // Сценарий закончился — снимаем и запросный флаг: если запрос по дороге
-      // отвалился, спиннер иначе останется на экране навсегда
+      // The flow is over — clear the per-request flag too: if a request died on
+      // the way, the spinner would otherwise stay on screen forever
       if (state.loaderHold === 0) state.isLoading = false;
     },
 
@@ -54,7 +54,7 @@ export const sharedSlice = createSlice({
 
     setUser: (state, action: PayloadAction<IUser | null>) => {
       state.user = action.payload;
-      // Роль всегда едет вместе с пользователем, чтобы они не разъезжались
+      // The role always travels with the user, so the two cannot drift apart
       state.role = action.payload?.role ?? null;
     },
 
@@ -65,7 +65,7 @@ export const sharedSlice = createSlice({
     setChildren: (state, action: PayloadAction<IChild[]>) => {
       state.children = action.payload;
 
-      // Выбранного ребёнка могли удалить — тогда встаём на первого
+      // The selected child may have been deleted — fall back to the first one
       const stillExists = state.children.some(child => child.id === state.activeChildId);
       if (!stillExists) {
         state.activeChildId = state.children[0]?.id ?? null;

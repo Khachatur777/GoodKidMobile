@@ -25,7 +25,7 @@ export const homeStyles = ({
       gap: 8,
     },
 
-    // Header (in-screen, дизайн v2)
+    // Header (in-screen, design v2)
     headerRow: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -44,8 +44,8 @@ export const homeStyles = ({
       height: 34,
       resizeMode: 'contain',
     },
-    // Детский Home по макету: поиск не иконкой в углу, а полем во всю ширину —
-    // крупная зона нажатия и понятная подпись
+    // The child's Home per the design: search is a full-width field rather than a
+    // corner icon — a large tap area with a legible label
     kidSearchField: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -163,11 +163,11 @@ export const homeStyles = ({
 
     videoYoutubeContainer: {
       position: 'relative',
-      height: isTablet ? Math.round(width * 0.45) : Math.round(width * 0.56), // tablet чуть ниже, phone 16:9
+      height: isTablet ? Math.round(width * 0.45) : Math.round(width * 0.56), // tablet a little shorter, phone 16:9
       overflow: 'hidden',
     },
 
-    // Эти "hide*" лучше тоже от width/height, а не фикс
+    // These "hide*" values would be better derived from width/height too, not fixed
     hideYoutubeContainer: {
       position: 'absolute',
       width: playing ? width * 0.5 : width * 0.6,

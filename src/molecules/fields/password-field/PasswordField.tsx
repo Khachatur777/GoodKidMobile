@@ -12,8 +12,8 @@ import {IIcons} from 'assets';
 export interface PasswordFiledProps extends TextFieldProps {
   isVisible?: boolean;
   showCleanBtn?: boolean;
-  // Обёртка по умолчанию поджимает поле на 20 с каждой стороны. На экранах,
-  // где рядом стоят обычные поля, это заметно — там отступ переопределяется.
+  // The wrapper insets the field by 20 on each side by default. On screens where
+  // ordinary fields sit next to it that shows, so the inset is overridden there.
   wrapperStyles?: StyleProp<ViewStyle>;
 }
 

@@ -99,7 +99,7 @@ const LearnExplanation: FC<LearnProps> = ({ route }) => {
         await viewLearnReset({showLoader: true});
         await refetch();
 
-      } catch (e) {
+      } catch {
 
       }
       return;
@@ -107,7 +107,7 @@ const LearnExplanation: FC<LearnProps> = ({ route }) => {
 
     try {
       await viewLearn({ knowledgeItemId: activeLearnData?._id! }).unwrap();
-    } catch (e) {}
+    } catch {}
 
     setActiveIndex(next);
     setActiveLearnData(learnData[next]);

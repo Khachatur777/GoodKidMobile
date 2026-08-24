@@ -1,4 +1,3 @@
-import i18n from 'localization/localization';
 import { Modal, Spacing, Typography } from 'molecules';
 import { RadioSelectCell } from 'organisms';
 import { Dispatch, FC, SetStateAction } from 'react';

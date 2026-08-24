@@ -85,8 +85,8 @@ android {
         applicationId "com.goodkid"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 43
-        versionName "1.1.149"
+        versionCode 44
+        versionName "1.1.150"
     }
     signingConfigs {
       release {

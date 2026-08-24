@@ -20,7 +20,7 @@ export const checkUserSubscription = async (): Promise<UserSubscription> => {
       plan: activeSub?.productIdentifier ?? null,
       expiresAt: activeSub?.expiresDate ?? null,
     };
-  } catch (error) {
+  } catch {
     return { isSubscribed: false, plan: null, expiresAt: null };
   }
 };

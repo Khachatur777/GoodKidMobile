@@ -1,13 +1,12 @@
 import { NavigationProp } from '@react-navigation/native';
-import { Image, Keyboard, Platform, View } from 'react-native';
+import { Keyboard, Platform, View } from 'react-native';
 import { forgotSendCodeStyles } from './forgot-send-code-styles.ts';
-import {FC, useCallback, useContext} from 'react';
+import {FC, useCallback} from 'react';
 import {GoodKidLogo, BackgroundWrapper, Button, KeyboardAwareScrollView, TextField, Typography} from 'molecules';
 import { Formik } from 'formik';
 import { forgotSendCodeValidationScheme } from './validations.ts';
 import { useTranslation } from 'react-i18next';
 import { useForgotSendCodeMutation } from 'rtk';
-import {ThemeContext} from "theme";
 
 export interface SignUpProps {
   navigation: NavigationProp<any>;
@@ -15,7 +14,6 @@ export interface SignUpProps {
 
 const ForgotSendCode: FC<SignUpProps> = ({ navigation }) => {
   const { t } = useTranslation();
-  const { theme } = useContext(ThemeContext);
   const [forgotSendCode] = useForgotSendCodeMutation()
 
   const initialValues = {

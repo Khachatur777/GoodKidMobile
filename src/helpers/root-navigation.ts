@@ -9,12 +9,12 @@ export function navigateFromRoot(name: string, params?: object) {
   }
 }
 
-// Сброс на экран входа: после выхода гостевого режима нет, и без роли внутри
-// приложения смотреть нечего — лента, Learn и фильтр требуют аккаунта.
+// Reset to the sign-in screen: there is no guest mode after signing out, and
+// with no role there is nothing to see — feed, Learn and filter need an account.
 export function resetToSignIn() {
   if (navigationRef.isReady()) {
-    // Вложенному стеку нужно именно состояние: с params он открывался на своём
-    // первом экране (Splash), а не на входе.
+    // The nested stack needs a state, not params: with params it opened on its
+    // own first screen (Splash) instead of sign-in.
     navigationRef.reset({
       index: 0,
       routes: [

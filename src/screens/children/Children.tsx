@@ -13,7 +13,7 @@ export interface ChildrenProps {
   navigation: NavigationProp<any>;
 }
 
-// Список детей родителя. Открывается из профиля после parental gate.
+// The parent's list of children. Opened from the profile after the parental gate.
 const Children: FC<ChildrenProps> = ({ navigation }) => {
   const { t } = useTranslation();
   const { color } = useContext(ThemeContext);
@@ -31,7 +31,7 @@ const Children: FC<ChildrenProps> = ({ navigation }) => {
     }
   }, [data?.data?.children, dispatch]);
 
-  // Сколько детей можно завести, решает сервер — приложение это число не зашивает
+  // How many children are allowed is the server's call — the app does not bake in the number
   const maxChildren = data?.data?.limits?.maxChildren ?? 3;
   const isFull = children.length >= maxChildren;
 

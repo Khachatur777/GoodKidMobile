@@ -83,7 +83,7 @@ const EditChild: FC<EditChildProps> = ({ navigation, route }) => {
   const onChangePassword = useCallback(async () => {
     if (!child || newPassword.length < 6) return;
 
-    // Смена пароля выкидывает ребёнка со всех устройств — так решает сервер
+    // Changing the password drops the child from every device — the server decides that
     const response = await changePassword({
       id: child.id,
       password: newPassword,

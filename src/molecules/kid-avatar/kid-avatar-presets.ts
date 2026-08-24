@@ -1,8 +1,8 @@
-// Пресеты аватарок детей. Фото на сервер не грузим — у ребёнка только выбор
-// из этого набора, и наружу уезжает лишь ключ вроде 'avatar_3'.
+// Avatar presets for children. Photos are never uploaded — a child only picks
+// from this set, and all that leaves the device is a key like 'avatar_3'.
 //
-// Пары «тон круга / цвет персонажа» взяты из handoff. Настоящие иллюстрации
-// ещё не нарисованы, поэтому пока рисуется заглушка-глиф — как и в макете.
+// The circle tone and character colour pairs come from the handoff. The real
+// illustrations are not drawn yet, so a placeholder glyph stands in, as in the design.
 export interface IKidAvatarPreset {
   id: string;
   tintLight: string;

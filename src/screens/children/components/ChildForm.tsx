@@ -26,8 +26,8 @@ export interface IChildFormValues {
 interface ChildFormProps {
   values: IChildFormValues;
   onChange: (patch: Partial<IChildFormValues>) => void;
-  // Занятость логина проверяется только по сабмиту: живая проверка отдавала бы
-  // список существующих логинов кому угодно.
+  // A taken login is checked only on submit: a live check would hand out the
+  // list of existing logins to anyone.
   loginError?: string;
   showAvatarHint?: boolean;
   showPasswordFields?: boolean;
@@ -66,7 +66,7 @@ const ChildForm: FC<ChildFormProps> = ({
           flexDirection: 'row',
           gap: 12,
         },
-        // Пароли должны стоять по той же линии, что Name, Age и Login
+        // The passwords must line up with Name, Age and Login
         fieldWrapper: {
           paddingHorizontal: 0,
         },
@@ -145,7 +145,7 @@ const ChildForm: FC<ChildFormProps> = ({
 
       <Spacing size={10} />
 
-      {/* Язык ребёнка задаёт родитель — сам ребёнок его не меняет */}
+      {/* The parent sets the child's language — the child does not change it */}
       <SegmentedControl
         items={[
           { value: 'en', title: 'English' },
@@ -169,8 +169,8 @@ const ChildForm: FC<ChildFormProps> = ({
         explanation={loginError || t('child_login_hint')}
       />
 
-      {/* Пароли — на всю ширину и друг под другом: рядом они слишком узкие,
-          в них не помещается ни подпись, ни сам ввод */}
+      {/* Passwords go full width, one under the other: side by side they are too
+          narrow for either the label or the input itself */}
       {showPasswordFields ? (
         <>
           <PasswordField

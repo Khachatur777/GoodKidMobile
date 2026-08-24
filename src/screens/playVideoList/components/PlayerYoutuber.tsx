@@ -1,7 +1,6 @@
 import { FC, Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { Image, Platform, View, useWindowDimensions } from 'react-native';
 import YoutubePlayer, { PLAYER_STATES } from 'react-native-youtube-iframe';
-import { Typography } from 'molecules';
 import { playVideoListStyles } from '../play-video-list-styles';
 import { KidsVideoItem } from 'models';
 import { controlsExtra, isTablet, playerHeight } from 'utils';
@@ -19,7 +18,7 @@ const PlayerYoutuber: FC<IPlayerYoutuberProps> = ({ videoData, onEnded }) => {
 
   const { width, height } = useWindowDimensions();
 
-  // Что смотрел ребёнок, родитель видит в его активности
+  // What a child watched shows up in their activity for the parent
   useWatchActivity(videoData?._id, playing);
 
 

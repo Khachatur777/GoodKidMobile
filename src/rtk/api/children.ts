@@ -90,8 +90,8 @@ export const childrenApi = baseApi
         providesTags: ['ChildActivity'],
       }),
 
-      // Плеер зовёт это на старте и потом с накопленным временем.
-      // Сервер пишет историю только для детского токена, родительские просмотры игнорирует.
+      // The player calls this at the start and then with the accumulated time.
+      // The server records history for a child token only and ignores a parent's views.
       recordVideoActivity: builder.mutation<IDefaultResponseModel, IVideoActivityRequestModel>({
         query: (body) => ({
           url: childrenRoutes().videoActivity,

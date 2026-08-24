@@ -59,7 +59,7 @@ export const baseQueryWithReAuth = (
       accessToken &&
       refreshToken
     ) {
-      // Проверяем, что ошибка связана с истекшим токеном
+      // Check that the error is about an expired token
       const errorData = result?.error?.data as any;
       if (errorData?.error === 'token.expired') {
         if (refreshing) {

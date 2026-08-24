@@ -6,7 +6,7 @@ import { getKidAvatarPreset } from './kid-avatar-presets';
 interface KidAvatarProps {
   avatarId?: string | null;
   size?: number;
-  // Кольцо выбранного аватара рисуется акцентом поверх фона экрана
+  // The ring around the selected avatar is drawn in the accent over the screen background
   selected?: boolean;
   containerStyle?: ViewStyle;
 }

@@ -1,9 +1,9 @@
 import { useCallback, useRef, useState } from 'react';
 
-// Взрослые действия — выход из приложения наружу, покупки, чужие данные —
-// закрываются арифметическим вопросом. Хук держит отложенное действие и
-// отдаёт готовые props для ParentGateModal, чтобы каждый экран не переписывал
-// одно и то же.
+// Adult actions — leaving the app, purchases, other people's data — are closed
+// by an arithmetic question. The hook holds the pending action and returns
+// ready-made props for ParentGateModal, so no screen has to rewrite the same
+// thing.
 export const useParentGate = () => {
   const [isVisible, setIsVisible] = useState(false);
   const pendingAction = useRef<(() => void) | null>(null);

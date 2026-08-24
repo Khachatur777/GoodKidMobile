@@ -20,7 +20,7 @@ i18n
             return callback('en');
           }
         });
-      } catch (error) {
+      } catch {
         if (__DEV__) {
           console.log('Error reading language', error);
         }

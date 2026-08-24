@@ -18,8 +18,8 @@ const VideoItem: FC<IVideoItemProps> = ({videoData, onPress}) => {
   const {width, height} = useWindowDimensions();
   const {t} = useTranslation();
 
-  // Если maxresdefault не открылся, переключаемся на hqdefault — иначе
-  // у части роликов карточка остаётся с пустым превью
+  // If maxresdefault does not load, fall back to hqdefault — otherwise some
+  // videos keep a card with an empty thumbnail
   const [thumbnail, setThumbnail] = useState<string | undefined>(videoData?.thumbnail);
 
   const styles = useMemo(

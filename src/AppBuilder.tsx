@@ -7,7 +7,7 @@ import {
 import {GlobalErrorModal, UpdateModal} from 'organisms';
 import {Loader} from 'molecules';
 import {useSelector} from 'react-redux';
-import {getMainLoadingState, getNetInfo} from 'rtk';
+import {getMainLoadingState} from 'rtk';
 import {navigationRef} from 'helpers';
 import {useContext, useEffect} from 'react';
 import {ThemeContext} from 'theme';
@@ -21,7 +21,6 @@ const AppBuilder = () => {
   const {theme} = useContext(ThemeContext);
   const isLoading = useSelector(getMainLoadingState);
   const {toastConfig} = useToast();
-  const isInternetConnected = useSelector(getNetInfo);
 
   useEffect(() => {
     Purchases.setLogLevel(LOG_LEVEL.INFO);

@@ -1,4 +1,4 @@
-import { Animated, Dimensions, StyleSheet, View } from 'react-native';
+import { Dimensions, View } from 'react-native';
 import { BaseSkeleton } from 'organisms';
 import { Spacing } from 'molecules';
 import { skeletonStyles } from 'organisms/skeleton/skeleton-styles.ts';

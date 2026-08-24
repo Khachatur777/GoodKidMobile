@@ -34,7 +34,7 @@ const useGetTranslations = () => {
     refetch();
   }, [getLanguageIdForRefetch]);
 
-  // Локальные строки — fallback для ключей, которых ещё нет на сервере
+  // Local strings are the fallback for keys the server does not have yet
   const localDefaults =
     localTranslations[i18n.language as keyof typeof localTranslations] ||
     localTranslations.en;

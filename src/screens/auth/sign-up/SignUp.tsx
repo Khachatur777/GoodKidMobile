@@ -1,7 +1,7 @@
 import { NavigationProp } from '@react-navigation/native';
-import { Image, Keyboard, Platform, Pressable, View } from 'react-native';
+import { Keyboard, Platform, Pressable, View } from 'react-native';
 import { signUpStyles } from './sign-up-styles.ts';
-import React, {FC, useCallback, useContext, useRef, useState} from 'react';
+import React, {FC, useCallback, useRef, useState} from 'react';
 import {GoodKidLogo, BackgroundWrapper,
   Button,
   KeyboardAwareScrollView,
@@ -24,7 +24,6 @@ import { useTranslation } from 'react-i18next';
 import { TermsModal } from 'organisms';
 import { showGlobalError } from 'rtk';
 import { useDispatch } from 'react-redux';
-import {ThemeContext} from "theme";
 
 export interface SignUpProps {
   navigation: NavigationProp<any>;
@@ -33,7 +32,6 @@ export interface SignUpProps {
 const SignUp: FC<SignUpProps> = ({ navigation }) => {
   const { t } = useTranslation();
   const [signUpReq] = useSignUpMutation();
-  const { theme } = useContext(ThemeContext);
   const formikRef = useRef(null);
   const dispatch = useDispatch();
   const [termsModal, setTermsModal] = useState<boolean>(false);

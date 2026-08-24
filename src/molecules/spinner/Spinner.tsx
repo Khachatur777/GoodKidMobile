@@ -8,9 +8,9 @@ export interface SpinnerProps extends Partial<LottieViewProps> {
   size?: 'small' | 'medium' | 'large';
 }
 
-// В анимации спиннера цвет задан градиентной обводкой (ty: 'gs'), а её
-// colorFilters от Lottie не перекрашивает — поэтому подменяем точки градиента
-// в копии JSON под выбранный акцент.
+// The spinner animation sets its colour through a gradient stroke (ty: 'gs'),
+// which Lottie's colorFilters do not repaint — so we swap the gradient stops in
+// a copy of the JSON for the chosen accent.
 const rgbFromThemeColor = (value: string): [number, number, number] | null => {
   const match = /rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/.exec(value);
   if (!match) {
@@ -25,7 +25,7 @@ const recolorGradients = (items: any[], rgb: [number, number, number]) => {
       const stops = item.g.k.k;
       const stopCount = item.g.p ?? stops.length / 4;
 
-      // Каждая точка — [позиция, r, g, b]; альфа-точки идут после и не трогаются
+      // Each stop is [position, r, g, b]; alpha stops follow and are left alone
       for (let i = 0; i < stopCount; i++) {
         const offset = i * 4;
         if (offset + 3 < stops.length) {

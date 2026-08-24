@@ -127,7 +127,7 @@ const TabBar: FC<TabBarProps> = ({descriptors, state, navigation}) => {
                   />
                 );
               case 'ProfileTab':
-              // У ребёнка свой профиль-таб, но иконка та же
+              // A child has their own profile tab, but the same icon
               case 'KidProfileTab':
                 return (
                   <Icon

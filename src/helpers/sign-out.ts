@@ -6,12 +6,12 @@ import {signOutGoogle} from "hooks";
 import {resetToSignIn} from './root-navigation';
 
 export const signOut = async () => {
-  // Роль нужна до очистки: под детским аккаунтом мы в RevenueCat не входили,
-  // и звать logOut там не за чем — он только ругается в консоль.
+  // The role is needed before the state is cleared: under a child account we
+  // never signed in to RevenueCat, so calling logOut there only logs a complaint.
   const wasParent = createStore.getState()?.shared?.user?.role !== 'child';
 
-  // Сначала уводим на экран входа и только потом чистим состояние: иначе
-  // текущий экран успевает перерисоваться в «не вошёл» и это видно как мигание.
+  // Go to the sign-in screen first and clear the state after: otherwise the
+  // current screen repaints as signed-out first, and that reads as a flicker.
   resetToSignIn();
 
   createStore.dispatch(setIsLoggedIn(false));
@@ -19,10 +19,10 @@ export const signOut = async () => {
   createStore.dispatch(setLanguageId(null));
   createStore.dispatch(setTokenData(null));
 
-  // Google и RevenueCat могут бросить: из Google мы могли не входить вовсе,
-  // а под детским аккаунтом в RevenueCat не логинимся принципиально. Раньше
-  // это роняло весь выход — токен оставался в хранилище, и сессия возвращалась
-  // после перезапуска.
+  // Google and RevenueCat can throw: we may never have signed in with Google,
+  // and under a child account we deliberately do not sign in to RevenueCat. This
+  // used to break the whole sign-out — the token stayed in storage and the
+  // session came back after a restart.
   try {
     await signOutGoogle();
   } catch (e) {

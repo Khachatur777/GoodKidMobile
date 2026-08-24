@@ -14,8 +14,8 @@ import {
 import { getTokenDataState, isLoggedInSelector } from 'rtk';
 
 const baseQuery = fetchBaseQuery({
-  // Отладочные сборки ходят на дев-стенд (apidev), релизные — в прод.
-  // Роли, дети и история живут пока только на дев-бэкенде.
+  // Debug builds talk to the dev stand (apidev), release builds to production.
+  // Roles, children and history live only on the dev backend for now.
   baseUrl: __DEV__ ? baseUrlDev : baseUrl,
   prepareHeaders: async (headers, { getState }) => {
     const state = getState() as ReduxStore;

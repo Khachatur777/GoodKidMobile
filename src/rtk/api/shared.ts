@@ -15,8 +15,8 @@ export const sharedApi = baseApi
         IPrivacyTermsResponseModel,
         IBaseRequestModel & {languageId: string}
       >({
-        // Документ приходит на языке приложения: раньше сервер отдавал все три
-        // языка одним куском, и человек читал свой текст, пролистав чужие.
+        // The document arrives in the app's language: the server used to return all
+        // three at once, so people read theirs after scrolling past the others.
         query: ({languageId}) => {
           return {
             url: `${sharedRoutes().privacy}?languageId=${languageId}`,

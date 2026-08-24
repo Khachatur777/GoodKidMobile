@@ -11,8 +11,8 @@ const Title: FC<INavigationHeaderProps> = ({options, navigation}) => {
     titleProps,
     leftIcon,
     renderRightSection,
-    // Экраны, на которые попадают сбросом стека (например, вход), возвращаться
-    // никуда не должны — там стрелку прячем
+    // Screens reached by resetting the stack (sign-in, say) have nowhere to go
+    // back to — the arrow is hidden there
     showBackIcon = true,
   } = options;
 

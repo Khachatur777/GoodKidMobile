@@ -1,15 +1,15 @@
 import { NavigationProp, ParamListBase, RouteProp } from '@react-navigation/native';
-import { Image, Keyboard, Platform, View } from 'react-native';
+import { Keyboard, Platform, View } from 'react-native';
 import { signUpVerifyStyles } from './sign-up-verify-styles.ts';
-import {FC, useCallback, useContext, useEffect, useState} from 'react';
+import {FC, useCallback, useEffect, useState} from 'react';
 import {
   BackgroundWrapper,
   Button,
+  GoodKidLogo,
   KeyboardAwareScrollView,
   Spacing,
   TextField,
 } from 'molecules';
-import {Logo, LogoWhiteWord} from 'assets';
 import { Formik } from 'formik';
 import { signUnVerifyValidationScheme } from './validations.ts';
 import {
@@ -17,7 +17,6 @@ import {
   useVerifyEmailAgainMutation,
 } from 'rtk';
 import { useTranslation } from 'react-i18next';
-import {ThemeContext} from "theme";
 import {useAuthSession} from "hooks";
 
 export interface SignUpProps {
@@ -32,7 +31,6 @@ export interface SignUpProps {
 const SignUpVerify: FC<SignUpProps> = ({ navigation, route }) => {
   const email = route?.params?.email;
   const { t } = useTranslation();
-  const { theme } = useContext(ThemeContext);
   const [verifyEmailAgain] = useVerifyEmailAgainMutation()
   const [resendLeft, setResendLeft] = useState(15);
 
@@ -49,9 +47,9 @@ const SignUpVerify: FC<SignUpProps> = ({ navigation, route }) => {
     });
   }, [navigation]);
 
-  // Сразу после регистрации ведём родителя добавлять первого ребёнка: без
-  // ребёнка ни фильтр, ни история смысла не имеют, а пустые экраны ничего не
-  // объясняют. Экран можно пропустить — тогда останется обычный Home.
+  // Straight after registration the parent is taken to add their first child:
+  // without one, neither filter nor history means anything, and empty screens
+  // explain nothing. The screen can be skipped — then it is the usual Home.
   const goHome = useCallback(() => {
     navigation.reset({
       index: 0,
@@ -79,8 +77,8 @@ const SignUpVerify: FC<SignUpProps> = ({ navigation, route }) => {
   }, [resendLeft]);
 
 
-  // Тот же общий сценарий, что и на экране входа: он держит лоадер до конца
-  // и сам решает, куда вести — на Home или на обновление приложения.
+  // The same shared flow as the sign-in screen: it holds the loader to the end
+  // and decides where to go — Home or the force-update screen.
   const {finalizeAuth, runAuthFlow} = useAuthSession({
     onAuthorized: goHome,
     onForceUpdate: goForceUpdate,
@@ -99,7 +97,7 @@ const SignUpVerify: FC<SignUpProps> = ({ navigation, route }) => {
         });
 
         if (!response?.data?.success) {
-          // Об ошибке от сервера уже сказал showModal
+          // showModal has already reported the server's error
           return response?.error || response?.data?.message ? 'silent' : false;
         }
 
@@ -143,7 +141,7 @@ const SignUpVerify: FC<SignUpProps> = ({ navigation, route }) => {
 
             <View style={signUpVerifyStyles().container}>
 
-              <Image source={theme === 'dark' ? LogoWhiteWord : Logo} style={signUpVerifyStyles().logo} />
+              <GoodKidLogo size={70} variant="stacked" />
 
               <TextField
                 size="large"

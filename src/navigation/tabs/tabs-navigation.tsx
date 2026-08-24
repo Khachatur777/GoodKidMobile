@@ -12,15 +12,15 @@ export interface TabNavigatorProps {
 const Tab = createBottomTabNavigator();
 
 export const TabNavigator: FC<TabNavigatorProps> = () => {
-  // Набор табов выбирается по роли из токена: у ребёнка нет фильтра и
-  // родительских разделов, попасть в них из детской сессии нельзя.
+  // The tab set follows the role from the token: a child has no filter and no
+  // parent sections, and cannot reach them from a child session.
   const role = useSelector(getRoleState);
 
-  // При выходе роль обнуляется раньше, чем экраны успевают размонтироваться.
-  // Если в этот момент подменить набор табов, навигатор пересобирается и своим
-  // обновлением состояния перебивает уже сделанный сброс на экран входа —
-  // ребёнок оказывался на родительском Home. Поэтому без роли держим прежний
-  // набор: он всё равно живёт последние мгновения до ухода на логин.
+  // On sign-out the role clears before the screens have unmounted. Swapping the
+  // tab set at that moment rebuilds the navigator, and its own state update
+  // overrides the reset to the sign-in screen that already happened — a child
+  // ended up on the parent's home screen. So with no role we keep the previous
+  // set: it only lives for the last moments before the sign-in screen.
   const wasChild = useRef(false);
   if (role) wasChild.current = role === 'child';
 

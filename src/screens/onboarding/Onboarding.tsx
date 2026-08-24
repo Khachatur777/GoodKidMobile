@@ -28,8 +28,8 @@ interface ISlide {
   tintDark: string;
 }
 
-// Четыре слайда из макета. Иллюстрации пока собраны из иконок приложения на
-// тонированной подложке — настоящие персонажи ещё не нарисованы.
+// Four slides from the design. The illustrations are assembled from the app's
+// own icons on a tinted backdrop — the real characters are not drawn yet.
 const SLIDES: ISlide[] = [
   {key: 'onboarding_1', icon: 'Sliders04Icon', tintLight: '#EDE9FD', tintDark: '#2A2350'},
   {key: 'onboarding_2', icon: 'User02Icon', tintLight: '#FFF1CE', tintDark: '#3A2F16'},
@@ -48,7 +48,7 @@ const Onboarding: FC<OnboardingProps> = ({ navigation }) => {
   const [index, setIndex] = useState(0);
   const isLast = index === SLIDES.length - 1;
 
-  // Онбординг показывается один раз на устройство
+  // Onboarding is shown once per device
   const finish = useCallback(async () => {
     dispatch(setOnboardingSeen(true));
     await setItem('onboardingSeen', true);
@@ -69,7 +69,7 @@ const Onboarding: FC<OnboardingProps> = ({ navigation }) => {
     <BackgroundWrapper includesSafeArea>
       <View style={styles.container}>
         <View style={styles.skipRow}>
-          {/* На последнем слайде вместо Skip уже стоят кнопки внизу */}
+          {/* On the last slide the buttons below replace Skip */}
           {isLast ? null : (
             <Pressable onPress={finish}>
               <Typography type="bodyMBold" textColor="text_secondary">

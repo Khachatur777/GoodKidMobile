@@ -1,7 +1,7 @@
 import { NavigationProp, ParamListBase, RouteProp } from '@react-navigation/native';
-import { Image, Keyboard, Platform, View } from 'react-native';
+import { Keyboard, Platform, View } from 'react-native';
 import { forgotChangePasswordStyles } from './forgot-change-password-styles.ts';
-import {FC, useCallback, useContext, useEffect, useState} from 'react';
+import {FC, useCallback, useEffect, useState} from 'react';
 import {GoodKidLogo, BackgroundWrapper, Button, KeyboardAwareScrollView, PasswordField, Spacing, TextField} from 'molecules';
 import { Formik } from 'formik';
 import { forgotChangePasswordValidationScheme } from './validations.ts';
@@ -10,7 +10,6 @@ import {
   useForgotChangePasswordMutation,
   useVerifyEmailAgainMutation,
 } from 'rtk';
-import {ThemeContext} from "theme";
 
 export interface SignUpProps {
   navigation: NavigationProp<any>;
@@ -23,7 +22,6 @@ export interface SignUpProps {
 
 const ForgotChangePassword: FC<SignUpProps> = ({ navigation, route }) => {
   const { t } = useTranslation();
-  const { theme } = useContext(ThemeContext);
   const [forgotChangePassword] = useForgotChangePasswordMutation()
   const [verifyEmailAgain] = useVerifyEmailAgainMutation()
   const email = route.params?.email
@@ -74,7 +72,7 @@ const ForgotChangePassword: FC<SignUpProps> = ({ navigation, route }) => {
         showModal: true
       }
       verifyEmailAgain(data)
-    } catch (e){}
+    } catch {}
 
 
   }, [resendLeft, email]);

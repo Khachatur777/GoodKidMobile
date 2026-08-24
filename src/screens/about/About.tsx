@@ -21,8 +21,8 @@ const About: FC<AboutProps> = () => {
   const {color} = useContext(ThemeContext);
   const styles = useMemo(() => aboutStyles(color), [color]);
 
-  // Экран открыт и ребёнку, поэтому всё, что уводит из приложения — сайт,
-  // оценка в сторе, «поделиться» — закрыто вопросом для взрослого.
+  // The screen is open to children too, so everything that leaves the app — the
+  // site, rating in the store, sharing — sits behind the adult question.
   const {runBehindGate, gateProps} = useParentGate();
 
   const onShare = () => {

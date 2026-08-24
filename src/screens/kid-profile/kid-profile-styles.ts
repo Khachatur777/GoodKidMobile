@@ -41,8 +41,8 @@ export const kidProfileStyles = (color?: IGetColor) =>
       gap: 6,
       alignItems: 'center',
     },
-    // Кольцо рисуется отдельной обёрткой: обводка на самой точке была белой
-    // на белой карточке, то есть невидимой.
+    // The ring is drawn by a separate wrapper: an outline on the dot itself was
+    // white on a white card, that is, invisible.
     accentDotRing: {
       padding: 2,
       borderRadius: 999,
