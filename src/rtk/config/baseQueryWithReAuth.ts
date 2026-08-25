@@ -30,7 +30,8 @@ export const baseQueryWithReAuth = (
     // Set Network Information
 
     fetch().then(state => {
-      api.dispatch(setNetInfo(state.isConnected ? state.isConnected : false));
+      // Same rule as the listener in AppBuilder: unknown is not offline
+      api.dispatch(setNetInfo(state.isConnected !== false));
     });
 
     let result = await baseQuery(args, api, extraOptions);

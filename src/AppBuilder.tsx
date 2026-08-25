@@ -49,9 +49,11 @@ const AppBuilder = () => {
 
   // Connection state used to be written on every request and read by nobody, so
   // the offline screen never appeared. The system tells us instead, the moment
-  // it changes.
+  // it changes. Only an explicit false counts: at launch iOS reports null while
+  // it is still working the connection out, and treating that as offline threw
+  // the screen up over a perfectly good connection.
   useEffect(() => addEventListener(state => {
-    dispatch(setNetInfo(!!state.isConnected));
+    dispatch(setNetInfo(state.isConnected !== false));
   }), [dispatch]);
 
   return (
