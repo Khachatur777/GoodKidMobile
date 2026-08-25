@@ -36,7 +36,8 @@ export interface IChildResponseModel extends IDefaultResponseModel {
 
 export interface IChildFilter {
   categories: number[];
-  language: string | null;
+  // A list since a filter may hold several; older rows still arrive as a string
+  language: string[] | string | null;
   age: number | null;
 }
 

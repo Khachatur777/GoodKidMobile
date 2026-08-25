@@ -43,7 +43,7 @@ const Filter: FC<FilterProps> = ({ navigation }) => {
   const children = useSelector(getChildrenState);
   const activeChildId = useSelector(getActiveChildIdState);
 
-  const [language, setLanguage] = useState<string>('');
+  const [language, setLanguage] = useState<string[]>([]);
   const [ages, setAges] = useState<number | null>(null);
   const [categories, setCategories] = useState<number[]>([]);
   const [dirty, setDirty] = useState(false);
@@ -71,7 +71,9 @@ const Filter: FC<FilterProps> = ({ navigation }) => {
 
       setCategories(response?.data?.filter?.categories || []);
       setAges(response?.data?.filter?.age ?? null);
-      setLanguage(response?.data?.filter?.language || '');
+      // Older filters hold a single language; the screen works in lists
+      const saved = response?.data?.filter?.language;
+      setLanguage(Array.isArray(saved) ? saved : saved ? [saved] : []);
       setDirty(false);
     },
     [loadChildFilter],
@@ -99,7 +101,9 @@ const Filter: FC<FilterProps> = ({ navigation }) => {
 
   const chooseFilterLanguage = useCallback((lng: IFilterData) => {
     const selectedKey = lng.key || lng.name;
-    setLanguage(prev => (prev === selectedKey ? '' : selectedKey));
+    setLanguage(prev =>
+      prev.includes(selectedKey) ? prev.filter(item => item !== selectedKey) : [...prev, selectedKey],
+    );
     setDirty(true);
   }, []);
 
@@ -127,7 +131,7 @@ const Filter: FC<FilterProps> = ({ navigation }) => {
       const response = await getVideosCount({
         categories,
         ...(ages ? {age: ages} : {}),
-        ...(language ? {language} : {}),
+        ...(language.length ? {language} : {}),
       });
 
       if (!cancelled) setMatchCount(response?.data?.data?.count ?? null);
@@ -140,7 +144,7 @@ const Filter: FC<FilterProps> = ({ navigation }) => {
   }, [activeChildId, ages, categories, getVideosCount, language]);
 
   const onReset = useCallback(() => {
-    setLanguage('');
+    setLanguage([]);
     setAges(null);
     setCategories([]);
     setDirty(true);
@@ -153,7 +157,7 @@ const Filter: FC<FilterProps> = ({ navigation }) => {
       id: activeChildId,
       categories,
       age: ages,
-      language: language || null,
+      language,
       showLoader: true,
       showModal: true,
     });
@@ -272,7 +276,7 @@ const Filter: FC<FilterProps> = ({ navigation }) => {
 
           <View style={styles.filterItemsContainer}>
             {LanguageFilter.map(lng => {
-              const isSelected = language === (lng.key || lng.name);
+              const isSelected = language.includes(lng.key || lng.name);
 
               return (
                 <Badge

@@ -27,7 +27,7 @@ export const homeApi = baseApi
       // so it must never raise the global loader.
       getVideosCount: builder.mutation<
         {success?: boolean; data?: {count: number}},
-        {categories?: number[]; language?: string; age?: number}
+        {categories?: number[]; language?: string[]; age?: number}
       >({
         query: (body) => {
           return {
