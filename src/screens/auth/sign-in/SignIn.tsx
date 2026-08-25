@@ -301,7 +301,14 @@ const SignIn: FC<SignInhProps> = ({navigation}) => {
       >
         {({setFieldValue, touched, handleSubmit, values, errors}) => (
           <KeyboardAwareScrollView
+            extraScrollHeight={Platform.OS === 'android' ? 180 : 130}
+            extraHeight={Platform.OS === 'android' ? 180 : 130}
             enableOnAndroid
+            // Without the content style the screen is pinned to the window and
+            // there is nothing to scroll: with the keyboard up the password
+            // field sat under it, out of reach — the other auth screens set this.
+            contentContainerStyle={signInStyles().scrollContainer}
+            keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
             <View style={signInStyles().container}>

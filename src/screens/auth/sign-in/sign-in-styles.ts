@@ -6,6 +6,8 @@ export const signInStyles = () =>
   StyleSheet.create({
     scrollContainer: {
       flexGrow: 1,
+      // Room under the last field so the keyboard never covers it outright
+      paddingBottom: 24,
     },
     container: {
       flex: 1,
