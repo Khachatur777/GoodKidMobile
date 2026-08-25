@@ -23,6 +23,20 @@ export const homeApi = baseApi
           };
         },
       }),
+      // How many videos the filter leaves. Asked while the parent taps chips,
+      // so it must never raise the global loader.
+      getVideosCount: builder.mutation<
+        {success?: boolean; data?: {count: number}},
+        {categories?: number[]; language?: string; age?: number}
+      >({
+        query: (body) => {
+          return {
+            url: homeRoutes().getVideosCount,
+            method: 'POST',
+            body,
+          };
+        },
+      }),
       getSearchTitleVideos: builder.mutation<
         IGetVideoSearchTitleResponse,
         IGetVideoSearchTitleRequestModel
@@ -42,5 +56,6 @@ export const homeApi = baseApi
 
 export const {
   useGetAllHomeVideosMutation,
+  useGetVideosCountMutation,
   useGetSearchTitleVideosMutation,
 } = homeApi;

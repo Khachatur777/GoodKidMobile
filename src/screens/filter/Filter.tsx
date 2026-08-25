@@ -14,6 +14,7 @@ import {
   useEditChildFilterMutation,
   useGetChildrenQuery,
   useLazyGetChildFilterQuery,
+  useGetVideosCountMutation,
 } from 'rtk';
 import { useDispatch, useSelector } from 'react-redux';
 import { ChildSelector } from 'organisms';
@@ -47,6 +48,7 @@ const Filter: FC<FilterProps> = ({ navigation }) => {
   const [categories, setCategories] = useState<number[]>([]);
   const [dirty, setDirty] = useState(false);
   const [pendingChildId, setPendingChildId] = useState<string | null>(null);
+  const [matchCount, setMatchCount] = useState<number | null>(null);
 
   const { data: childrenResponse, isFetching: childrenLoading } = useGetChildrenQuery(undefined, {
     refetchOnMountOrArgChange: true,
@@ -55,6 +57,7 @@ const Filter: FC<FilterProps> = ({ navigation }) => {
 
   const [loadChildFilter] = useLazyGetChildFilterQuery();
   const [editChildFilter] = useEditChildFilterMutation();
+  const [getVideosCount] = useGetVideosCountMutation();
 
   useEffect(() => {
     if (childrenResponse?.data?.children) {
@@ -113,6 +116,28 @@ const Filter: FC<FilterProps> = ({ navigation }) => {
     );
     setDirty(true);
   }, []);
+
+  // Recounted while the parent taps: a filter that leaves three videos is worth
+  // seeing before it is saved, not after.
+  useEffect(() => {
+    if (!activeChildId) return;
+
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      const response = await getVideosCount({
+        categories,
+        ...(ages ? {age: ages} : {}),
+        ...(language ? {language} : {}),
+      });
+
+      if (!cancelled) setMatchCount(response?.data?.data?.count ?? null);
+    }, 350);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [activeChildId, ages, categories, getVideosCount, language]);
 
   const onReset = useCallback(() => {
     setLanguage('');
@@ -265,13 +290,23 @@ const Filter: FC<FilterProps> = ({ navigation }) => {
         </View>
       </ScrollView>
 
-      <View style={styles.footer}>
-        <View style={styles.footerReset}>
-          <Button variant="outline" title={t('filter_reset')} onPress={onReset} />
-        </View>
+      <View style={styles.stickyBottom}>
+        {matchCount !== null && (
+          <View style={styles.countRow}>
+            <Typography type="bodySM" textColor="text_secondary">
+              {t('filter_match_count', {count: matchCount})}
+            </Typography>
+          </View>
+        )}
 
-        <View style={styles.footerSave}>
-          <Button title={t('save')} onPress={onSave} />
+        <View style={styles.footer}>
+          <View style={styles.footerReset}>
+            <Button variant="outline" title={t('filter_reset')} onPress={onReset} />
+          </View>
+
+          <View style={styles.footerSave}>
+            <Button title={t('save')} onPress={onSave} />
+          </View>
         </View>
       </View>
 

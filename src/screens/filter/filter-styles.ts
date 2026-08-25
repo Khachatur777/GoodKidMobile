@@ -7,8 +7,9 @@ export const filterStyles = (color?: IGetColor) =>
       flexGrow: 1,
       paddingHorizontal: 22,
       paddingTop: 8,
-      // above the sticky bottom and the floating tab bar
-      paddingBottom: 190,
+      // Clears the count line, the sticky buttons and the floating tab bar:
+      // without this the last chips slide under them and look cut off
+      paddingBottom: 236,
     },
     section: {
       paddingTop: 24,
@@ -19,12 +20,27 @@ export const filterStyles = (color?: IGetColor) =>
       gap: 12,
       paddingTop: 16,
     },
-    // The sticky pair of buttons above the tab bar: Reset narrower, Save wider
-    footer: {
+    // The sticky bottom: the match count over the pair of buttons, on the screen's
+    // own background so the chips scrolling underneath do not show through it.
+    stickyBottom: {
       position: 'absolute',
-      left: 22,
-      right: 22,
-      bottom: 100,
+      left: 0,
+      right: 0,
+      bottom: 92,
+      paddingHorizontal: 22,
+      paddingTop: 12,
+      paddingBottom: 8,
+      gap: 10,
+      backgroundColor: color?.('bg_primary'),
+      // A hairline so the chips passing underneath read as scrolled away
+      borderTopWidth: 1,
+      borderTopColor: color?.('controls_border_default', 0.5),
+    },
+    countRow: {
+      alignItems: 'center',
+    },
+    // Reset narrower, Save wider
+    footer: {
       flexDirection: 'row',
       gap: 12,
     },
