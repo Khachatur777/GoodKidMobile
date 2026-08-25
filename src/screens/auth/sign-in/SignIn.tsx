@@ -451,19 +451,21 @@ const SignIn: FC<SignInhProps> = ({navigation}) => {
                 </View>
               </>
               )}
+
+              {/* Only a parent registers. Inside the scroll area: standing after
+                  it, the link was pushed past the bottom edge and cut in half */}
+              {role === 'parent' ? (
+                <Button
+                  variant="ghost"
+                  title={t('sign_up_text')}
+                  onPress={() => navigation.navigate('SignUp')}
+                />
+              ) : null}
             </View>
           </KeyboardAwareScrollView>
         )}
       </Formik>
 
-      {/* Only a parent registers */}
-      {role === 'parent' ? (
-        <Button
-          variant="ghost"
-          title={t('sign_up_text')}
-          onPress={() => navigation.navigate('SignUp')}
-        />
-      ) : null}
     </BackgroundWrapper>
   );
 };
