@@ -60,14 +60,22 @@ const Splash: FC<SplashProps> = ({navigation}) => {
     };
 
     const init = async () => {
+      // Read outside the try: a const declared inside it is invisible to the
+      // catch below, and the failure path needs to know whether the onboarding
+      // has already been seen. Reaching for it there threw instead of
+      // navigating, and the app sat on the splash screen for good.
+      let onboardingSeen = false;
+
       try {
-        const [tokenData, language, onboardingSeen] = await Promise.all([
+        const [tokenData, language, seenOnboarding] = await Promise.all([
           getItem('tokenData'),
           getItem('language'),
           getItem('onboardingSeen'),
         ]);
 
-        dispatch(setOnboardingSeen(!!onboardingSeen));
+        onboardingSeen = !!seenOnboarding;
+
+        dispatch(setOnboardingSeen(onboardingSeen));
 
         await i18n.changeLanguage(language || 'en');
 
@@ -92,14 +100,14 @@ const Splash: FC<SplashProps> = ({navigation}) => {
             dispatch(setUpdateIsVisibleData(true));
           }
 
-          safeGoSignInWithDelay(!!onboardingSeen);
+          safeGoSignInWithDelay(onboardingSeen);
           return;
         }
 
         const response = await authorization({});
 
         if (!response?.data?.success) {
-          safeGoSignInWithDelay(!!onboardingSeen);
+          safeGoSignInWithDelay(onboardingSeen);
           return;
         }
 
@@ -130,7 +138,7 @@ const Splash: FC<SplashProps> = ({navigation}) => {
         resetTo('TabScreens');
       } catch (e) {
         console.error('Splash init error:', e);
-        safeGoSignInWithDelay(!!onboardingSeen);
+        safeGoSignInWithDelay(onboardingSeen);
       }
     };
 
