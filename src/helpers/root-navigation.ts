@@ -26,3 +26,15 @@ export function resetToSignIn() {
     });
   }
 }
+
+// Back to the app proper. Used when a step that took over the screen is done —
+// adding the first child, for one: without this the profile tab is left sitting
+// on that screen and cannot be reached again until the app restarts.
+export function resetToHome() {
+  if (navigationRef.isReady()) {
+    navigationRef.reset({
+      index: 0,
+      routes: [{name: 'TabScreens', params: {screen: 'HomeTab'}}],
+    });
+  }
+}

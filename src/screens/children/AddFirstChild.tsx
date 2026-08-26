@@ -4,6 +4,7 @@ import { FC, useContext, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { ThemeContext } from 'theme';
+import { resetToHome } from 'helpers';
 import { childrenStyles } from './children-styles';
 
 export interface AddFirstChildProps {
@@ -42,12 +43,7 @@ const AddFirstChild: FC<AddFirstChildProps> = ({ navigation }) => {
         <Button
           variant="ghost"
           title={t('add_child_maybe_later')}
-          onPress={() =>
-            navigation.reset({
-              index: 0,
-              routes: [{name: 'TabScreens', params: {screen: 'HomeTab'}}],
-            })
-          }
+          onPress={resetToHome}
         />
       </View>
     </BackgroundWrapper>

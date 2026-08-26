@@ -2,6 +2,7 @@ import { NavigationProp } from '@react-navigation/native';
 import { BackgroundWrapper, Button, KeyboardAwareScrollView, Spacing } from 'molecules';
 import { FC, useCallback, useContext, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { resetToHome } from 'helpers';
 import { View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { getUserState, useCreateChildMutation } from 'rtk';
@@ -58,6 +59,17 @@ const AddChild: FC<AddChildProps> = ({ navigation }) => {
     });
 
     if (response?.data?.success) {
+      // Coming from "add your first child" there is nowhere to go back to: that
+      // screen would just ask again, and the profile tab would stay on it. The
+      // child exists now, so the onboarding step is over.
+      const cameFromFirstChild = navigation
+        .getState()
+        ?.routes?.some(route => route.name === 'AddFirstChildScreen');
+
+      if (cameFromFirstChild) {
+        return resetToHome();
+      }
+
       return navigation.goBack();
     }
 
