@@ -75,9 +75,11 @@ export const useAuthSession = ({onAuthorized, onForceUpdate}: IAuthSessionOption
       }
 
       try {
+        // The e-mail and the name used to go here as well. The app is in the
+        // Kids category, which forbids handing personal data to a third party,
+        // and RevenueCat needs none of it: the account id is enough to find the
+        // subscription. Do not put them back.
         await Purchases.setAttributes({
-          'E-mail': user?.email || '',
-          'Name': `${user?.profile?.firstName || ''} ${user?.profile?.lastName || ''}`.trim(),
           VersionNumber: String(versionNumber),
           LoginTime: new Date().toString(),
         });
