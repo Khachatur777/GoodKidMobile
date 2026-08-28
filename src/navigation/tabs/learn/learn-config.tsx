@@ -1,5 +1,5 @@
 import {IScreens} from 'navigation';
-import { Learn, LearnExplanation, MathCard, MathCategories, MathResult, Sections } from 'screens';
+import { CardCategories, CardSession, Learn, LearnExplanation, MathCard, MathCategories, MathResult, Sections } from 'screens';
 import i18n from 'i18next';
 
 export const learnScreens: IScreens[] = [
@@ -22,6 +22,24 @@ export const learnScreens: IScreens[] = [
       type: 'title',
       showBackIcon: true,
       showIconInTabScreen: false,
+    }),
+  },
+  {
+    name: 'CardCategories',
+    component: CardCategories,
+    options: () => ({
+      title: i18n.t('section_world'),
+      type: 'title',
+      showBackIcon: true,
+      showIconInTabScreen: false,
+    }),
+  },
+  {
+    // Как и математическая сессия, занимает экран целиком.
+    name: 'CardSession',
+    component: CardSession,
+    options: () => ({
+      headerShown: false,
     }),
   },
   {

@@ -15,7 +15,7 @@ import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 
 // Экраны сессии занимают телефон целиком: под таб-баром тонула бы кнопка
 // «Готово», а выйти из задания и так можно крестиком слева.
-const FULL_SCREEN_ROUTES = ['MathCard', 'MathResult'];
+const FULL_SCREEN_ROUTES = ['MathCard', 'MathResult', 'CardSession'];
 
 const hideTabBarOnSession = ({ route }: { route: any }) => {
   const focused = getFocusedRouteNameFromRoute(route);

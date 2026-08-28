@@ -26,7 +26,13 @@ const MathResult: FC<MathResultProps> = ({ navigation, route }) => {
 
   // Ни одного «ты проиграл». Даже нулевой результат — приглашение попробовать
   // ещё раз: у ребёнка 4–6 лет проигрыш это причина закрыть приложение.
-  const message = result.perfect
+  // Просмотренную категорию не хвалят за «первую попытку»: там ничего не
+  // отвечали, и цифра означала бы не то, что написано рядом.
+  const message = result.viewOnly
+    ? result.stars > 0
+      ? t('cards_done_reward', { count: result.totalQuestions })
+      : t('cards_done_again')
+    : result.perfect
     ? t('math_result_perfect', { total: result.totalQuestions })
     : result.correctFirstTry > 0
       ? t('math_result_good', { count: result.correctFirstTry })
@@ -75,7 +81,7 @@ const MathResult: FC<MathResultProps> = ({ navigation, route }) => {
         <View style={styles.statCard}>
           <View style={styles.statRow}>
             <Typography type="bodyS" textColor="text_tertiary">
-              {t('math_result_first_try')}
+              {result.viewOnly ? t('cards_result_viewed') : t('math_result_first_try')}
             </Typography>
             <Typography type="bodyBold">
               {t('math_result_of', {
@@ -99,9 +105,15 @@ const MathResult: FC<MathResultProps> = ({ navigation, route }) => {
         </View>
 
         <View style={styles.buttons}>
+          {/* Пройденная просмотровая категория повторно звёзд не даёт, поэтому
+              и звать «ещё раз» первой кнопкой незачем. */}
           <Pressable
-            style={styles.primary}
-            onPress={() => navigation.replace('MathCard', { category })}
+            style={result.viewOnly ? styles.secondary : styles.primary}
+            onPress={() =>
+              category
+                ? navigation.replace('MathCard', { category })
+                : navigation.goBack()
+            }
           >
             <Typography type="titleL" textColor="text_inverted" textStyles={styles.buttonText}>
               {t('math_result_again')}

@@ -66,6 +66,9 @@ export interface ISessionResult {
   totalStars: number | null;
   starsBalance: number | null;
   alreadyFinished?: boolean;
+  // Просмотровая категория: отвечать было нечего, и «с первой попытки» про неё
+  // сказать нельзя — там считаются просмотренные карточки.
+  viewOnly?: boolean;
 }
 
 export interface ISessionResultResponseModel extends IDefaultResponseModel {
@@ -106,4 +109,80 @@ export interface IUnlockResult {
 
 export interface IUnlockResponseModel extends IDefaultResponseModel {
   data: IUnlockResult;
+}
+
+export type CardType = 'learn' | 'multiple_choice' | 'count' | 'numeric_input';
+
+export interface ILocalized {
+  ru: string;
+  en: string;
+  hy: string;
+}
+
+export interface IAudioTrack {
+  path: string;
+  voice: string;
+  format: string;
+}
+
+export type ILocalizedAudio = Partial<Record<'ru' | 'en' | 'hy', IAudioTrack>>;
+
+export interface ICardAnswer {
+  id: string;
+  emoji?: string;
+  imagePath?: string;
+  label?: ILocalized;
+  isCorrect?: boolean;
+}
+
+export interface ILearningCard {
+  id: string;
+  type: CardType;
+  title: ILocalized;
+  description: ILocalized;
+  question?: ILocalized;
+  audio?: ILocalizedAudio;
+  questionAudio?: ILocalizedAudio;
+  images?: { type: string; path: string }[];
+  visual?: { emoji: string; repeat: number };
+  answers?: ICardAnswer[];
+}
+
+export interface ICardCategory {
+  categoryKey: string;
+  section: string;
+  name: string;
+  image: string;
+  ageFrom: number;
+  ageTo: number;
+  isFree: boolean;
+  suitsAge: boolean;
+  cardsTotal: number;
+  starsEarned: number;
+  sessionsPlayed: number;
+}
+
+export interface ICardCategoriesResponseModel extends IDefaultResponseModel {
+  data: ICardCategory[];
+}
+
+export interface ICardSession {
+  sessionId: string;
+  categoryKey: string;
+  cards: ILearningCard[];
+}
+
+export interface ICardSessionResponseModel extends IDefaultResponseModel {
+  data: ICardSession;
+}
+
+export interface ICompleteCategoryResult {
+  stars: number;
+  alreadyRewarded?: boolean;
+  totalStars?: number | null;
+  starsBalance?: number | null;
+}
+
+export interface ICompleteCategoryResponseModel extends IDefaultResponseModel {
+  data: ICompleteCategoryResult;
 }

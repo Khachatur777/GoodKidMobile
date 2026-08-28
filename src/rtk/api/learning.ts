@@ -8,6 +8,12 @@ import {
   IStartMathSessionRequestModel,
   IUnlockAppearanceRequestModel,
   IUnlockResponseModel,
+  ICardCategoriesRequestModel,
+  ICardCategoriesResponseModel,
+  IStartCardSessionRequestModel,
+  ICardSessionResponseModel,
+  ICompleteCategoryRequestModel,
+  ICompleteCategoryResponseModel,
 } from 'models';
 import { baseApi } from './base';
 import { learningRoutes } from './routes';
@@ -48,6 +54,37 @@ export const learningApi = baseApi
       }),
       invalidatesTags: ['LearningProgress'],
     }),
+    getCardCategories: builder.query<
+      ICardCategoriesResponseModel,
+      ICardCategoriesRequestModel
+    >({
+      query: ({ section = 'world' }) => ({
+        url: `${learningRoutes().cardCategories}?section=${section}`,
+        method: 'GET',
+      }),
+      providesTags: ['LearningProgress'],
+    }),
+    startCardSession: builder.mutation<
+      ICardSessionResponseModel,
+      IStartCardSessionRequestModel
+    >({
+      query: ({ categoryId, limit }) => ({
+        url: learningRoutes().cardSession,
+        method: 'POST',
+        body: { categoryId, limit },
+      }),
+    }),
+    completeCategory: builder.mutation<
+      ICompleteCategoryResponseModel,
+      ICompleteCategoryRequestModel
+    >({
+      query: ({ categoryId }) => ({
+        url: learningRoutes().completeCategory,
+        method: 'POST',
+        body: { categoryId },
+      }),
+      invalidatesTags: ['LearningProgress'],
+    }),
     unlockAppearance: builder.mutation<
       IUnlockResponseModel,
       IUnlockAppearanceRequestModel
@@ -79,4 +116,7 @@ export const {
   useFinishSessionMutation,
   useGetLearningProgressQuery,
   useUnlockAppearanceMutation,
+  useGetCardCategoriesQuery,
+  useStartCardSessionMutation,
+  useCompleteCategoryMutation,
 } = learningApi;

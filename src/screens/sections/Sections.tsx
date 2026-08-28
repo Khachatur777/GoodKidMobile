@@ -19,7 +19,7 @@ interface SectionTile {
 // Разделы фиксированы в коде: под каждый нужен свой экран. Категории внутри
 // приходят с сервера и добавляются без релиза.
 const SECTIONS: SectionTile[] = [
-  { key: 'world', icon: 'GlobeIcon', route: 'LearnScreen' },
+  { key: 'world', icon: 'GlobeIcon', route: 'CardCategories' },
   { key: 'math', icon: 'DotsGridIcon', route: 'MathCategories' },
   { key: 'language', icon: 'MessageChatSquareIcon' },
   { key: 'logic', icon: 'PuzzleIcon' },
