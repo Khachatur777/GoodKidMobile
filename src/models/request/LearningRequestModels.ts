@@ -18,3 +18,8 @@ export interface IFinishSessionRequestModel extends IBaseRequestModel {
   sessionId: string;
   answers: ISubmittedAnswer[];
 }
+
+export interface IUnlockAppearanceRequestModel extends IBaseRequestModel {
+  type: 'avatar' | 'accent';
+  id: string;
+}

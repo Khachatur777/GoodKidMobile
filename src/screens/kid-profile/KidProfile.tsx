@@ -1,6 +1,6 @@
 import { NavigationProp } from '@react-navigation/native';
 import { AlertModal, BackgroundWrapper, CardWrapper, KidAvatar, Typography } from 'molecules';
-import { Cell, ChangeThemeModal } from 'organisms';
+import { Cell, ChangeThemeModal, StarsCard } from 'organisms';
 import { FC, useContext, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ScrollView, View } from 'react-native';
@@ -68,6 +68,8 @@ const KidProfile: FC<KidProfileProps> = ({ navigation }) => {
               </View>
             </View>
           </View>
+
+          <StarsCard currentAvatarId={user?.avatar} />
 
           <CardWrapper showArrowBtn={false}>
             <Cell

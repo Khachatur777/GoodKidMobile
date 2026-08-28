@@ -5,5 +5,6 @@ export const learningRoutes = (version: string = 'v1') => {
     finishSession: (sessionId: string) =>
       `/${version}/learning/session/${sessionId}/finish`,
     progress: `/${version}/learning/progress`,
+    unlock: `/${version}/learning/unlock`,
   };
 };

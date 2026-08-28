@@ -6,11 +6,15 @@ import {
   IMathSessionResponseModel,
   ISessionResultResponseModel,
   IStartMathSessionRequestModel,
+  IUnlockAppearanceRequestModel,
+  IUnlockResponseModel,
 } from 'models';
 import { baseApi } from './base';
 import { learningRoutes } from './routes';
 
-export const learningApi = baseApi.injectEndpoints({
+export const learningApi = baseApi
+  .enhanceEndpoints({ addTagTypes: ['LearningProgress'] })
+  .injectEndpoints({
   endpoints: builder => ({
     getMathCategories: builder.query<
       IMathCategoriesResponseModel,
@@ -42,6 +46,18 @@ export const learningApi = baseApi.injectEndpoints({
         method: 'POST',
         body: { answers },
       }),
+      invalidatesTags: ['LearningProgress'],
+    }),
+    unlockAppearance: builder.mutation<
+      IUnlockResponseModel,
+      IUnlockAppearanceRequestModel
+    >({
+      query: ({ type, id }) => ({
+        url: learningRoutes().unlock,
+        method: 'POST',
+        body: { type, id },
+      }),
+      invalidatesTags: ['LearningProgress'],
     }),
     getLearningProgress: builder.query<
       ILearningProgressResponseModel,
@@ -51,6 +67,7 @@ export const learningApi = baseApi.injectEndpoints({
         url: learningRoutes().progress,
         method: 'GET',
       }),
+      providesTags: ['LearningProgress'],
     }),
   }),
   overrideExisting: false,
@@ -61,4 +78,5 @@ export const {
   useStartMathSessionMutation,
   useFinishSessionMutation,
   useGetLearningProgressQuery,
+  useUnlockAppearanceMutation,
 } = learningApi;

@@ -96,3 +96,14 @@ export interface ILearningProgress {
 export interface ILearningProgressResponseModel extends IDefaultResponseModel {
   data: ILearningProgress;
 }
+
+export interface IUnlockResult {
+  spent?: number;
+  alreadyUnlocked?: boolean;
+  stars: { total: number; balance: number };
+  unlocked: string[];
+}
+
+export interface IUnlockResponseModel extends IDefaultResponseModel {
+  data: IUnlockResult;
+}

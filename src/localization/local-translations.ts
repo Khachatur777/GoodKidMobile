@@ -191,6 +191,9 @@ export const localTranslations = {
     section_language: 'Language',
     section_logic: 'Logic',
     section_soon: 'coming soon',
+    stars_total: 'stars earned',
+    stars_to_next_avatar: '{{count}} more for a new avatar',
+    stars_can_unlock: 'You can open a new avatar!',
 },
   ru: {
     theme_system: 'Системная',
@@ -382,6 +385,9 @@ export const localTranslations = {
     section_language: 'Язык',
     section_logic: 'Логика',
     section_soon: 'скоро',
+    stars_total: 'звёзд заработано',
+    stars_to_next_avatar: 'до нового аватара осталось {{count}}',
+    stars_can_unlock: 'Можно открыть новый аватар!',
 },
   hy: {
     theme_system: 'Համակարգային',
@@ -573,6 +579,9 @@ export const localTranslations = {
     section_language: 'Լեզու',
     section_logic: 'Տրամաբանություն',
     section_soon: 'շուտով',
+    stars_total: 'աստղ վաստակած',
+    stars_to_next_avatar: 'նոր ավատարին մնաց {{count}}',
+    stars_can_unlock: 'Կարող ես բացել նոր ավատար:',
 },
 };
 
