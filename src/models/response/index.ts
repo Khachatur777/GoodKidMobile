@@ -4,3 +4,4 @@ export * from './FilterResponseModels';
 export * from './SharedResponseModels';
 export * from './LearnResponseModels.ts';
 export * from './ChildrenResponseModels';
+export * from './LearningResponseModels';

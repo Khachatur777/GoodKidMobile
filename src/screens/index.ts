@@ -16,3 +16,7 @@ export * from './kid-profile';
 export * from './children';
 export * from './child-activity';
 export * from './onboarding';
+export * from './math-categories';
+export * from './math-card';
+export * from './math-result';
+export * from './sections';

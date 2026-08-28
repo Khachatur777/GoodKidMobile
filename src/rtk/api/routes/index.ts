@@ -5,3 +5,4 @@ export * from './sharedRoutes';
 export * from './supportRoutes';
 export * from './learnRoutes';
 export * from './childrenRoutes';
+export * from './learningRoutes';

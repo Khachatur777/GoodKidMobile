@@ -6,3 +6,4 @@ export * from './shared';
 export * from './support';
 export * from './learn';
 export * from './children';
+export * from './learning';

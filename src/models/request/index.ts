@@ -5,3 +5,4 @@ export * from './SupportRequestModels';
 export * from './SharedRequestModels.ts';
 export * from './LearnRequestModels.ts';
 export * from './ChildrenRequestModels';
+export * from './LearningRequestModels';

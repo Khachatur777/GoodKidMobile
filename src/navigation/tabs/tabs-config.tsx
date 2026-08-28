@@ -11,6 +11,18 @@ import {HomeTab} from './home';
 import {FilterTab} from './filter';
 import {ProfileTab} from './profile';
 import { LearnTab } from './learn';
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
+
+// Экраны сессии занимают телефон целиком: под таб-баром тонула бы кнопка
+// «Готово», а выйти из задания и так можно крестиком слева.
+const FULL_SCREEN_ROUTES = ['MathCard', 'MathResult'];
+
+const hideTabBarOnSession = ({ route }: { route: any }) => {
+  const focused = getFocusedRouteNameFromRoute(route);
+  return focused && FULL_SCREEN_ROUTES.includes(focused)
+    ? { tabBarStyle: { display: 'none' as const } }
+    : {};
+};
 import { KidProfileTab } from './kid-profile';
 
 export type ScreenTypes = RouteConfig<ParamListBase, any, any, {}, EventMapBase, any>;
@@ -55,11 +67,12 @@ export const parentTabScreens: ScreenTypes[] = [
   {
     name: 'LearnTab',
     component: LearnTab,
+    options: hideTabBarOnSession,
     listeners: ({ navigation }: { navigation: NavigationProp<any> }) => ({
       tabPress: (e: any) => {
         e.preventDefault();
         navigation.navigate('LearnTab', {
-          screen: 'LearnScreen',
+          screen: 'SectionsScreen',
         });
       },
     }),
@@ -99,11 +112,12 @@ export const kidTabScreens: ScreenTypes[] = [
   {
     name: 'LearnTab',
     component: LearnTab,
+    options: hideTabBarOnSession,
     listeners: ({ navigation }: { navigation: NavigationProp<any> }) => ({
       tabPress: (e: any) => {
         e.preventDefault();
         navigation.navigate('LearnTab', {
-          screen: 'LearnScreen',
+          screen: 'SectionsScreen',
         });
       },
     }),
