@@ -9,5 +9,6 @@ export const learningRoutes = (version: string = 'v1') => {
     cardCategories: `/${version}/learning/cards/categories`,
     cardSession: `/${version}/learning/cards/session`,
     completeCategory: `/${version}/learning/cards/complete`,
+    report: (childId: string) => `/${version}/learning/report/${childId}`,
   };
 };

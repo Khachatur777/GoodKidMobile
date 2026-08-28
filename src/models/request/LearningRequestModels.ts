@@ -38,3 +38,7 @@ export interface IStartCardSessionRequestModel extends IBaseRequestModel {
 export interface ICompleteCategoryRequestModel extends IBaseRequestModel {
   categoryId: string;
 }
+
+export interface ILearningReportRequestModel extends IBaseRequestModel {
+  childId: string;
+}

@@ -186,3 +186,35 @@ export interface ICompleteCategoryResult {
 export interface ICompleteCategoryResponseModel extends IDefaultResponseModel {
   data: ICompleteCategoryResult;
 }
+
+export interface IReportCategory {
+  categoryKey: string;
+  // Ключ перевода для категорий из админки; у арифметики его нет — её названия
+  // приложение знает само.
+  nameKey?: string | null;
+  source: 'math' | 'cards';
+  sessions: number;
+  answered: number;
+  correctFirstTry: number;
+  // Пропущенные — главный сигнал для родителя: не «не знает», а «слишком
+  // сложно». Поэтому лежат отдельно от неверных.
+  skipped: number;
+  averageAttempts: number;
+  starsEarned: number;
+  perfectSessions: number;
+  lastPlayedAt: string;
+}
+
+export interface ILearningReport {
+  child: {
+    id: string;
+    name: string;
+    age: number;
+    stars: { total: number; balance: number };
+  };
+  categories: IReportCategory[];
+}
+
+export interface ILearningReportResponseModel extends IDefaultResponseModel {
+  data: ILearningReport;
+}

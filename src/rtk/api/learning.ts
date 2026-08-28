@@ -14,6 +14,8 @@ import {
   ICardSessionResponseModel,
   ICompleteCategoryRequestModel,
   ICompleteCategoryResponseModel,
+  ILearningReportRequestModel,
+  ILearningReportResponseModel,
 } from 'models';
 import { baseApi } from './base';
 import { learningRoutes } from './routes';
@@ -96,6 +98,15 @@ export const learningApi = baseApi
       }),
       invalidatesTags: ['LearningProgress'],
     }),
+    getLearningReport: builder.query<
+      ILearningReportResponseModel,
+      ILearningReportRequestModel
+    >({
+      query: ({ childId }) => ({
+        url: learningRoutes().report(childId),
+        method: 'GET',
+      }),
+    }),
     getLearningProgress: builder.query<
       ILearningProgressResponseModel,
       IBaseRequestModel
@@ -119,4 +130,5 @@ export const {
   useGetCardCategoriesQuery,
   useStartCardSessionMutation,
   useCompleteCategoryMutation,
+  useGetLearningReportQuery,
 } = learningApi;

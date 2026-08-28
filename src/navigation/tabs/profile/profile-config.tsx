@@ -4,6 +4,7 @@ import {
   AddFirstChild,
   AppColour,
   ChildActivity,
+  LearningReport,
   Children,
   EditChild,
   Profile,
@@ -88,6 +89,16 @@ export const profileScreens: IScreens[] = [
     component: ChildActivity,
     options: () => ({
       title: i18n.t('child_activity_title'),
+      type: 'title',
+      showBackIcon: true,
+      showIconInTabScreen: false,
+    }),
+  },
+  {
+    name: 'LearningReportScreen',
+    component: LearningReport,
+    options: () => ({
+      title: i18n.t('report_title'),
       type: 'title',
       showBackIcon: true,
       showIconInTabScreen: false,

@@ -22,3 +22,4 @@ export * from './math-result';
 export * from './sections';
 export * from './card-categories';
 export * from './card-session';
+export * from './learning-report';
