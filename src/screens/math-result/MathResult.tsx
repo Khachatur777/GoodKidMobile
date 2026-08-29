@@ -70,8 +70,11 @@ const MathResult: FC<MathResultProps> = ({ navigation, route }) => {
           ))}
         </View>
 
+        {/* Со своим потолком: рядом стоит «10 из 10» решённых, и голая пятёрка
+            читалась как продолжение того же счёта. У каждого числа свой
+            знаменатель — спутать нечего. */}
         <Typography type="titleL" textStyles={styles.starsCount}>
-          {t('math_result_stars', { count: result.stars })}
+          {t('math_result_stars_of', { count: result.stars, max: MAX_STARS })}
         </Typography>
 
         <Typography type="body" textColor="text_tertiary" textStyles={styles.message}>
