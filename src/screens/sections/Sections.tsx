@@ -4,8 +4,9 @@ import { NavigationProp } from '@react-navigation/native';
 import { BackgroundWrapper, Icon, Typography } from 'molecules';
 import { ThemeContext } from 'theme';
 import { useTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
 import { IIcons } from 'assets';
-import { useGetLearningProgressQuery } from 'rtk';
+import { getIsChildState, useGetLearningProgressQuery } from 'rtk';
 import { sectionsStyles } from './sections-styles.ts';
 
 type SectionKey = 'world' | 'math' | 'language' | 'logic';
@@ -34,7 +35,13 @@ const Sections: FC<SectionsProps> = ({ navigation }) => {
   const { t } = useTranslation();
   const styles = useMemo(() => sectionsStyles(color), [color]);
 
-  const { data } = useGetLearningProgressQuery({ showModal: false });
+  // Звёзды принадлежат ребёнку. Родителю, зашедшему посмотреть содержимое,
+  // счётчик показывать нечего: «0» рядом с ним ничего не значит.
+  const isChild = useSelector(getIsChildState);
+  const { data } = useGetLearningProgressQuery(
+    { showModal: false },
+    { skip: !isChild },
+  );
   const stars = data?.data?.stars?.total ?? 0;
 
   return (
@@ -48,10 +55,12 @@ const Sections: FC<SectionsProps> = ({ navigation }) => {
             </Typography>
           </View>
 
-          <View style={styles.starsBadge}>
-            <Icon name={'StarIcon'} width={20} height={20} color={'accent_active'} />
-            <Typography type="bodyBold">{String(stars)}</Typography>
-          </View>
+          {isChild && (
+            <View style={styles.starsBadge}>
+              <Icon name={'StarIcon'} width={20} height={20} color={'accent_active'} />
+              <Typography type="bodyBold">{String(stars)}</Typography>
+            </View>
+          )}
         </View>
 
         <ScrollView

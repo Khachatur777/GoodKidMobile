@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { ICardCategory } from 'models';
 import {
   getContentLockedState,
+  getIsChildState,
   setSubscriptionUserData,
   useGetCardCategoriesQuery,
 } from 'rtk';
@@ -29,6 +30,7 @@ const CardCategories: FC<CardCategoriesProps> = ({ navigation }) => {
   // семьи. Оба условия должны совпасть: бесплатную категорию не запирает даже
   // отсутствие подписки.
   const contentLocked = useSelector(getContentLockedState);
+  const isChild = useSelector(getIsChildState);
 
   const { data, isLoading, isError, error, refetch } = useGetCardCategoriesQuery({
     section: 'world',
@@ -83,7 +85,7 @@ const CardCategories: FC<CardCategoriesProps> = ({ navigation }) => {
           </Typography>
 
           <View style={styles.lockRow}>
-            {item.starsEarned > 0 ? (
+            {isChild && item.starsEarned > 0 ? (
               <View style={styles.starsRow}>
                 <Icon name={'StarIcon'} width={15} height={15} color={'accent_active'} />
                 <Typography type="captionBold" textColor="text_tertiary">
@@ -100,7 +102,7 @@ const CardCategories: FC<CardCategoriesProps> = ({ navigation }) => {
       </Pressable>
       );
     },
-    [styles, t, openCategory, contentLocked],
+    [styles, t, openCategory, contentLocked, isChild],
   );
 
   if (isLoading) {

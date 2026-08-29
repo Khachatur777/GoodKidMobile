@@ -4,8 +4,9 @@ import { NavigationProp } from '@react-navigation/native';
 import { BackgroundWrapper, Icon, Loader, Typography } from 'molecules';
 import { ThemeContext } from 'theme';
 import { useTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
 import { IMathCategory, MathOperation } from 'models';
-import { useGetMathCategoriesQuery } from 'rtk';
+import { getIsChildState, useGetMathCategoriesQuery } from 'rtk';
 import { mathCategoriesStyles } from './math-categories-styles.ts';
 
 const OPERATION_SIGNS: Record<MathOperation, string> = {
@@ -24,6 +25,7 @@ const MathCategories: FC<MathCategoriesProps> = ({ navigation }) => {
   const { t } = useTranslation();
   const styles = useMemo(() => mathCategoriesStyles(color), [color]);
 
+  const isChild = useSelector(getIsChildState);
   const { data, isLoading } = useGetMathCategoriesQuery({ showModal: true });
 
   const categories = data?.data || [];
@@ -66,7 +68,7 @@ const MathCategories: FC<MathCategoriesProps> = ({ navigation }) => {
           </Typography>
         </View>
 
-        {item.starsEarned > 0 && (
+        {isChild && item.starsEarned > 0 && (
           <View style={styles.starsBadge}>
             <Icon name={'StarIcon'} width={18} height={18} color={'accent_active'} />
             <Typography type="bodySBold">{String(item.starsEarned)}</Typography>
@@ -74,7 +76,7 @@ const MathCategories: FC<MathCategoriesProps> = ({ navigation }) => {
         )}
       </Pressable>
     ),
-    [styles, t, openCategory],
+    [styles, t, openCategory, isChild],
   );
 
   const renderGroup = (title: string, items: IMathCategory[]) =>
@@ -106,10 +108,12 @@ const MathCategories: FC<MathCategoriesProps> = ({ navigation }) => {
             contentContainerStyle={styles.listContent}
             renderItem={() => (
               <>
-                <View style={styles.starsBadge}>
-                  <Icon name={'StarIcon'} width={20} height={20} color={'accent_active'} />
-                  <Typography type="bodyBold">{String(totalStars)}</Typography>
-                </View>
+                {isChild && (
+                  <View style={styles.starsBadge}>
+                    <Icon name={'StarIcon'} width={20} height={20} color={'accent_active'} />
+                    <Typography type="bodyBold">{String(totalStars)}</Typography>
+                  </View>
+                )}
 
                 {renderGroup(t('math_for_you_now'), forNow)}
                 {renderGroup(t('math_try_when_ready'), ahead)}
