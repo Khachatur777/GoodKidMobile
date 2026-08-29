@@ -6,7 +6,11 @@ import { ThemeContext } from 'theme';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { IMathCategory, MathOperation } from 'models';
-import { getIsChildState, useGetMathCategoriesQuery } from 'rtk';
+import {
+  getIsChildState,
+  useGetLearningProgressQuery,
+  useGetMathCategoriesQuery,
+} from 'rtk';
 import { mathCategoriesStyles } from './math-categories-styles.ts';
 
 const OPERATION_SIGNS: Record<MathOperation, string> = {
@@ -28,13 +32,21 @@ const MathCategories: FC<MathCategoriesProps> = ({ navigation }) => {
   const isChild = useSelector(getIsChildState);
   const { data, isLoading } = useGetMathCategoriesQuery({ showModal: true });
 
+  // Общий счёт ребёнка, тот же, что на разделах и в профиле. Складывать здесь
+  // только математические категории значило бы показывать в том же углу той же
+  // звёздочкой другое число — и не сказать, чем оно отличается.
+  const { data: progress } = useGetLearningProgressQuery(
+    { showModal: false },
+    { skip: !isChild },
+  );
+
   const categories = data?.data || [];
   // Сервер уже отдаёт подходящие возрасту первыми; здесь только разделение на
   // две группы с разными заголовками.
   const forNow = categories.filter(item => item.suitsAge);
   const ahead = categories.filter(item => !item.suitsAge);
 
-  const totalStars = categories.reduce((sum, item) => sum + item.starsEarned, 0);
+  const totalStars = progress?.data?.stars?.total ?? 0;
 
   const openCategory = useCallback(
     (category: IMathCategory) => {
