@@ -56,11 +56,21 @@ const StarsCard: FC<StarsCardProps> = ({ currentAvatarId }) => {
       <View style={styles.totalRow}>
         <Icon name={'StarIcon'} width={40} height={40} color={'accent_active'} />
         <View style={styles.totalText}>
-          <Typography type="titleL" textStyles={styles.total}>{String(total)}</Typography>
+          {/* Крупным — то, чем ребёнок расплачивается. Заработанное за всё время
+              стоит рядом помельче: показывать его главным числом значит спорить
+              с полоской, которая считает от баланса. */}
+          <Typography type="titleL" textStyles={styles.total}>{String(balance)}</Typography>
           <Typography type="bodyS" textColor="text_tertiary">
-            {t('stars_total')}
+            {t('stars_balance')}
           </Typography>
         </View>
+
+        {total !== balance && (
+          <View style={styles.earnedBox}>
+            <Typography type="bodyBold" textColor="text_secondary">{String(total)}</Typography>
+            <Typography type="caption" textColor="text_tertiary">{t('stars_total_short')}</Typography>
+          </View>
+        )}
       </View>
 
       {locked.length > 0 && (

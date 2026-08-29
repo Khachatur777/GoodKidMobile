@@ -19,6 +19,15 @@ export const starsCardStyles = (color?: IGetColor) =>
       fontWeight: '900',
       lineHeight: 46,
     },
+    // Заработанное за всё время: гордость, но не валюта — поэтому в стороне
+    // и мельче, чем баланс.
+    earnedBox: {
+      alignItems: 'center',
+      paddingHorizontal: 14,
+      paddingVertical: 8,
+      borderRadius: 16,
+      backgroundColor: color?.('surface_secondary'),
+    },
     totalText: {
       flex: 1,
       gap: 2,
