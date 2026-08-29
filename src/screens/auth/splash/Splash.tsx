@@ -20,7 +20,7 @@ import {
   useConfigMutation,
 } from 'rtk';
 import { getItem } from 'configs';
-import { isForceUpdateRequired, isOptionalUpdateAvailable } from 'helpers';
+import { applyLanguageForUser, isForceUpdateRequired, isOptionalUpdateAvailable } from 'helpers';
 import i18n from 'localization/localization.ts';
 import { checkUserSubscription } from 'hooks/usePurchase.ts';
 
@@ -132,6 +132,9 @@ const Splash: FC<SplashProps> = ({navigation}) => {
 
         dispatch(setIsLoggedIn(true));
         dispatch(setUser(user));
+        // Сеанс восстановлен из хранилища — язык тоже: у ребёнка свой, из
+        // карточки, у родителя его собственный.
+        await applyLanguageForUser(user);
         dispatch(setLanguageId(user?.role === 'child' ? user?.language : user?.profile?.preferredLanguages));
         dispatch(setConfigData(config));
 

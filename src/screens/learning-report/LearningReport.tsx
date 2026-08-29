@@ -49,7 +49,7 @@ const LearningReport: FC<LearningReportProps> = ({ route }) => {
   if (isFetching && !report) {
     return (
       <BackgroundWrapper>
-        <Loader />
+        <Loader isLoading />
       </BackgroundWrapper>
     );
   }

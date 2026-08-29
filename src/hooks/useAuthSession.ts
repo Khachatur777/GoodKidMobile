@@ -2,9 +2,9 @@ import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import Purchases from 'react-native-purchases';
 import { getBuildNumber } from 'react-native-device-info';
-import i18n, { t } from 'i18next';
+import { t } from 'i18next';
 import { setItem } from 'configs';
-import { isForceUpdateRequired as forceUpdateRequired } from 'helpers';
+import { applyLanguageForUser, isForceUpdateRequired as forceUpdateRequired } from 'helpers';
 import { IConfig, IUser } from 'models';
 import {
   holdMainLoader,
@@ -107,17 +107,9 @@ export const useAuthSession = ({onAuthorized, onForceUpdate}: IAuthSessionOption
         ),
       );
 
-      // ...and it has to reach the interface, not just the store. Without this
-      // the child saw whichever language the device was last left in — the
-      // parent's — while their card said something else. A parent choosing
-      // Russian for their child means the child's screens are in Russian.
-      if (user?.role === 'child' && user?.language) {
-        const language = String(user.language).toLowerCase();
-        if (language !== i18n.language) {
-          await i18n.changeLanguage(language);
-        }
-        await setItem('language', language);
-      }
+      // ...и должен дойти до интерфейса, а не остаться в сторе. Родителю при
+      // этом возвращается его собственный язык: он выбирал его сам.
+      await applyLanguageForUser(user);
       dispatch(setConfigData(config as any));
 
       dispatch(

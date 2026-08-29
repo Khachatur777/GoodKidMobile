@@ -7,6 +7,7 @@ import {useDispatch} from 'react-redux';
 import {setLanguageId} from 'rtk';
 import {languagesModalStyles} from './languages-modal-styles';
 import {setItem} from "configs";
+import {rememberParentLanguage} from "helpers";
 
 export interface ChangeLanguageModalProps {
   isVisible: boolean;
@@ -27,6 +28,9 @@ const ChangeLanguageModal: FC<ChangeLanguageModalProps> = ({
     }
 
     await setItem('language', code);
+    // Этот экран открывает только родитель — значит это его собственный выбор,
+    // и он должен пережить вход ребёнка с другим языком.
+    await rememberParentLanguage(code);
 
     await i18n.changeLanguage(code);
     dispatch(setLanguageId(code));

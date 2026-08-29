@@ -34,7 +34,11 @@ const localized = (value: ILocalized | undefined, lang: Lang) =>
   value?.[lang] || value?.en || '';
 
 export interface CardSessionProps {
-  navigation: NavigationProp<any>;
+  // replace даёт стек, базовый тип о нём не знает: экран результата и конец
+  // сессии заменяют текущий экран, а не кладут поверх.
+  navigation: NavigationProp<any> & {
+    replace: (name: string, params?: object) => void;
+  };
   route: RouteProp<{ params: { category: ICardCategory } }, 'params'>;
 }
 
@@ -187,7 +191,7 @@ const CardSession: FC<CardSessionProps> = ({ navigation, route }) => {
   if (!card) {
     return (
       <BackgroundWrapper includesSafeArea>
-        <Loader />
+        <Loader isLoading />
       </BackgroundWrapper>
     );
   }

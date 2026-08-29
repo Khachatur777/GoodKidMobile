@@ -10,7 +10,11 @@ import { mathResultStyles } from './math-result-styles.ts';
 const MAX_STARS = 5;
 
 export interface MathResultProps {
-  navigation: NavigationProp<any>;
+  // replace даёт стек, базовый тип о нём не знает: экран результата и конец
+  // сессии заменяют текущий экран, а не кладут поверх.
+  navigation: NavigationProp<any> & {
+    replace: (name: string, params?: object) => void;
+  };
   route: RouteProp<
     { params: { result: ISessionResult; category: IMathCategory } },
     'params'

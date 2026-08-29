@@ -167,12 +167,12 @@ const MathCard: FC<MathCardProps> = ({ navigation, route }) => {
   if (!question) {
     return (
       <BackgroundWrapper includesSafeArea>
-        <Loader />
+        <Loader isLoading />
       </BackgroundWrapper>
     );
   }
 
-  const progress = `${(index + 1) / questions.length * 100}%`;
+  const progress: `${number}%` = `${((index + 1) / questions.length) * 100}%`;
 
   return (
     <BackgroundWrapper includesSafeArea>

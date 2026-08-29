@@ -108,7 +108,7 @@ const CardCategories: FC<CardCategoriesProps> = ({ navigation }) => {
   if (isLoading) {
     return (
       <BackgroundWrapper>
-        <Loader />
+        <Loader isLoading />
       </BackgroundWrapper>
     );
   }

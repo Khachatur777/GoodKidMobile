@@ -2,7 +2,10 @@
   "extends": "@react-native/typescript-config",
   "compilerOptions": {
     "experimentalDecorators": true,
-    "allowJs": true,
+    // Единственные .js в src — вендорная копия keyboard-aware-scroll-view с
+    // Flow-аннотациями. Пока tsc их читал, он спотыкался на синтаксисе и не
+    // проверял типы во всём остальном проекте.
+    "allowJs": false,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "isolatedModules": true,
@@ -16,7 +19,9 @@
       "es2019",
     ],
     "typeRoots" : ["node_modules/@types","src/types"],
-    "moduleResolution": "node",
+    // Базовый конфиг React Native задаёт "bundler" вместе с customConditions;
+    // переопределение на "node" конфликтовало с ними, и tsc отказывался
+    // работать вовсе.
     "noEmit": true,
     "strict": true,
     "target": "esnext",
@@ -48,5 +53,11 @@
     "node_modules",
     "babel.config.js",
     "metro.config.js",
+    // Вендорный код с Flow-аннотациями. Для tsc это синтаксические ошибки, а
+    // при них он выводит только их и до проверки типов не доходит вовсе — то
+    // есть весь остальной проект оставался непроверенным.
+    "src/molecules/keyboard-aware-scroll-view/KeyboardAwareHOC.js",
+    "src/molecules/keyboard-aware-scroll-view/KeyboardAwareHOC.web.js",
+    "src/molecules/keyboard-aware-scroll-view/KeyboardAwareInterface.js",
   ]
 }

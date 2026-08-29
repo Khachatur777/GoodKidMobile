@@ -111,7 +111,7 @@ const MathCategories: FC<MathCategoriesProps> = ({ navigation }) => {
     <BackgroundWrapper>
       <View style={styles.container}>
         {isLoading ? (
-          <Loader />
+          <Loader isLoading />
         ) : (
           <FlatList
             data={[0]}
