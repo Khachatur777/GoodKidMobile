@@ -8,7 +8,7 @@ import { IMathCategory, MathOperation } from 'models';
 import { useGetMathCategoriesQuery } from 'rtk';
 import { mathCategoriesStyles } from './math-categories-styles.ts';
 
-export const OPERATION_SIGNS: Record<MathOperation, string> = {
+const OPERATION_SIGNS: Record<MathOperation, string> = {
   addition: '+',
   subtraction: '−',
   multiplication: '×',
