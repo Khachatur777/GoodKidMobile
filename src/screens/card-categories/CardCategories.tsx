@@ -30,10 +30,16 @@ const CardCategories: FC<CardCategoriesProps> = ({ navigation }) => {
   // отсутствие подписки.
   const contentLocked = useSelector(getContentLockedState);
 
-  const { data, isLoading, isError, refetch } = useGetCardCategoriesQuery({
+  const { data, isLoading, isError, error, refetch } = useGetCardCategoriesQuery({
     section: 'world',
     showModal: false,
   });
+
+  // Отказ по правам — не обрыв связи. Предлагать «проверь соединение» тому, у
+  // кого связь в порядке, значит отправить его чинить исправное.
+  const forbidden =
+    (error as { status?: number })?.status === 403 ||
+    (error as { data?: { message?: string } })?.data?.message === 'child_only';
 
   const categories = data?.data || [];
 
@@ -109,14 +115,24 @@ const CardCategories: FC<CardCategoriesProps> = ({ navigation }) => {
     return (
       <BackgroundWrapper>
         <View style={styles.stateBox}>
-          <Icon name={'CloudOffIcon'} width={56} height={56} color={'icon_tertiary'} />
-          <Typography type="title3" alignment="center">{t('cards_offline_title')}</Typography>
-          <Typography type="bodyS" textColor="text_tertiary" alignment="center">
-            {t('cards_offline_hint')}
+          <Icon
+            name={forbidden ? 'Lock' : 'CloudOffIcon'}
+            width={56}
+            height={56}
+            color={'icon_tertiary'}
+          />
+          <Typography type="title3" alignment="center">
+            {forbidden ? t('learning_child_only_title') : t('cards_offline_title')}
           </Typography>
-          <Pressable style={styles.retry} onPress={() => refetch()}>
-            <Typography type="bodyBold" textColor="text_inverted">{t('cards_retry')}</Typography>
-          </Pressable>
+          <Typography type="bodyS" textColor="text_tertiary" alignment="center">
+            {forbidden ? t('learning_child_only') : t('cards_offline_hint')}
+          </Typography>
+
+          {!forbidden && (
+            <Pressable style={styles.retry} onPress={() => refetch()}>
+              <Typography type="bodyBold" textColor="text_inverted">{t('cards_retry')}</Typography>
+            </Pressable>
+          )}
         </View>
       </BackgroundWrapper>
     );
