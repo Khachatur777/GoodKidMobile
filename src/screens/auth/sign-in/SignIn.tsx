@@ -4,7 +4,6 @@ import React, { FC, useCallback, useState } from 'react';
 import {GoodKidLogo, BackgroundWrapper,
   Button,
   KeyboardAwareScrollView,
-  KidAvatar,
   PasswordField,
   SegmentedControl,
   Spacing,
@@ -331,17 +330,6 @@ const SignIn: FC<SignInhProps> = ({navigation}) => {
 
               {role === 'child' ? (
                 <>
-                  {rememberedKidLogin ? (
-                    <>
-                      <KidAvatar size={84} />
-                      <Spacing size={12} />
-                      <Typography type="title3">
-                        {t('sign_in_welcome_back', {name: rememberedKidLogin})}
-                      </Typography>
-                      <Spacing size={16} />
-                    </>
-                  ) : null}
-
                   <TextField
                     size="large"
                     value={kidLogin}
