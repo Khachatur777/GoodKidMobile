@@ -1,5 +1,5 @@
 import { FC, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { Image, Pressable, ScrollView, Text, View } from 'react-native';
+import { Alert, Image, Pressable, ScrollView, Text, View } from 'react-native';
 import { NavigationProp, RouteProp } from '@react-navigation/native';
 import { BackgroundWrapper, Icon, Loader, Typography } from 'molecules';
 import { ThemeContext } from 'theme';
@@ -67,7 +67,19 @@ const CardSession: FC<CardSessionProps> = ({ navigation, route }) => {
         setSessionId(response.data.sessionId);
         setCards(response.data.cards);
       })
-      .catch(() => {});
+      .catch(error => {
+        if (cancelled) return;
+        // Сессии принадлежат ребёнку: звёзды и прогресс — его. Родителю,
+        // открывшему раздел, надо это сказать, а не оставить пустой экран.
+        const message =
+          error?.data?.message === 'child_only'
+            ? t('learning_child_only')
+            : t('cards_offline_hint');
+
+        Alert.alert(t('learning_child_only_title'), message, [
+          { text: t('close'), onPress: () => navigation.goBack() },
+        ]);
+      });
 
     return () => {
       cancelled = true;
