@@ -220,3 +220,35 @@ export interface ILearningReport {
 export interface ILearningReportResponseModel extends IDefaultResponseModel {
   data: ILearningReport;
 }
+
+export interface IChildMathRule {
+  operation: MathOperation;
+  enabled: boolean;
+  minOperand: number;
+  maxOperand: number;
+  maxResult: number;
+  // Родитель менял эти числа или они пришли из умолчаний.
+  customised: boolean;
+  // Сколько разных примеров дают эти настройки и сколько нужно на сессию.
+  variants: number;
+  requiredVariants: number;
+  ageFrom: number;
+  ageTo: number;
+  questionsPerSession: number;
+}
+
+export interface IChildMathResponseModel extends IDefaultResponseModel {
+  data: IChildMathRule[];
+}
+
+export interface IChildMathPreview {
+  ok: boolean;
+  reason: string | null;
+  variants: number;
+  required: number;
+  examples: { expression: string; correctValue: number }[];
+}
+
+export interface IChildMathPreviewResponseModel extends IDefaultResponseModel {
+  data: IChildMathPreview;
+}

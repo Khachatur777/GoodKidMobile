@@ -45,3 +45,20 @@ export interface ICompleteCategoryRequestModel extends IBaseRequestModel {
 export interface ILearningReportRequestModel extends IBaseRequestModel {
   childId: string;
 }
+
+export interface IChildMathRequestModel extends IBaseRequestModel {
+  childId: string;
+}
+
+export interface IChildMathValues {
+  minOperand?: number;
+  maxOperand?: number;
+  maxResult?: number;
+}
+
+export interface IChildMathUpdateRequestModel
+  extends IBaseRequestModel,
+    IChildMathValues {
+  childId: string;
+  operation: string;
+}

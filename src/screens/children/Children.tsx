@@ -140,6 +140,20 @@ const Children: FC<ChildrenProps> = ({ navigation }) => {
                 <Button
                   variant="secondary"
                   size="small"
+                  title={t('children_math')}
+                  onPress={() =>
+                    navigation.navigate('ChildMathScreen', {
+                      childId: child.id,
+                      childName: child.name,
+                    })
+                  }
+                />
+              </View>
+
+              <View style={styles.cardAction}>
+                <Button
+                  variant="secondary"
+                  size="small"
                   title={t('children_learning')}
                   onPress={() =>
                     navigation.navigate('LearningReportScreen', {

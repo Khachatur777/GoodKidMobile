@@ -16,12 +16,16 @@ import {
   ICompleteCategoryResponseModel,
   ILearningReportRequestModel,
   ILearningReportResponseModel,
+  IChildMathRequestModel,
+  IChildMathResponseModel,
+  IChildMathUpdateRequestModel,
+  IChildMathPreviewResponseModel,
 } from 'models';
 import { baseApi } from './base';
 import { learningRoutes } from './routes';
 
 export const learningApi = baseApi
-  .enhanceEndpoints({ addTagTypes: ['LearningProgress'] })
+  .enhanceEndpoints({ addTagTypes: ['LearningProgress', 'ChildMath'] })
   .injectEndpoints({
   endpoints: builder => ({
     getMathCategories: builder.query<
@@ -110,6 +114,45 @@ export const learningApi = baseApi
         method: 'GET',
       }),
     }),
+    getChildMath: builder.query<IChildMathResponseModel, IChildMathRequestModel>({
+      query: ({ childId }) => ({
+        url: learningRoutes().childMath(childId),
+        method: 'GET',
+      }),
+      providesTags: ['ChildMath'],
+    }),
+    updateChildMath: builder.mutation<
+      IChildMathResponseModel,
+      IChildMathUpdateRequestModel
+    >({
+      query: ({ childId, operation, ...values }) => ({
+        url: learningRoutes().childMathOperation(childId, operation),
+        method: 'PUT',
+        body: values,
+      }),
+      invalidatesTags: ['ChildMath'],
+    }),
+    resetChildMath: builder.mutation<
+      IChildMathResponseModel,
+      IChildMathUpdateRequestModel
+    >({
+      query: ({ childId, operation }) => ({
+        url: learningRoutes().childMathOperation(childId, operation),
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['ChildMath'],
+    }),
+    // Черновик: что дадут эти числа, пока их ещё не сохранили.
+    previewChildMath: builder.mutation<
+      IChildMathPreviewResponseModel,
+      IChildMathUpdateRequestModel
+    >({
+      query: ({ childId, operation, ...values }) => ({
+        url: learningRoutes().childMathPreview(childId, operation),
+        method: 'POST',
+        body: values,
+      }),
+    }),
     getLearningProgress: builder.query<
       ILearningProgressResponseModel,
       IBaseRequestModel
@@ -134,4 +177,8 @@ export const {
   useStartCardSessionMutation,
   useCompleteCategoryMutation,
   useGetLearningReportQuery,
+  useGetChildMathQuery,
+  useUpdateChildMathMutation,
+  useResetChildMathMutation,
+  usePreviewChildMathMutation,
 } = learningApi;

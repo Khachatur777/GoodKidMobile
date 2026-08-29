@@ -4,6 +4,7 @@ import {
   AddFirstChild,
   AppColour,
   ChildActivity,
+  ChildMathSettings,
   LearningReport,
   Children,
   EditChild,
@@ -99,6 +100,16 @@ export const profileScreens: IScreens[] = [
     component: LearningReport,
     options: () => ({
       title: i18n.t('report_title'),
+      type: 'title',
+      showBackIcon: true,
+      showIconInTabScreen: false,
+    }),
+  },
+  {
+    name: 'ChildMathScreen',
+    component: ChildMathSettings,
+    options: () => ({
+      title: i18n.t('child_math_title'),
       type: 'title',
       showBackIcon: true,
       showIconInTabScreen: false,
