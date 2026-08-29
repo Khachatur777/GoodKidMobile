@@ -96,7 +96,11 @@ const MathCard: FC<MathCardProps> = ({ navigation, route }) => {
       return;
     }
 
-    if (!sessionId) return;
+    // Просмотр родителя: сессии нет, засчитывать и награждать нечего.
+    if (!sessionId) {
+      navigation.goBack();
+      return;
+    }
 
     try {
       const result = await finishSession({

@@ -38,7 +38,9 @@ export interface IMathQuestion {
 }
 
 export interface IMathSession {
-  sessionId: string;
+  // null — режим просмотра: родитель смотрит содержимое, занятие не
+  // засчитывается и звёзды не начисляются.
+  sessionId: string | null;
   operation: MathOperation;
   categoryKey: string;
   answerMaxDigits: number;
@@ -167,7 +169,7 @@ export interface ICardCategoriesResponseModel extends IDefaultResponseModel {
 }
 
 export interface ICardSession {
-  sessionId: string;
+  sessionId: string | null;
   categoryKey: string;
   cards: ILearningCard[];
 }

@@ -110,6 +110,12 @@ const CardSession: FC<CardSessionProps> = ({ navigation, route }) => {
       return;
     }
 
+    // Просмотр родителя: показывать экран результата не за что, звёзд нет.
+    if (!sessionId) {
+      navigation.goBack();
+      return;
+    }
+
     const answered = Array.from(answers.current.values());
 
     try {
