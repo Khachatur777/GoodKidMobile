@@ -115,6 +115,7 @@ const CardSession: FC<CardSessionProps> = ({ navigation, route }) => {
       // фиксированная и только за первый раз.
       const result = await completeCategory({
         categoryId: category.categoryKey,
+        cardIds: cards.map(item => item.id),
         showLoader: true,
       }).unwrap();
 
@@ -134,7 +135,7 @@ const CardSession: FC<CardSessionProps> = ({ navigation, route }) => {
     } catch {
       // Итог не ушёл — экран остаётся, кнопка сработает снова.
     }
-  }, [index, cards.length, sessionId, finishSession, completeCategory, category.categoryKey, navigation]);
+  }, [index, cards, sessionId, finishSession, completeCategory, category.categoryKey, navigation]);
 
   const onPick = useCallback(
     (answer: ICardAnswer) => {

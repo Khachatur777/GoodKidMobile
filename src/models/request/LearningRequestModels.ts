@@ -37,6 +37,9 @@ export interface IStartCardSessionRequestModel extends IBaseRequestModel {
 
 export interface ICompleteCategoryRequestModel extends IBaseRequestModel {
   categoryId: string;
+  // Карточки пройденной сессии: сервер отмечает их просмотренными, чтобы
+  // следующий заход отдал следующие, а не те же самые.
+  cardIds?: string[];
 }
 
 export interface ILearningReportRequestModel extends IBaseRequestModel {

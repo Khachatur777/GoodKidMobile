@@ -80,10 +80,10 @@ export const learningApi = baseApi
       ICompleteCategoryResponseModel,
       ICompleteCategoryRequestModel
     >({
-      query: ({ categoryId }) => ({
+      query: ({ categoryId, cardIds }) => ({
         url: learningRoutes().completeCategory,
         method: 'POST',
-        body: { categoryId },
+        body: { categoryId, cardIds },
       }),
       invalidatesTags: ['LearningProgress'],
     }),
