@@ -5,7 +5,8 @@ export const learningReportStyles = (color?: IGetColor) =>
   StyleSheet.create({
     content: {
       paddingHorizontal: 18,
-      paddingBottom: 60,
+      // Хватает, чтобы последняя подсказка не пряталась под таб-баром.
+      paddingBottom: 130,
       gap: 14,
     },
     summary: {

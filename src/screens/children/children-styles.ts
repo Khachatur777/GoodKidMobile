@@ -29,10 +29,15 @@ export const childrenStyles = (color?: IGetColor) =>
     },
     cardActions: {
       flexDirection: 'row',
+      // Три действия в строку не помещаются, и подписи обрезались до
+      // «Ակտիվը...». По-армянски слова длиннее, поэтому переносим, а не
+      // ужимаем: обрезанная подпись не говорит, что делает кнопка.
+      flexWrap: 'wrap',
       gap: 10,
     },
     cardAction: {
-      flex: 1,
+      flexGrow: 1,
+      flexBasis: '45%',
     },
     footer: {
       paddingTop: 6,
