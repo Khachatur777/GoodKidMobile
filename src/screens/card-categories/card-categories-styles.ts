@@ -40,6 +40,21 @@ export const cardCategoriesStyles = (color?: IGetColor) =>
       height: 118,
       backgroundColor: color?.('surface_secondary'),
     },
+    // Замок поверх картинки, а не вместо неё: ребёнок должен видеть, что там
+    // есть, иначе платная категория выглядит просто сломанной.
+    lockOverlay: {
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      top: 0,
+      height: 118,
+      backgroundColor: 'rgba(25,22,52,0.55)',
+    },
+    lockIcon: {
+      position: 'absolute',
+      top: 46,
+      alignSelf: 'center',
+    },
     itemBody: {
       padding: 12,
       gap: 4,

@@ -4,8 +4,14 @@ import { NavigationProp } from '@react-navigation/native';
 import { BackgroundWrapper, Icon, Loader, Typography } from 'molecules';
 import { ThemeContext } from 'theme';
 import { useTranslation } from 'react-i18next';
+import { useDispatch, useSelector } from 'react-redux';
 import { ICardCategory } from 'models';
-import { useGetCardCategoriesQuery } from 'rtk';
+import {
+  getContentLockedState,
+  setSubscriptionUserData,
+  useGetCardCategoriesQuery,
+} from 'rtk';
+import { purchaseUser } from 'hooks/usePurchase.ts';
 import { getFileUri } from 'utils';
 import { cardCategoriesStyles } from './card-categories-styles.ts';
 
@@ -18,6 +24,12 @@ const CardCategories: FC<CardCategoriesProps> = ({ navigation }) => {
   const { t } = useTranslation();
   const styles = useMemo(() => cardCategoriesStyles(color), [color]);
 
+  const dispatch = useDispatch();
+  // Платность приходит с сервера полем isFree, а сам замок зависит от подписки
+  // семьи. Оба условия должны совпасть: бесплатную категорию не запирает даже
+  // отсутствие подписки.
+  const contentLocked = useSelector(getContentLockedState);
+
   const { data, isLoading, isError, refetch } = useGetCardCategoriesQuery({
     section: 'world',
     showModal: false,
@@ -25,20 +37,39 @@ const CardCategories: FC<CardCategoriesProps> = ({ navigation }) => {
 
   const categories = data?.data || [];
 
+  const purchase = useCallback(() => {
+    purchaseUser()
+      .then(result => dispatch(setSubscriptionUserData(result?.isSubscribed!)))
+      .catch(() => null);
+  }, [dispatch]);
+
   const openCategory = useCallback(
     (category: ICardCategory) => {
+      if (contentLocked && !category.isFree) {
+        return purchase();
+      }
       navigation.navigate('CardSession', { category });
     },
-    [navigation],
+    [navigation, contentLocked, purchase],
   );
 
   const renderItem = useCallback(
-    ({ item }: { item: ICardCategory }) => (
+    ({ item }: { item: ICardCategory }) => {
+      const locked = contentLocked && !item.isFree;
+
+      return (
       <Pressable
         style={[styles.item, !item.suitsAge && styles.itemAhead]}
         onPress={() => openCategory(item)}
       >
         <Image source={{ uri: getFileUri(item.image) }} style={styles.image} />
+
+        {locked && (
+          <>
+            <View style={styles.lockOverlay} />
+            <Icon name={'Lock'} width={26} height={26} color={'icon_inverted'} style={styles.lockIcon} />
+          </>
+        )}
 
         <View style={styles.itemBody}>
           <Typography type="bodyBold" numberOfLines={2}>
@@ -61,8 +92,9 @@ const CardCategories: FC<CardCategoriesProps> = ({ navigation }) => {
           </View>
         </View>
       </Pressable>
-    ),
-    [styles, t, openCategory],
+      );
+    },
+    [styles, t, openCategory, contentLocked],
   );
 
   if (isLoading) {

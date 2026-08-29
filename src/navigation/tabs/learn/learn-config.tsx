@@ -1,5 +1,5 @@
 import {IScreens} from 'navigation';
-import { CardCategories, CardSession, Learn, LearnExplanation, MathCard, MathCategories, MathResult, Sections } from 'screens';
+import { CardCategories, CardSession, MathCard, MathCategories, MathResult, Sections } from 'screens';
 import i18n from 'i18next';
 
 export const learnScreens: IScreens[] = [
@@ -10,17 +10,6 @@ export const learnScreens: IScreens[] = [
       title: i18n.t('learn_header'),
       type: 'title',
       showBackIcon: false,
-      showIconInTabScreen: false,
-    }),
-  },
-  {
-    // Бывший корень вкладки: теперь это «Познание мира» внутри разделов.
-    name: 'LearnScreen',
-    component: Learn,
-    options: () => ({
-      title: i18n.t('section_world'),
-      type: 'title',
-      showBackIcon: true,
       showIconInTabScreen: false,
     }),
   },
@@ -69,16 +58,6 @@ export const learnScreens: IScreens[] = [
       tabBarStyle: {display: 'none'},
       // Назад с экрана результата возвращал бы в уже завершённую сессию.
       gestureEnabled: false,
-    }),
-  },
-  {
-    name: 'LearnExplanation',
-    component: LearnExplanation,
-    options: () => ({
-      title: i18n.t('learn_explanation'),
-      type: 'title',
-      showBackIcon: true,
-      showIconInTabScreen: false,
     }),
   },
 ];
