@@ -41,8 +41,12 @@ export const childMathStyles = (color?: IGetColor) =>
       flex: 1,
       gap: 2,
     },
+    // Названия полей в разных языках занимают то одну строку, то две. Выравнивание
+    // по низу держит сами рамки на одной линии: подпись растёт вверх, а поля
+    // остаются рядом, как одна строка ввода.
     fields: {
       flexDirection: 'row',
+      alignItems: 'flex-end',
       gap: 10,
     },
     field: {
