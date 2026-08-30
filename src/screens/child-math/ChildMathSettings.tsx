@@ -37,6 +37,28 @@ const toNumbers = (draft: Draft) => ({
 const isComplete = (draft: Draft) =>
   Object.values(draft).every(value => value !== '' && Number.isFinite(Number(value)));
 
+// The same ceilings the server enforces. Checking them here too means a parent
+// who types one digit too many is told what is wrong, instead of watching a
+// request fail somewhere they cannot see.
+const LIMITS: Record<keyof Draft, number> = {
+  minOperand: 1000,
+  maxOperand: 1000,
+  maxResult: 10000,
+};
+
+type LocalProblem = { key: string; params?: Record<string, number> } | null;
+
+const localProblem = (draft: Draft): LocalProblem => {
+  const over = (Object.keys(LIMITS) as (keyof Draft)[]).find(
+    field => Number(draft[field]) > LIMITS[field],
+  );
+
+  if (over) return { key: 'child_math_too_big', params: { limit: LIMITS[over] } };
+  if (Number(draft.minOperand) > Number(draft.maxOperand)) return { key: 'child_math_inverted' };
+
+  return null;
+};
+
 export interface ChildMathSettingsProps {
   route: RouteProp<{ params: { childId: string; childName?: string } }, 'params'>;
 }
@@ -55,38 +77,61 @@ const ChildMathSettings: FC<ChildMathSettingsProps> = ({ route }) => {
   const rules = data?.data;
 
   const [drafts, setDrafts] = useState<Record<string, Draft>>({});
-  const [previews, setPreviews] = useState<Record<string, IChildMathPreview>>({});
+  const [previews, setPreviews] = useState<Record<string, IChildMathPreview | undefined>>({});
+  const [problems, setProblems] = useState<Record<string, LocalProblem>>({});
   const timers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
 
-  useEffect(() => {
-    if (!rules) return;
-    setDrafts(Object.fromEntries(rules.map(rule => [rule.operation, toDraft(rule)])));
-  }, [rules]);
 
   // Проверка и примеры считаются на сервере тем же кодом, что потом выдаёт
   // задания ребёнку. Повторять эту логику в приложении значит однажды показать
   // родителю примеры, которых ребёнок не увидит.
+  const loadPreview = useCallback(
+    async (operation: string, draft: Draft) => {
+      try {
+        const result = await previewMath({
+          childId,
+          operation,
+          ...toNumbers(draft),
+          showModal: false,
+        }).unwrap();
+
+        setPreviews(prev => ({ ...prev, [operation]: result.data }));
+        setProblems(prev => ({ ...prev, [operation]: null }));
+      } catch {
+        // Keeping the previous count here would let the screen say "190 examples,
+        // and you need 10" while refusing to save — numbers that contradict
+        // themselves. Drop the stale answer and say plainly that the check failed.
+        setPreviews(prev => ({ ...prev, [operation]: undefined }));
+        setProblems(prev => ({ ...prev, [operation]: { key: 'child_math_check_failed' } }));
+      }
+    },
+    [childId, previewMath],
+  );
+
+  // Примеры нужны сразу: родитель открывает экран, чтобы увидеть, что решает
+  // ребёнок, а не чтобы сначала что-то поменять.
+  useEffect(() => {
+    if (!rules) return;
+    setDrafts(Object.fromEntries(rules.map(rule => [rule.operation, toDraft(rule)])));
+    rules.forEach(rule => loadPreview(rule.operation, toDraft(rule)));
+  }, [rules, loadPreview]);
+
   const askPreview = useCallback(
     (operation: string, draft: Draft) => {
       clearTimeout(timers.current[operation]);
       if (!isComplete(draft)) return;
 
-      timers.current[operation] = setTimeout(async () => {
-        try {
-          const result = await previewMath({
-            childId,
-            operation,
-            ...toNumbers(draft),
-            showModal: false,
-          }).unwrap();
+      const problem = localProblem(draft);
+      setProblems(prev => ({ ...prev, [operation]: problem }));
 
-          setPreviews(prev => ({ ...prev, [operation]: result.data }));
-        } catch {
-          setPreviews(prev => ({ ...prev, [operation]: { ...prev[operation], ok: false } as IChildMathPreview }));
-        }
-      }, 400);
+      if (problem) {
+        setPreviews(prev => ({ ...prev, [operation]: undefined }));
+        return;
+      }
+
+      timers.current[operation] = setTimeout(() => loadPreview(operation, draft), 400);
     },
-    [childId, previewMath],
+    [loadPreview],
   );
 
   useEffect(() => () => Object.values(timers.current).forEach(clearTimeout), []);
@@ -106,7 +151,7 @@ const ChildMathSettings: FC<ChildMathSettingsProps> = ({ route }) => {
 
     try {
       await updateMath({ childId, operation: rule.operation, ...toNumbers(draft), showLoader: true }).unwrap();
-      setPreviews(prev => ({ ...prev, [rule.operation]: { ...prev[rule.operation], ok: true } as IChildMathPreview }));
+      setProblems(prev => ({ ...prev, [rule.operation]: null }));
     } catch {
       // Сервер отказал — черновик остаётся на экране, чтобы было что поправить.
     }
@@ -133,7 +178,8 @@ const ChildMathSettings: FC<ChildMathSettingsProps> = ({ route }) => {
           if (!draft) return null;
 
           const changed = JSON.stringify(draft) !== JSON.stringify(toDraft(rule));
-          const blocked = preview ? !preview.ok : false;
+          const problem = problems[rule.operation];
+          const blocked = Boolean(problem) || (preview ? !preview.ok : false);
 
           return (
             <View key={rule.operation} style={styles.card}>
@@ -157,6 +203,7 @@ const ChildMathSettings: FC<ChildMathSettingsProps> = ({ route }) => {
                   <TextField
                     label={t('child_math_from')}
                     keyboardType="number-pad"
+                    maxLength={String(LIMITS.minOperand).length}
                     value={draft.minOperand}
                     onChangeText={value => edit(rule.operation, 'minOperand', value)}
                   />
@@ -165,6 +212,7 @@ const ChildMathSettings: FC<ChildMathSettingsProps> = ({ route }) => {
                   <TextField
                     label={t('child_math_to')}
                     keyboardType="number-pad"
+                    maxLength={String(LIMITS.maxOperand).length}
                     value={draft.maxOperand}
                     onChangeText={value => edit(rule.operation, 'maxOperand', value)}
                   />
@@ -173,6 +221,7 @@ const ChildMathSettings: FC<ChildMathSettingsProps> = ({ route }) => {
                   <TextField
                     label={t('child_math_max')}
                     keyboardType="number-pad"
+                    maxLength={String(LIMITS.maxResult).length}
                     value={draft.maxResult}
                     onChangeText={value => edit(rule.operation, 'maxResult', value)}
                   />
@@ -190,10 +239,12 @@ const ChildMathSettings: FC<ChildMathSettingsProps> = ({ route }) => {
                 <View style={styles.problem}>
                   <Icon name={'InfoIcon'} width={20} height={20} color={'accent_warning'} />
                   <Typography type="bodyS" textColor="text_secondary" textStyles={styles.problemText}>
-                    {t('child_math_too_few', {
-                      count: preview?.variants ?? 0,
-                      required: preview?.required ?? rule.requiredVariants,
-                    })}
+                    {problem
+                      ? t(problem.key, problem.params)
+                      : t('child_math_too_few', {
+                          count: preview?.variants ?? 0,
+                          required: preview?.required ?? rule.requiredVariants,
+                        })}
                   </Typography>
                 </View>
               ) : (
