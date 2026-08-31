@@ -52,7 +52,12 @@ const MathCard: FC<MathCardProps> = ({ navigation, route }) => {
         if (cancelled) return;
         setSessionId(response.data.sessionId);
         setQuestions(response.data.questions);
-        setMaxDigits(response.data.answerMaxDigits);
+        // Нижняя граница на стороне приложения: сколько бы цифр ни назвал
+        // сервер, их должно хватать на самый большой ответ этой категории.
+        // Иначе ребёнок получает «898 + 417» и три места под ответ — правильный
+        // ответ не набирается вообще, и никакие попытки не помогают.
+        const needed = String(Math.max(1, category.maxResult || 0)).length;
+        setMaxDigits(Math.max(response.data.answerMaxDigits || 1, needed));
       })
       .catch(error => {
         if (cancelled) return;
