@@ -45,6 +45,7 @@ export const mathCardStyles = (color?: IGetColor) =>
     formulaCard: {
       height: 186,
       borderRadius: 30,
+      paddingHorizontal: 16,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',

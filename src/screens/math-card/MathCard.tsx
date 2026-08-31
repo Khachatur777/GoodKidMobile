@@ -1,5 +1,5 @@
 import { FC, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, Animated, Pressable, View } from 'react-native';
+import { Alert, Animated, Pressable, useWindowDimensions, View } from 'react-native';
 import { NavigationProp, RouteProp } from '@react-navigation/native';
 import { BackgroundWrapper, Icon, Loader, Typography } from 'molecules';
 import { ThemeContext } from 'theme';
@@ -9,6 +9,10 @@ import { useFinishSessionMutation, useStartMathSessionMutation } from 'rtk';
 import { mathCardStyles } from './math-card-styles.ts';
 
 const KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', 'backspace'];
+
+// Базовые кегли формулы — те же, что в стилях; здесь они нужны, чтобы посчитать,
+// во сколько раз строку надо ужать.
+const FORMULA = { operand: 72, operator: 58, equals: 54 };
 
 type Feedback = 'idle' | 'correct' | 'wrong';
 
@@ -21,6 +25,7 @@ const MathCard: FC<MathCardProps> = ({ navigation, route }) => {
   const { color } = useContext(ThemeContext);
   const { t } = useTranslation();
   const styles = useMemo(() => mathCardStyles(color), [color]);
+  const { width: screenWidth } = useWindowDimensions();
   const category = route.params?.category;
 
   const [startSession] = useStartMathSessionMutation();
@@ -70,6 +75,30 @@ const MathCard: FC<MathCardProps> = ({ navigation, route }) => {
 
   const question = questions[index];
   const [left, operator, right] = (question?.expression || '').split(' ');
+
+  // «120 + 345 = 465» должно читаться так же, как «2 + 3 = 5», — в одну строку.
+  // Размер считается по числу знаков, а не подбирается на глаз, и множитель
+  // один на все части, поэтому цифры и знак сохраняют свои пропорции.
+  const answerText = feedback === 'correct' ? String(question?.correctValue ?? '') : '?';
+  const formulaScale = useMemo(() => {
+    const digits = `${left || ''}${right || ''}${answerText}`.length;
+    if (!digits) return 1;
+
+    // 0.62 — ширина цифры этого начертания относительно кегля; 48 — четыре
+    // просвета между пятью частями, 40 — поля экрана, 32 — поля карточки.
+    const needed = 0.62 * (FORMULA.operand * digits + FORMULA.operator + FORMULA.equals);
+    const budget = screenWidth - 40 - 48 - 32;
+
+    return Math.min(1, budget / needed);
+  }, [left, right, answerText, screenWidth]);
+
+  const scaled = useCallback(
+    (fontSize: number, lineHeight: number) => ({
+      fontSize: fontSize * formulaScale,
+      lineHeight: lineHeight * formulaScale,
+    }),
+    [formulaScale],
+  );
 
   const recordAttempt = useCallback(
     (answered: number | null) => {
@@ -202,16 +231,16 @@ const MathCard: FC<MathCardProps> = ({ navigation, route }) => {
             { transform: [{ translateX: shake.interpolate({ inputRange: [-1, 1], outputRange: [-10, 10] }) }] },
           ]}
         >
-          <Typography type="titleXL" textStyles={styles.operand}>{left}</Typography>
-          <Typography type="titleXL" textColor="accent_active" textStyles={styles.operator}>{operator}</Typography>
-          <Typography type="titleXL" textStyles={styles.operand}>{right}</Typography>
-          <Typography type="titleXL" textColor="text_tertiary" textStyles={styles.equals}>=</Typography>
+          <Typography type="titleXL" textStyles={[styles.operand, scaled(FORMULA.operand, 82)]}>{left}</Typography>
+          <Typography type="titleXL" textColor="accent_active" textStyles={[styles.operator, scaled(FORMULA.operator, 66)]}>{operator}</Typography>
+          <Typography type="titleXL" textStyles={[styles.operand, scaled(FORMULA.operand, 82)]}>{right}</Typography>
+          <Typography type="titleXL" textColor="text_tertiary" textStyles={[styles.equals, scaled(FORMULA.equals, 62)]}>=</Typography>
           <Typography
             type="titleXL"
             textColor={feedback === 'correct' ? 'text_positive' : 'controls_inactive'}
-            textStyles={styles.operand}
+            textStyles={[styles.operand, scaled(FORMULA.operand, 82)]}
           >
-            {feedback === 'correct' ? String(question.correctValue) : '?'}
+            {answerText}
           </Typography>
         </Animated.View>
 
