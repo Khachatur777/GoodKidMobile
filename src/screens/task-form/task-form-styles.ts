@@ -11,6 +11,45 @@ export const taskFormStyles = (color?: IGetColor) =>
     section: {
       gap: 10,
     },
+    // Поля по макету: подпись сверху отдельной строкой, а не внутри рамки, как
+    // в TextField приложения.
+    field: {
+      gap: 7,
+    },
+    fieldLabel: {
+      paddingLeft: 2,
+    },
+    // Кольцо вокруг сфокусированного поля рисуется подложкой: обводки в 4 px
+    // с прозрачностью в RN нет, а тень ведёт себя по-разному на платформах.
+    inputRing: {
+      borderRadius: 22,
+      padding: 4,
+      margin: -4,
+    },
+    inputRingFocused: {
+      backgroundColor: color?.('accent_active', 0.12),
+    },
+    input: {
+      height: 54,
+      borderRadius: 18,
+      borderWidth: 1.5,
+      borderColor: color?.('surface_stroke'),
+      backgroundColor: color?.('surface_primary'),
+      paddingHorizontal: 16,
+      fontSize: 16,
+      fontWeight: '500',
+      color: color?.('text_primary'),
+    },
+    inputFocused: {
+      borderColor: color?.('accent_active'),
+    },
+    inputMultiline: {
+      height: 96,
+      paddingTop: 14,
+      paddingBottom: 14,
+      lineHeight: 23,
+      textAlignVertical: 'top',
+    },
     label: {
       paddingLeft: 2,
     },

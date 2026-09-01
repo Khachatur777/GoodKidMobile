@@ -4,13 +4,12 @@ import {
   Button,
   Icon,
   KeyboardAwareScrollView,
-  TextField,
   Toggle,
   Typography,
 } from 'molecules';
 import { FC, useContext, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, Text, TextInput, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { getChildrenState, useCreateChildTaskMutation } from 'rtk';
 import { ThemeContext } from 'theme';
@@ -50,6 +49,7 @@ const TaskForm: FC<TaskFormProps> = ({ navigation, route }) => {
   const [stars, setStars] = useState(template?.stars ?? 10);
   const [icon, setIcon] = useState(template?.icon ?? '');
   const [saveAsTemplate, setSaveAsTemplate] = useState(false);
+  const [focused, setFocused] = useState<'title' | 'description' | null>(null);
 
   const [createTask, { isLoading }] = useCreateChildTaskMutation();
 
@@ -74,21 +74,49 @@ const TaskForm: FC<TaskFormProps> = ({ navigation, route }) => {
   return (
     <BackgroundWrapper>
       <KeyboardAwareScrollView contentContainerStyle={styles.scroll}>
-        <View style={styles.section}>
-          <TextField
-            label={t('tasks_field_title')}
-            value={title}
-            onChangeText={setTitle}
-            maxLength={80}
-          />
+        <View style={styles.field}>
+          <View style={styles.fieldLabel}>
+            <Typography type="bodySM" textColor="text_secondary">
+              {t('tasks_field_title')}
+            </Typography>
+          </View>
 
-          <TextField
-            label={t('tasks_field_description')}
-            value={description}
-            onChangeText={setDescription}
-            maxLength={200}
-            multiline
-          />
+          <View style={[styles.inputRing, focused === 'title' && styles.inputRingFocused]}>
+            <TextInput
+              style={[styles.input, focused === 'title' && styles.inputFocused]}
+              value={title}
+              onChangeText={setTitle}
+              onFocus={() => setFocused('title')}
+              onBlur={() => setFocused(null)}
+              maxLength={80}
+              placeholderTextColor={color('text_tertiary')}
+            />
+          </View>
+        </View>
+
+        <View style={styles.field}>
+          <View style={styles.fieldLabel}>
+            <Typography type="bodySM" textColor="text_secondary">
+              {t('tasks_field_description')}
+            </Typography>
+          </View>
+
+          <View style={[styles.inputRing, focused === 'description' && styles.inputRingFocused]}>
+            <TextInput
+              style={[
+                styles.input,
+                styles.inputMultiline,
+                focused === 'description' && styles.inputFocused,
+              ]}
+              value={description}
+              onChangeText={setDescription}
+              onFocus={() => setFocused('description')}
+              onBlur={() => setFocused(null)}
+              maxLength={200}
+              multiline
+              placeholderTextColor={color('text_tertiary')}
+            />
+          </View>
         </View>
 
         <View style={styles.section}>
