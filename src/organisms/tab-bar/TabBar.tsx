@@ -14,7 +14,7 @@ import Animated, {
 import {useSelector} from 'react-redux';
 import {
   getIsTabBarHiddenState,
-  getIsChildState,
+  getRoleState,
   useGetPendingTasksCountQuery,
 } from 'rtk';
 import {ThemeContext} from 'theme';
@@ -27,10 +27,13 @@ const TabBar: FC<TabBarProps> = ({descriptors, state, navigation}) => {
   const translateY = useSharedValue(0);
   const {color} = useContext(ThemeContext);
   const isTabBarHidden = useSelector(getIsTabBarHiddenState);
-  // Счётчик задач, ждущих подтверждения. Только у родителя: у ребёнка нет ни
-  // такого экрана, ни прав на этот запрос.
-  const isChild = useSelector(getIsChildState);
-  const { data: pending } = useGetPendingTasksCountQuery(undefined, { skip: isChild });
+  // Счётчик задач, ждущих подтверждения. Спрашиваем, только когда точно знаем,
+  // что перед нами родитель: роль приходит не сразу, и «не ребёнок» в момент
+  // монтирования означает «ещё неизвестно». Ребёнку этот запрос отвечает 403.
+  const role = useSelector(getRoleState);
+  const { data: pending } = useGetPendingTasksCountQuery(undefined, {
+    skip: role !== 'parent',
+  });
   const pendingCount = pending?.data?.count ?? 0;
 
 

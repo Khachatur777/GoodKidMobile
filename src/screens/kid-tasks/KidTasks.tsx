@@ -3,7 +3,9 @@ import { RefreshControl, ScrollView, View } from 'react-native';
 import { BackgroundWrapper, Button, Icon, Typography } from 'molecules';
 import { useTranslation } from 'react-i18next';
 import { ITask } from 'models';
+import { useSelector } from 'react-redux';
 import {
+  getRoleState,
   useGetLearningProgressQuery,
   useGetMyTasksQuery,
   useSubmitTaskMutation,
@@ -19,7 +21,13 @@ const KidTasks: FC = () => {
   const { t } = useTranslation();
   const styles = useMemo(() => kidTasksStyles(color), [color]);
 
+  // При смене роли таб-бар какое-то время держит прежний набор вкладок (см.
+  // комментарий в tabs-navigation), поэтому детский экран может на мгновение
+  // оказаться с родительским токеном. Этот запрос ответил бы ему 403.
+  const role = useSelector(getRoleState);
+
   const { data, isFetching, refetch } = useGetMyTasksQuery(undefined, {
+    skip: role !== 'child',
     refetchOnMountOrArgChange: true,
   });
   const { data: progress } = useGetLearningProgressQuery({ showModal: false });
