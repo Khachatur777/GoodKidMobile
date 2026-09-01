@@ -131,7 +131,7 @@ const TaskForm: FC<TaskFormProps> = ({ navigation, route }) => {
             </Pressable>
 
             <View style={styles.stepperValue}>
-              <Icon name="StarIcon" width={22} height={22} color="accent_active" />
+              <Icon name="StarIcon" width={22} height={22} color="accent_star" />
               <Typography type="title3">{String(stars)}</Typography>
             </View>
 

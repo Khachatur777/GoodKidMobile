@@ -227,8 +227,8 @@ const Children: FC<ChildrenProps> = ({ navigation }) => {
               </View>
 
               <View style={styles.statusStars}>
-                <Icon name="StarIcon" width={16} height={16} color="accent_active" />
-                <Typography type="bodySBold">
+                <Icon name="StarIcon" width={16} height={16} color="accent_star" />
+                <Typography type="bodySBold" textColor="text_star">
                   {String(child.stars?.balance ?? 0)}
                 </Typography>
               </View>

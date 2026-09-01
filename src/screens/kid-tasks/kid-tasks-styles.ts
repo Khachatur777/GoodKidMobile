@@ -23,7 +23,7 @@ export const kidTasksStyles = (color?: IGetColor) =>
       paddingVertical: 10,
       paddingHorizontal: 14,
       borderRadius: 999,
-      backgroundColor: color?.('surface_secondary'),
+      backgroundColor: color?.('accent_star', 0.16),
     },
     listContent: {
       paddingBottom: 140,
@@ -34,7 +34,7 @@ export const kidTasksStyles = (color?: IGetColor) =>
       paddingBottom: 2,
     },
     card: {
-      borderRadius: 20,
+      borderRadius: 26,
       padding: 18,
       gap: 14,
       backgroundColor: color?.('surface_primary'),
@@ -53,17 +53,20 @@ export const kidTasksStyles = (color?: IGetColor) =>
       flex: 1,
       gap: 4,
     },
+    // Тёплая плашка вместо серой: награда — единственное золотое пятно на
+    // экране, и по нему ребёнок находит её, не читая. Оттенок берётся из того же
+    // токена, что и сама звезда, поэтому работает в обеих темах.
     reward: {
       flexDirection: 'row',
       alignItems: 'center',
       gap: 5,
-      paddingVertical: 7,
-      paddingHorizontal: 11,
+      paddingVertical: 9,
+      paddingHorizontal: 13,
       borderRadius: 999,
-      backgroundColor: color?.('surface_secondary'),
+      backgroundColor: color?.('accent_star', 0.16),
     },
     rewardOnMuted: {
-      backgroundColor: color?.('surface_primary'),
+      backgroundColor: color?.('accent_star', 0.1),
     },
     statusRow: {
       flexDirection: 'row',

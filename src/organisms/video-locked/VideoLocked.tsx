@@ -80,7 +80,7 @@ const VideoLocked: FC<VideoLockedProps> = ({ state, navigation }) => {
               </Typography>
 
               <View style={styles.progressRight}>
-                <Icon name="StarIcon" width={16} height={16} color="accent_active" />
+                <Icon name="StarIcon" width={16} height={16} color="accent_star" />
                 <Typography type="bodySBold">{String(state.unlockCost)}</Typography>
               </View>
             </View>
@@ -141,7 +141,7 @@ const VideoLocked: FC<VideoLockedProps> = ({ state, navigation }) => {
                 {t('video_unlock_now')}
               </Typography>
               <View style={styles.exchangeStars}>
-                <Icon name="StarIcon" width={18} height={18} color="accent_active" />
+                <Icon name="StarIcon" width={18} height={18} color="accent_star" />
                 <Typography type="bodyBold">{String(state.balance)}</Typography>
               </View>
             </View>
@@ -153,7 +153,7 @@ const VideoLocked: FC<VideoLockedProps> = ({ state, navigation }) => {
                 {t('video_unlock_left')}
               </Typography>
               <View style={styles.exchangeStars}>
-                <Icon name="StarIcon" width={18} height={18} color="accent_active" />
+                <Icon name="StarIcon" width={18} height={18} color="accent_star" />
                 <Typography type="bodyBold">
                   {String(Math.max(0, state.balance - state.unlockCost))}
                 </Typography>

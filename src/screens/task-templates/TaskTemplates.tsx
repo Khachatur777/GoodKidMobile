@@ -83,7 +83,7 @@ const TaskTemplates: FC<TaskTemplatesProps> = ({ navigation, route }) => {
         </View>
 
         <View style={styles.reward}>
-          <Icon name="StarIcon" width={16} height={16} color="accent_active" />
+          <Icon name="StarIcon" width={16} height={16} color="accent_star" />
           <Typography type="bodySBold">{String(template.stars)}</Typography>
         </View>
       </Pressable>

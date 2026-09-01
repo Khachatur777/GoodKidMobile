@@ -5,105 +5,118 @@ export const childTasksStyles = (color?: IGetColor) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      paddingHorizontal: 22,
+      paddingHorizontal: 18,
     },
-    selectorRow: {
-      paddingTop: 8,
-      paddingBottom: 4,
+    // Дети выбираются плитками во всю ширину, а не кружками: в плитку помещается
+    // счётчик задач, ждущих подтверждения, а это главное, ради чего родитель
+    // сюда заходит.
+    childRow: {
+      flexDirection: 'row',
+      gap: 10,
+      paddingBottom: 12,
+    },
+    childPill: {
+      flex: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+      padding: 10,
+      borderRadius: 18,
+      borderWidth: 2,
+      borderColor: 'transparent',
+      backgroundColor: color?.('surface_primary'),
+    },
+    childPillSelected: {
+      borderColor: color?.('accent_active'),
+    },
+    childName: {
+      flex: 1,
     },
     listContent: {
-      paddingTop: 8,
       paddingBottom: 190,
-      gap: 10,
+      gap: 12,
     },
     groupHeader: {
       flexDirection: 'row',
       alignItems: 'center',
       gap: 8,
-      paddingTop: 20,
-      paddingBottom: 4,
+      paddingHorizontal: 4,
+      paddingTop: 4,
     },
-    // Счётчик ждущих подтверждения — единственный сигнал, что ребёнок что-то
-    // доделал: пушей в приложении нет.
+    // Красный, а не акцентный: акцент ребёнок меняет сам, и на красной теме
+    // счётчик сливался бы с фоном кнопок.
     counter: {
-      minWidth: 22,
-      paddingHorizontal: 7,
-      paddingVertical: 2,
+      minWidth: 20,
+      height: 20,
+      paddingHorizontal: 6,
       borderRadius: 999,
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: color?.('accent_active'),
+      backgroundColor: color?.('accent_negative'),
     },
-    card: {
+    // Карточка ожидающей задачи — отдельная: с неё родитель действует.
+    pendingCard: {
+      backgroundColor: color?.('surface_primary'),
       borderRadius: 20,
       padding: 16,
       gap: 12,
-      backgroundColor: color?.('surface_primary'),
     },
-    cardMuted: {
-      backgroundColor: color?.('surface_secondary'),
-    },
-    cardTop: {
+    pendingTop: {
       flexDirection: 'row',
-      alignItems: 'flex-start',
+      alignItems: 'center',
       gap: 12,
     },
-    iconTile: {
-      width: 42,
-      height: 42,
-      borderRadius: 14,
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: color?.('surface_secondary'),
-    },
-    iconTileOnMuted: {
-      backgroundColor: color?.('surface_primary'),
-    },
-    emoji: {
-      fontSize: 20,
-    },
-    cardText: {
+    pendingText: {
       flex: 1,
       gap: 3,
     },
-    reward: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 5,
-      paddingVertical: 7,
-      paddingHorizontal: 11,
-      borderRadius: 999,
-      backgroundColor: color?.('surface_secondary'),
-    },
-    rewardOnMuted: {
-      backgroundColor: color?.('surface_primary'),
-    },
     actionsRow: {
       flexDirection: 'row',
-      gap: 10,
+      gap: 9,
     },
     action: {
       flex: 1,
     },
-    // Липкая подложка, а не просто кнопка: без фона содержимое прокручивается
-    // сквозь неё. Волосяная линия сверху — как на экране фильтра, чтобы было
-    // видно, что список уходит под панель. 92 = таб-бар (24 снизу + 68 высоты).
-    footer: {
-      position: 'absolute',
-      left: 0,
-      right: 0,
-      bottom: 92,
-      paddingHorizontal: 22,
-      paddingTop: 12,
-      paddingBottom: 14,
-      backgroundColor: color?.('bg_primary'),
-      borderTopWidth: 1,
-      borderTopColor: color?.('controls_border_default', 0.5),
-      flexDirection: 'row',
-      gap: 10,
+    // Выданные и выполненные — списком внутри одной карточки, разделённые
+    // волосяной линией. Отдельными карточками список рассыпался на плитки.
+    groupCard: {
+      backgroundColor: color?.('surface_primary'),
+      borderRadius: 20,
+      paddingHorizontal: 16,
+      paddingVertical: 4,
     },
-    footerMain: {
+    row: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+      paddingVertical: 14,
+    },
+    rowDivided: {
+      borderBottomWidth: 1,
+      borderBottomColor: color?.('surface_stroke'),
+    },
+    iconTile: {
+      width: 36,
+      height: 36,
+      borderRadius: 12,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: color?.('surface_secondary'),
+    },
+    iconTileDone: {
+      backgroundColor: color?.('accent_positive', 0.14),
+    },
+    emoji: {
+      fontSize: 19,
+    },
+    rowText: {
       flex: 1,
+      gap: 2,
+    },
+    reward: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
     },
     empty: {
       flex: 1,
@@ -121,5 +134,18 @@ export const childTasksStyles = (color?: IGetColor) =>
       justifyContent: 'center',
       backgroundColor: color?.('surface_secondary'),
       marginBottom: 4,
+    },
+    // Одна кнопка: шаблоны переехали в закладку в шапке, как в макете.
+    footer: {
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      bottom: 92,
+      paddingHorizontal: 18,
+      paddingTop: 12,
+      paddingBottom: 14,
+      backgroundColor: color?.('bg_primary'),
+      borderTopWidth: 1,
+      borderTopColor: color?.('controls_border_default', 0.5),
     },
   });

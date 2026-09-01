@@ -17,6 +17,18 @@ import {
 } from 'screens';
 import {IScreens} from '../tabs-config';
 import i18n from 'i18next';
+import {NavigationProp, ParamListBase, RouteProp} from '@react-navigation/native';
+import {Pressable} from 'react-native';
+import {Icon} from 'molecules';
+
+// Квадратная кнопка-действие в шапке. Размеры из макета: 40×40, радиус 14.
+const headerActionStyle = {
+  width: 40,
+  height: 40,
+  borderRadius: 14,
+  alignItems: 'center' as const,
+  justifyContent: 'center' as const,
+};
 
 export const profileScreens: IScreens[] = [
   {
@@ -122,11 +134,26 @@ export const profileScreens: IScreens[] = [
   {
     name: 'ChildTasksScreen',
     component: ChildTasks,
-    options: () => ({
+    // Шаблоны живут закладкой в шапке, а не второй кнопкой внизу: внизу должно
+    // остаться одно действие — выдать задачу.
+    options: ({route}: {route: RouteProp<ParamListBase, string>}) => ({
       title: i18n.t('tasks_parent_title'),
       type: 'title',
       showBackIcon: true,
       showIconInTabScreen: false,
+      renderRightSection: (navigation: NavigationProp<any>) => (
+        <Pressable
+          hitSlop={8}
+          style={headerActionStyle}
+          onPress={() =>
+            navigation.navigate('TaskTemplatesScreen', {
+              childId: (route.params as {childId?: string})?.childId,
+            })
+          }
+        >
+          <Icon name="BookmarkIcon" width={22} height={22} color="accent_active" />
+        </Pressable>
+      ),
     }),
   },
   {

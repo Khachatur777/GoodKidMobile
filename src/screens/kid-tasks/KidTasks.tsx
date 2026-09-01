@@ -45,8 +45,8 @@ const KidTasks: FC = () => {
 
   const reward = (task: ITask, muted?: boolean) => (
     <View style={[styles.reward, muted && styles.rewardOnMuted]}>
-      <Icon name="StarIcon" width={16} height={16} color="accent_active" />
-      <Typography type="bodySBold">
+      <Icon name="StarIcon" width={21} height={21} color="accent_star" />
+      <Typography type="bodyLBold" textColor="text_star">
         {String(task.awardedStars ?? task.stars)}
       </Typography>
     </View>
@@ -59,7 +59,7 @@ const KidTasks: FC = () => {
     >
       <View style={styles.cardTop}>
         <View style={styles.cardText}>
-          <Typography type="bodyBold">{task.title}</Typography>
+          <Typography type="title3">{task.title}</Typography>
 
           {!!task.description && (
             <Typography type="bodyS" textColor="text_secondary">
@@ -74,7 +74,6 @@ const KidTasks: FC = () => {
       {kind === 'open' && (
         <Button
           title={t('tasks_kid_did_it')}
-          size="small"
           disabled={submitting}
           onPress={() => submitTask({ taskId: task._id })}
         />
@@ -109,8 +108,8 @@ const KidTasks: FC = () => {
           </View>
 
           <View style={styles.starsBadge}>
-            <Icon name="StarIcon" width={20} height={20} color="accent_active" />
-            <Typography type="bodyBold">{String(balance)}</Typography>
+            <Icon name="StarIcon" width={20} height={20} color="accent_star" />
+            <Typography type="bodyBold" textColor="text_star">{String(balance)}</Typography>
           </View>
         </View>
 

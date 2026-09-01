@@ -150,7 +150,7 @@ const ChildVideoLock: FC<ChildVideoLockProps> = ({ route }) => {
                 </Pressable>
 
                 <View style={styles.stepperValue}>
-                  <Icon name="StarIcon" width={22} height={22} color="accent_active" />
+                  <Icon name="StarIcon" width={22} height={22} color="accent_star" />
                   <Typography type="title3">{String(cost)}</Typography>
                 </View>
 

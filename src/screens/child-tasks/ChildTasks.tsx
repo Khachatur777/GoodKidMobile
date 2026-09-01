@@ -1,9 +1,8 @@
 import { NavigationProp, RouteProp } from '@react-navigation/native';
-import { AlertModal, BackgroundWrapper, Button, Icon, Typography } from 'molecules';
-import { ChildSelector } from 'organisms';
+import { AlertModal, BackgroundWrapper, Button, Icon, KidAvatar, Typography } from 'molecules';
 import { FC, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RefreshControl, ScrollView, Text, View } from 'react-native';
+import { Pressable, RefreshControl, ScrollView, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { ITask } from 'models';
 import {
@@ -11,6 +10,7 @@ import {
   useApproveChildTaskMutation,
   useDeleteChildTaskMutation,
   useGetChildTasksQuery,
+  useGetPendingTasksCountQuery,
   useReopenChildTaskMutation,
 } from 'rtk';
 import { ThemeContext } from 'theme';
@@ -24,6 +24,15 @@ export interface ChildTasksProps {
 const timeOfDay = (iso: string) =>
   new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
+// Дни считаются в местном времени родителя: сервер присылает метку, а «сегодня»
+// и «вчера» имеют смысл только в его часовом поясе.
+const daysAgo = (iso: string) => {
+  const startOfDay = (date: Date) =>
+    new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+
+  return Math.round((startOfDay(new Date()) - startOfDay(new Date(iso))) / 86400000);
+};
+
 // Tasks belong to one child, like the filter does, so the screen picks a child
 // first and everything below follows that choice.
 const ChildTasks: FC<ChildTasksProps> = ({ navigation, route }) => {
@@ -35,7 +44,6 @@ const ChildTasks: FC<ChildTasksProps> = ({ navigation, route }) => {
   const [childId, setChildId] = useState<string | null>(route.params?.childId ?? null);
   const [confirming, setConfirming] = useState<ITask | null>(null);
 
-  // Opened from the profile without a child in the route — start on the first.
   useEffect(() => {
     if (!childId && children.length) setChildId(children[0].id);
   }, [childId, children]);
@@ -46,6 +54,7 @@ const ChildTasks: FC<ChildTasksProps> = ({ navigation, route }) => {
     { id: childId as string },
     { skip: !childId, refetchOnMountOrArgChange: true },
   );
+  const { data: pendingCounts } = useGetPendingTasksCountQuery();
 
   const [approveTask, { isLoading: approving }] = useApproveChildTaskMutation();
   const [reopenTask] = useReopenChildTaskMutation();
@@ -66,86 +75,102 @@ const ChildTasks: FC<ChildTasksProps> = ({ navigation, route }) => {
     if (childId) await reopenTask({ id: childId, taskId: task._id });
   };
 
-  const renderTask = (task: ITask, kind: 'pending' | 'open' | 'done') => (
-    <View key={task._id} style={[styles.card, kind === 'done' && styles.cardMuted]}>
-      <View style={styles.cardTop}>
-        <View style={[styles.iconTile, kind === 'done' && styles.iconTileOnMuted]}>
-          {task.icon ? (
-            <Text style={styles.emoji}>{task.icon}</Text>
-          ) : (
-            <Icon name="TasksIcon" width={22} height={22} color="icon_secondary" />
-          )}
-        </View>
+  const reward = (value: number) => (
+    <View style={styles.reward}>
+      <Icon name="StarIcon" width={17} height={17} color="accent_star" />
+      <Typography type="bodySBold" textColor="text_star">
+        {String(value)}
+      </Typography>
+    </View>
+  );
 
-        <View style={styles.cardText}>
+  const completedAt = (task: ITask) => {
+    const days = task.completedAt ? daysAgo(task.completedAt) : null;
+
+    if (days === null) return null;
+    if (days === 0) return t('child_activity_today');
+    if (days === 1) return t('child_activity_yesterday');
+
+    return new Date(task.completedAt as string).toLocaleDateString([], {
+      day: 'numeric',
+      month: 'long',
+    });
+  };
+
+  const marker = (task: ITask, done?: boolean) => (
+    <View style={[styles.iconTile, done && styles.iconTileDone]}>
+      {done ? (
+        <Icon name="CheckMark" width={19} height={19} color="text_positive" />
+      ) : task.icon ? (
+        <Text style={styles.emoji}>{task.icon}</Text>
+      ) : (
+        <Icon name="TasksIcon" width={19} height={19} color="accent_active" />
+      )}
+    </View>
+  );
+
+  // Ожидающие подтверждения — единственные, с которых родитель действует,
+  // поэтому у каждой своя карточка с кнопками.
+  const renderPending = (task: ITask) => (
+    <View key={task._id} style={styles.pendingCard}>
+      <View style={styles.pendingTop}>
+        <View style={styles.pendingText}>
           <Typography type="bodyBold">{task.title}</Typography>
 
-          {kind === 'pending' && !!task.submittedAt && (
-            // Neutral wording on purpose: the model holds no gender for a child,
-            // and a kids' app is the last place to start collecting one.
+          {!!task.submittedAt && (
+            // Нейтрально: пола ребёнка в модели нет, а имя и так на плитке выше.
             <Typography type="bodyS" textColor="text_secondary">
               {t('tasks_marked_at', { time: timeOfDay(task.submittedAt) })}
             </Typography>
           )}
-
-          {kind === 'open' && !!task.description && (
-            <Typography type="bodyS" textColor="text_secondary">
-              {task.description}
-            </Typography>
-          )}
         </View>
 
-        <View style={[styles.reward, kind === 'done' && styles.rewardOnMuted]}>
-          <Icon name="StarIcon" width={16} height={16} color="accent_active" />
-          <Typography type="bodySBold">
-            {String(task.awardedStars ?? task.stars)}
-          </Typography>
-        </View>
+        {reward(task.stars)}
       </View>
 
-      {kind === 'pending' && (
-        <View style={styles.actionsRow}>
-          <View style={styles.action}>
-            <Button
-              title={t('tasks_approve')}
-              size="small"
-              disabled={approving}
-              onPress={() => setConfirming(task)}
-            />
-          </View>
-          <View style={styles.action}>
-            <Button
-              title={t('tasks_not_yet')}
-              size="small"
-              variant="outline"
-              onPress={() => onReopen(task)}
-            />
-          </View>
+      <View style={styles.actionsRow}>
+        <View style={styles.action}>
+          <Button
+            title={t('tasks_approve')}
+            size="small"
+            disabled={approving}
+            onPress={() => setConfirming(task)}
+          />
         </View>
-      )}
-
-      {kind === 'open' && (
-        <View style={styles.actionsRow}>
-          <View style={styles.action}>
-            <Button
-              title={t('tasks_approve')}
-              size="small"
-              variant="outline"
-              disabled={approving}
-              onPress={() => setConfirming(task)}
-            />
-          </View>
-          <View style={styles.action}>
-            <Button
-              title={t('tasks_delete')}
-              size="small"
-              variant="outline"
-              onPress={() => childId && deleteTask({ id: childId, taskId: task._id })}
-            />
-          </View>
+        <View style={styles.action}>
+          <Button
+            title={t('tasks_not_yet')}
+            size="small"
+            variant="outline"
+            onPress={() => onReopen(task)}
+          />
         </View>
-      )}
+      </View>
     </View>
+  );
+
+  const renderRow = (task: ITask, isLast: boolean, isDone: boolean) => (
+    <Pressable
+      key={task._id}
+      style={[styles.row, !isLast && styles.rowDivided]}
+      // Выданную задачу родитель закрывает сам, не дожидаясь ребёнка, или
+      // удаляет. Выполненная — история, её не трогают.
+      onPress={() => !isDone && setConfirming(task)}
+    >
+      {marker(task, isDone)}
+
+      <View style={styles.rowText}>
+        <Typography type="bodySBold">{task.title}</Typography>
+
+        {!!(isDone ? completedAt(task) : task.description) && (
+          <Typography type="caption" textColor="text_tertiary">
+            {isDone ? (completedAt(task) as string) : task.description}
+          </Typography>
+        )}
+      </View>
+
+      {reward(task.awardedStars ?? task.stars)}
+    </Pressable>
   );
 
   const group = (label: string, count?: number) => (
@@ -170,8 +195,39 @@ const ChildTasks: FC<ChildTasksProps> = ({ navigation, route }) => {
     <BackgroundWrapper>
       <View style={styles.container}>
         {children.length > 1 && (
-          <View style={styles.selectorRow}>
-            <ChildSelector children={children} selectedId={childId} onSelect={setChildId} />
+          <View style={styles.childRow}>
+            {children.map(item => {
+              const waiting = pendingCounts?.data?.byChild?.[item.id] ?? 0;
+              const selected = item.id === childId;
+
+              return (
+                <Pressable
+                  key={item.id}
+                  style={[styles.childPill, selected && styles.childPillSelected]}
+                  onPress={() => setChildId(item.id)}
+                >
+                  <KidAvatar avatarId={item.avatar} size={34} />
+
+                  <View style={styles.childName}>
+                    <Typography
+                      type={selected ? 'bodySBold' : 'bodySM'}
+                      textColor={selected ? 'text_primary' : 'text_secondary'}
+                      numberOfLines={1}
+                    >
+                      {item.name}
+                    </Typography>
+                  </View>
+
+                  {!!waiting && (
+                    <View style={styles.counter}>
+                      <Typography type="captionBold" textColor="text_inverted">
+                        {String(waiting)}
+                      </Typography>
+                    </View>
+                  )}
+                </Pressable>
+              );
+            })}
           </View>
         )}
 
@@ -196,28 +252,37 @@ const ChildTasks: FC<ChildTasksProps> = ({ navigation, route }) => {
             refreshControl={<RefreshControl refreshing={isFetching} onRefresh={refetch} />}
           >
             {!!pending.length && group(t('tasks_waiting_approval'), pending.length)}
-            {pending.map(task => renderTask(task, 'pending'))}
+            {pending.map(renderPending)}
 
-            {!!open.length && group(t('tasks_given'))}
-            {open.map(task => renderTask(task, 'open'))}
+            {!!open.length && (
+              <>
+                {group(t('tasks_given'))}
+                <View style={styles.groupCard}>
+                  {open.map((task, index) =>
+                    renderRow(task, index === open.length - 1, false),
+                  )}
+                </View>
+              </>
+            )}
 
-            {!!done.length && group(t('tasks_kid_done'))}
-            {done.map(task => renderTask(task, 'done'))}
+            {!!done.length && (
+              <>
+                {group(t('tasks_kid_done'))}
+                <View style={styles.groupCard}>
+                  {done.map((task, index) =>
+                    renderRow(task, index === done.length - 1, true),
+                  )}
+                </View>
+              </>
+            )}
           </ScrollView>
         )}
 
         <View style={styles.footer}>
-          <View style={styles.footerMain}>
-            <Button
-              title={t('tasks_new')}
-              onPress={() => navigation.navigate('TaskFormScreen', { childId })}
-            />
-          </View>
-
           <Button
-            title={t('tasks_from_template')}
-            variant="outline"
-            onPress={() => navigation.navigate('TaskTemplatesScreen', { childId })}
+            title={t('tasks_new')}
+            startIconName="PlusIcon"
+            onPress={() => navigation.navigate('TaskFormScreen', { childId })}
           />
         </View>
       </View>
@@ -230,7 +295,7 @@ const ChildTasks: FC<ChildTasksProps> = ({ navigation, route }) => {
           name: child?.name ?? '',
           stars: confirming?.stars ?? 0,
         })}
-        iconProps={{ name: 'StarIcon' }}
+        iconProps={{ name: 'StarIcon', color: 'accent_star' }}
         buttons={[
           {
             title: t('tasks_approve_confirm', { stars: confirming?.stars ?? 0 }),
@@ -241,6 +306,14 @@ const ChildTasks: FC<ChildTasksProps> = ({ navigation, route }) => {
             title: t('tasks_not_yet'),
             variant: 'outline',
             onPress: () => confirming && onReopen(confirming),
+          },
+          {
+            title: t('tasks_delete'),
+            variant: 'outline',
+            onPress: () => {
+              if (childId && confirming) deleteTask({ id: childId, taskId: confirming._id });
+              setConfirming(null);
+            },
           },
         ]}
       />

@@ -104,6 +104,10 @@ export const colorTheme = {
     accent_positive: '0, 194, 112',
     accent_warning: '255, 103, 0',
     accent_negative: '255, 47, 1',
+    // Звёзды — золотые во всей системе (в макетах 29 из 29). Токена не было,
+    // потому что до задач и блокировки звёзды рисовались акцентом.
+    accent_star: '224, 160, 8',
+    text_star: '122, 92, 15',
 
     // #endregion Highlight Colors Start
 
@@ -322,6 +326,8 @@ export const colorTheme = {
     accent_positive: '0, 194, 112',
     accent_warning: '255, 103, 0',
     accent_negative: '255, 89, 52',
+    accent_star: '255, 197, 61',
+    text_star: '239, 237, 250',
 
     // #endregion Highlight Colors Start
 

@@ -71,4 +71,8 @@ export const navBarStyles = ({
       justifyContent: 'space-between',
       alignItems: 'center',
     },
+    // Заголовок занимает всё, что осталось между стрелкой и правой секцией.
+    titleText: {
+      flex: 1,
+    },
   });

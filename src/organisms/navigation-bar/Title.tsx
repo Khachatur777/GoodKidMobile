@@ -40,20 +40,25 @@ const Title: FC<INavigationHeaderProps> = ({options, navigation}) => {
           ) : null}
         </View>
 
-        {renderRightSection ? (
-          <View style={navBarStyles({}).sectionRightIconContainer}>
-            {renderRightSection?.(navigation)}
-          </View>
-        ) : null}
       </View>
 
       {title && (
-        <Typography type="title1" {...titleProps}>
-          {title}
-        </Typography>
+        // Растягивается, чтобы правая секция ушла к краю. Экраны без неё
+        // выглядят как раньше: текст всё так же прижат влево.
+        <View style={navBarStyles({}).titleText}>
+          <Typography type="title1" {...titleProps}>
+            {title}
+          </Typography>
+        </View>
       )}
 
-      <View />
+      {/* Раньше правая секция лежала внутри строки со стрелкой «назад» и
+          физически не могла оказаться справа. Её место — в конце. */}
+      {renderRightSection ? (
+        <View style={navBarStyles({}).sectionRightIconContainer}>
+          {renderRightSection?.(navigation)}
+        </View>
+      ) : null}
     </View>
   );
 };
