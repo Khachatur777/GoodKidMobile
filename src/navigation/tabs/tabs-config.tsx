@@ -25,6 +25,7 @@ const hideTabBarOnSession = ({ route }: { route: any }) => {
 };
 import { KidProfileTab } from './kid-profile';
 import { TasksTab } from './tasks';
+import { ChildrenTab } from './children';
 
 export type ScreenTypes = RouteConfig<ParamListBase, any, any, {}, EventMapBase, any>;
 
@@ -61,6 +62,18 @@ export const parentTabScreens: ScreenTypes[] = [
         e.preventDefault();
         navigation.navigate('FilterTab', {
           screen: 'Filter',
+        });
+      },
+    }),
+  },
+  {
+    name: 'ChildrenTab',
+    component: ChildrenTab,
+    listeners: ({ navigation }: { navigation: NavigationProp<any> }) => ({
+      tabPress: (e: any) => {
+        e.preventDefault();
+        navigation.navigate('ChildrenTab', {
+          screen: 'ChildrenScreen',
         });
       },
     }),

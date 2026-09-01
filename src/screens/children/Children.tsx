@@ -1,7 +1,8 @@
-import { NavigationProp } from '@react-navigation/native';
+import { NavigationProp, useFocusEffect } from '@react-navigation/native';
 import { BackgroundWrapper, Button, Icon, KidAvatar, Spacing, Typography } from 'molecules';
-import { timeLeft } from 'organisms';
-import { FC, useContext, useEffect, useMemo } from 'react';
+import { ParentGateModal, timeLeft } from 'organisms';
+import { useParentGate } from 'hooks';
+import { FC, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
@@ -22,6 +23,18 @@ export interface ChildrenProps {
 // The parent's list of children. Opened from the profile after the parental gate.
 const Children: FC<ChildrenProps> = ({ navigation }) => {
   const { t } = useTranslation();
+
+  // Раздел детей закрыт родительским гейтом. Раньше гейт стоял на строке в
+  // профиле; теперь вход — вкладка, поэтому вопрос задаётся при первом её
+  // открытии. Отказ уводит обратно на главную, а не оставляет пустой экран.
+  const [unlocked, setUnlocked] = useState(false);
+  const {runBehindGate, gateProps} = useParentGate();
+
+  useFocusEffect(
+    useCallback(() => {
+      if (!unlocked) runBehindGate(() => setUnlocked(true));
+    }, [unlocked, runBehindGate]),
+  );
 
   // Пушей в приложении нет: этот счётчик — единственный способ узнать, что
   // ребёнок отметил задачу выполненной.
@@ -57,7 +70,8 @@ const Children: FC<ChildrenProps> = ({ navigation }) => {
 
           <Button variant="outline" title={t('children_try_again')} onPress={refetch} />
         </View>
-      </BackgroundWrapper>
+        <ParentGateModal {...gateProps} />
+    </BackgroundWrapper>
     );
   }
 
@@ -67,7 +81,8 @@ const Children: FC<ChildrenProps> = ({ navigation }) => {
         <View style={styles.scrollContainer}>
           <BaseSkeleton height={132} radius={28} count={2} betweenSpace={14} />
         </View>
-      </BackgroundWrapper>
+        <ParentGateModal {...gateProps} />
+    </BackgroundWrapper>
     );
   }
 
@@ -94,7 +109,8 @@ const Children: FC<ChildrenProps> = ({ navigation }) => {
             onPress={() => navigation.navigate('AddChildScreen')}
           />
         </View>
-      </BackgroundWrapper>
+        <ParentGateModal {...gateProps} />
+    </BackgroundWrapper>
     );
   }
 
@@ -250,6 +266,7 @@ const Children: FC<ChildrenProps> = ({ navigation }) => {
           ) : null}
         </View>
       </ScrollView>
+      <ParentGateModal {...gateProps} />
     </BackgroundWrapper>
   );
 };

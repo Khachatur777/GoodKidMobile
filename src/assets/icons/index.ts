@@ -50,3 +50,4 @@ export {default as TasksIcon} from './tasks.svg';
 export {default as LockIcon} from './lock.svg';
 export {default as PlusIcon} from './plus.svg';
 export {default as BookmarkIcon} from './bookmark.svg';
+export {default as UsersIcon} from './users.svg';

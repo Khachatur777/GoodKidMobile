@@ -12,8 +12,6 @@ import {useTranslation} from 'react-i18next';
 import {useParentGate} from 'hooks';
 import {purchaseUser} from "hooks/usePurchase.ts";
 import {
-  getChildrenState,
-  getConfigDataState,
   getPaymentsEnabledState,
   getSubscriptionUserState,
   setChildren,
@@ -61,13 +59,8 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({navigation}) => {
   const subscriptionState = useSelector(getSubscriptionUserState);
   const paymentsEnabled = useSelector(getPaymentsEnabledState);
   const accents = useSelector(getAvailableAccentsState);
-  const children = useSelector(getChildrenState);
-  const configData = useSelector(getConfigDataState);
-  // The limit comes from the server: turn subscriptions on and the number changes without a release
-  const maxChildren = configData?.features?.maxChildren ?? 3;
-
-
-  // The "2/3" counter next to the row has to be fresh on every visit to the profile
+  // Счётчик «2/3» уехал вместе со строкой «Дети», но запрос остался: он кладёт
+  // список детей в стор, откуда его читают экраны вкладки «Дети».
   const {data: childrenResponse} = useGetChildrenQuery(undefined, {
     refetchOnMountOrArgChange: true,
   });
@@ -129,21 +122,6 @@ const ProfileSettings: FC<ProfileSettingsProps> = ({navigation}) => {
       title={t('profile_settings')}
       containerStyles={profileStyle({}).profileWrapper}
     >
-      {/* The children's section opens only through the parental gate */}
-      <Cell
-        type="icon"
-        iconName="User02Icon"
-        title={t('children_title')}
-        onPress={() => {
-          runBehindGate(() => navigation.navigate('ChildrenScreen'));
-        }}
-        renderRightContent={() => (
-          <Typography type="bodyS" textColor="text_tertiary">
-            {t('children_count_value', {count: children.length, max: maxChildren})}
-          </Typography>
-        )}
-      />
-
       {paymentsEnabled || subscriptionState ? (
         <Cell
           type="icon"

@@ -129,6 +129,13 @@ const TabBar: FC<TabBarProps> = ({descriptors, state, navigation}) => {
                     name="Sliders04Icon"
                   />
                 );
+              case 'ChildrenTab':
+                return (
+                  <Icon
+                    color={isFocused ? 'controls_tab_bar_active' : 'controls_tab_bar_inactive'}
+                    name="UsersIcon"
+                  />
+                );
               case 'TasksTab':
                 return (
                   <Icon
@@ -174,6 +181,8 @@ const TabBar: FC<TabBarProps> = ({descriptors, state, navigation}) => {
                 return t('home_tab');
               case 'FilterTab':
                 return t('filter_tab');
+              case 'ChildrenTab':
+                return t('children_title');
               case 'TasksTab':
                 return t('tasks_tab');
               case 'LearnTab':
