@@ -7,7 +7,7 @@ import {
   Toggle,
   Typography,
 } from 'molecules';
-import { ChildSelector } from 'organisms';
+import { ChildSelector, timeLeft } from 'organisms';
 import { FC, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, View } from 'react-native';
@@ -27,9 +27,6 @@ export interface ChildVideoLockProps {
   navigation: NavigationProp<any>;
   route: RouteProp<{ params: { childId?: string } }, 'params'>;
 }
-
-const timeOfDay = (iso: string) =>
-  new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
 // Настройка принадлежит одному ребёнку, как и фильтр: старшему видео можно
 // закрыть, младшему оставить открытым, и цена у каждого своя. Поэтому сверху
@@ -188,7 +185,9 @@ const ChildVideoLock: FC<ChildVideoLockProps> = ({ route }) => {
               <View style={styles.statusText}>
                 <Typography type="bodyBold">
                   {openNow && state?.unlockedUntil
-                    ? t('video_open_until', { time: timeOfDay(state.unlockedUntil) })
+                    ? t(timeLeft(state.unlockedUntil).key, {
+                        value: timeLeft(state.unlockedUntil).value,
+                      })
                     : t('video_locked_title')}
                 </Typography>
 

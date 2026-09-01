@@ -1,5 +1,6 @@
 import { NavigationProp } from '@react-navigation/native';
 import { BackgroundWrapper, Button, Icon, KidAvatar, Spacing, Typography } from 'molecules';
+import { timeLeft } from 'organisms';
 import { FC, useContext, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, View } from 'react-native';
@@ -218,11 +219,8 @@ const Children: FC<ChildrenProps> = ({ navigation }) => {
                   {child.videoLock?.locked
                     ? t('children_video_closed', { cost: child.videoLock.unlockCost })
                     : child.videoLock?.unlockedUntil
-                      ? t('video_open_until', {
-                          time: new Date(child.videoLock.unlockedUntil).toLocaleTimeString([], {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          }),
+                      ? t(timeLeft(child.videoLock.unlockedUntil).key, {
+                          value: timeLeft(child.videoLock.unlockedUntil).value,
                         })
                       : t('children_video_open')}
                 </Typography>

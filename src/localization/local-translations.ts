@@ -290,6 +290,8 @@ export const localTranslations = {
     video_open_until: 'Video open until {{time}}',
     children_video_closed: 'Video closed · {{cost}} ★ for a day',
     children_video_open: 'Video open',
+    video_open_hours_left: 'Video open for {{value}} more hours',
+    video_open_minutes_left: 'Video open for {{value}} more minutes',
 },
   ru: {
     theme_system: 'Системная',
@@ -580,6 +582,8 @@ export const localTranslations = {
     video_open_until: 'Видео открыто до {{time}}',
     children_video_closed: 'Видео закрыто · {{cost}} ★ за сутки',
     children_video_open: 'Видео открыто',
+    video_open_hours_left: 'Видео открыто ещё {{value}} ч',
+    video_open_minutes_left: 'Видео открыто ещё {{value}} мин',
 },
   hy: {
     theme_system: 'Համակարգային',
@@ -870,6 +874,8 @@ export const localTranslations = {
     video_open_until: 'Տեսանյութերը բաց են մինչև {{time}}',
     children_video_closed: 'Տեսանյութերը փակ են · {{cost}} ★ մեկ օրվա համար',
     children_video_open: 'Տեսանյութերը բաց են',
+    video_open_hours_left: 'Տեսանյութերը բաց են ևս {{value}} ժ',
+    video_open_minutes_left: 'Տեսանյութերը բաց են ևս {{value}} ր',
 },
 };
 

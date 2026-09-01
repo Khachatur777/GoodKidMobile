@@ -13,8 +13,17 @@ export interface VideoLockedProps {
   navigation: NavigationProp<any>;
 }
 
-const timeOfDay = (iso: string) =>
-  new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+// Показываем остаток, а не время окончания. Сутки, купленные в 14:27,
+// заканчиваются в 14:27 — и «открыто до 14:27» читается как «уже истекло».
+// Ребёнку «ещё 23 часа» и понятнее, и не врёт ни при каком размере окна.
+export const timeLeft = (iso: string) => {
+  const ms = new Date(iso).getTime() - Date.now();
+  const minutes = Math.max(0, Math.round(ms / 60000));
+
+  return minutes >= 60
+    ? { key: 'video_open_hours_left', value: Math.floor(minutes / 60) }
+    : { key: 'video_open_minutes_left', value: minutes };
+};
 
 // Что видит ребёнок вместо ленты. Не запрет, а цена: сколько стоит, сколько у
 // него есть и где взять недостающее. Ни минусов, ни красного, ни слова
@@ -172,6 +181,7 @@ const VideoLocked: FC<VideoLockedProps> = ({ state, navigation }) => {
 // Тонкая плашка над лентой, когда окно оплачено и идёт.
 export const VideoOpenBanner: FC<{ until: string }> = ({ until }) => {
   const { t } = useTranslation();
+  const left = timeLeft(until);
   const { color } = useContext(ThemeContext);
   const styles = useMemo(() => videoLockedStyles(color), [color]);
 
@@ -179,7 +189,7 @@ export const VideoOpenBanner: FC<{ until: string }> = ({ until }) => {
     <View style={styles.banner}>
       <Icon name="LockIcon" width={16} height={16} color="text_positive" />
       <Typography type="bodyS" textColor="text_secondary">
-        {t('video_open_until', { time: timeOfDay(until) })}
+        {t(left.key, { value: left.value })}
       </Typography>
     </View>
   );

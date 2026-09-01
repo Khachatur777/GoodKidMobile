@@ -180,12 +180,19 @@ const Home: FC<HomeProps> = ({navigation}) => {
     [videosGet, isLoggedIn, filter, chipCategory, refetchLock],
   );
 
+  const isVideoLocked = !!lockState?.locked;
+
   useEffect(() => {
+    // За лентой не ходим, пока видео закрыто: сервер всё равно ответит 403. Зато
+    // как только ребёнок оплатил, флаг снимается — и это же условие приводит
+    // ленту. Без него после оплаты открывался пустой экран.
+    if (isVideoLocked) return;
+
     // videos are kept so the screen does not flash empty
     setCursor('');
     setHasMore(false);
     getVideos();
-  }, [isLoggedIn, filter.categories, filter.age, filter.language, getVideos]);
+  }, [isLoggedIn, filter.categories, filter.age, filter.language, getVideos, isVideoLocked]);
 
   useEffect(() => {
     return () => {
@@ -275,7 +282,7 @@ const Home: FC<HomeProps> = ({navigation}) => {
 
   // Лента даже не запрашивается: сервер всё равно ответит 403, а ребёнку нужен
   // не пустой список, а цена и путь к ней.
-  if (lockState?.locked) {
+  if (isVideoLocked) {
     return <VideoLocked state={lockState} navigation={navigation} />;
   }
 
