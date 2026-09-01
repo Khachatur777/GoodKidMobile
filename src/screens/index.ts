@@ -22,3 +22,8 @@ export * from './card-categories';
 export * from './card-session';
 export * from './learning-report';
 export * from './child-math';
+export * from './kid-tasks';
+export * from './child-tasks';
+export * from './task-form';
+export * from './task-templates';
+export * from './child-video-lock';

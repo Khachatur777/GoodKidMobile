@@ -39,6 +39,25 @@ export const childrenStyles = (color?: IGetColor) =>
       flexGrow: 1,
       flexBasis: '45%',
     },
+    // Статус видео и звёзды — строка под кнопками. Родителю важно увидеть
+    // положение дел, не открывая экран; это сообщение, а не контрол.
+    statusRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 8,
+      marginTop: 12,
+      paddingTop: 12,
+      borderTopWidth: 1,
+      borderTopColor: color?.('controls_border_default', 0.4),
+    },
+    statusText: {
+      flex: 1,
+    },
+    statusStars: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+    },
     footer: {
       paddingTop: 6,
       gap: 10,

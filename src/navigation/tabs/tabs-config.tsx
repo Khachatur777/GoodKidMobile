@@ -24,6 +24,7 @@ const hideTabBarOnSession = ({ route }: { route: any }) => {
     : {};
 };
 import { KidProfileTab } from './kid-profile';
+import { TasksTab } from './tasks';
 
 export type ScreenTypes = RouteConfig<ParamListBase, any, any, {}, EventMapBase, any>;
 
@@ -94,8 +95,11 @@ export const parentTabScreens: ScreenTypes[] = [
   },
 ];
 
-// Child: Home, Learn, Me. No filter — the parent set the feed and the server
-// applies it regardless of what the client sends.
+// Child: Home, Tasks, Learn, Me. No filter — the parent set the feed and the
+// server applies it regardless of what the client sends.
+//
+// Tasks sit next to Home on purpose: when video is locked the child lands on
+// Home and the way to open it is the neighbouring tab.
 export const kidTabScreens: ScreenTypes[] = [
   {
     name: 'HomeTab',
@@ -105,6 +109,18 @@ export const kidTabScreens: ScreenTypes[] = [
         e.preventDefault();
         navigation.navigate('HomeTab', {
           screen: 'Search',
+        });
+      },
+    }),
+  },
+  {
+    name: 'TasksTab',
+    component: TasksTab,
+    listeners: ({ navigation }: { navigation: NavigationProp<any> }) => ({
+      tabPress: (e: any) => {
+        e.preventDefault();
+        navigation.navigate('TasksTab', {
+          screen: 'KidTasksScreen',
         });
       },
     }),

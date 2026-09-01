@@ -46,3 +46,5 @@ export {default as SparklesIcon} from './sparkles.svg';
 export {default as DownloadIcon} from './download.svg';
 export {default as CloudOffIcon} from './cloud-off.svg';
 export {default as RefreshIcon} from './refresh.svg';
+export {default as TasksIcon} from './tasks.svg';
+export {default as LockIcon} from './lock.svg';

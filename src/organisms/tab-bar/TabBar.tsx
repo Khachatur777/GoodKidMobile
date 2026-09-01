@@ -14,6 +14,8 @@ import Animated, {
 import {useSelector} from 'react-redux';
 import {
   getIsTabBarHiddenState,
+  getIsChildState,
+  useGetPendingTasksCountQuery,
 } from 'rtk';
 import {ThemeContext} from 'theme';
 import {tabBarStyles} from './tab-bar-styles';
@@ -25,6 +27,11 @@ const TabBar: FC<TabBarProps> = ({descriptors, state, navigation}) => {
   const translateY = useSharedValue(0);
   const {color} = useContext(ThemeContext);
   const isTabBarHidden = useSelector(getIsTabBarHiddenState);
+  // Счётчик задач, ждущих подтверждения. Только у родителя: у ребёнка нет ни
+  // такого экрана, ни прав на этот запрос.
+  const isChild = useSelector(getIsChildState);
+  const { data: pending } = useGetPendingTasksCountQuery(undefined, { skip: isChild });
+  const pendingCount = pending?.data?.count ?? 0;
 
 
   const hideTabBarFromScreens = hideTabBar();
@@ -119,6 +126,13 @@ const TabBar: FC<TabBarProps> = ({descriptors, state, navigation}) => {
                     name="Sliders04Icon"
                   />
                 );
+              case 'TasksTab':
+                return (
+                  <Icon
+                    color={isFocused ? 'controls_tab_bar_active' : 'controls_tab_bar_inactive'}
+                    name="TasksIcon"
+                  />
+                );
               case 'LearnTab':
                 return (
                   <Icon
@@ -130,10 +144,22 @@ const TabBar: FC<TabBarProps> = ({descriptors, state, navigation}) => {
               // A child has their own profile tab, but the same icon
               case 'KidProfileTab':
                 return (
-                  <Icon
-                    color={isFocused ? 'controls_tab_bar_active' : 'controls_tab_bar_inactive'}
-                    name="User02Icon"
-                  />
+                  <View>
+                    <Icon
+                      color={isFocused ? 'controls_tab_bar_active' : 'controls_tab_bar_inactive'}
+                      name="User02Icon"
+                    />
+
+                    {/* Задачи ждут проверки. Без пушей это единственное место,
+                        где родитель узнаёт об этом, не заходя внутрь. */}
+                    {label === 'ProfileTab' && pendingCount > 0 && (
+                      <View style={tabBarStyles({color}).badge}>
+                        <Typography type="captionBold" textColor="text_inverted">
+                          {pendingCount > 9 ? '9+' : String(pendingCount)}
+                        </Typography>
+                      </View>
+                    )}
+                  </View>
                 );
               default:
                 break;
@@ -145,6 +171,8 @@ const TabBar: FC<TabBarProps> = ({descriptors, state, navigation}) => {
                 return t('home_tab');
               case 'FilterTab':
                 return t('filter_tab');
+              case 'TasksTab':
+                return t('tasks_tab');
               case 'LearnTab':
                 return t('learn_tab');
               case 'ProfileTab':

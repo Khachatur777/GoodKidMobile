@@ -5,11 +5,15 @@ import {
   AppColour,
   ChildActivity,
   ChildMathSettings,
-  LearningReport,
+  ChildTasks,
+  ChildVideoLock,
   Children,
   EditChild,
+  LearningReport,
   Profile,
   Support,
+  TaskForm,
+  TaskTemplates,
 } from 'screens';
 import {IScreens} from '../tabs-config';
 import i18n from 'i18next';
@@ -110,6 +114,46 @@ export const profileScreens: IScreens[] = [
     component: ChildMathSettings,
     options: () => ({
       title: i18n.t('child_math_title'),
+      type: 'title',
+      showBackIcon: true,
+      showIconInTabScreen: false,
+    }),
+  },
+  {
+    name: 'ChildTasksScreen',
+    component: ChildTasks,
+    options: () => ({
+      title: i18n.t('tasks_parent_title'),
+      type: 'title',
+      showBackIcon: true,
+      showIconInTabScreen: false,
+    }),
+  },
+  {
+    name: 'TaskFormScreen',
+    component: TaskForm,
+    options: () => ({
+      title: i18n.t('tasks_new'),
+      type: 'title',
+      showBackIcon: true,
+      showIconInTabScreen: false,
+    }),
+  },
+  {
+    name: 'TaskTemplatesScreen',
+    component: TaskTemplates,
+    options: () => ({
+      title: i18n.t('tasks_templates_title'),
+      type: 'title',
+      showBackIcon: true,
+      showIconInTabScreen: false,
+    }),
+  },
+  {
+    name: 'ChildVideoLockScreen',
+    component: ChildVideoLock,
+    options: () => ({
+      title: i18n.t('video_lock_title'),
       type: 'title',
       showBackIcon: true,
       showIconInTabScreen: false,

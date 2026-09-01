@@ -16,3 +16,4 @@ export * from './radio-button'
 export * from './goodkid-logo'
 export * from './kid-avatar';
 export * from './segmented-control';
+export * from './toggle';

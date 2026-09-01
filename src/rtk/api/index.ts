@@ -6,3 +6,5 @@ export * from './shared';
 export * from './support';
 export * from './children';
 export * from './learning';
+export * from './tasks';
+export * from './videoLock';

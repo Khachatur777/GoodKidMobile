@@ -14,12 +14,19 @@ import {
   RouteProp,
 } from '@react-navigation/native';
 import {BackgroundWrapper, GoodKidLogo, Icon, Typography} from 'molecules';
+import {VideoLocked, VideoOpenBanner} from 'organisms';
 import {homeStyles} from './home-styles';
 import {VideoItem} from './components';
 import {useGetAllHomeVideosMutation} from 'rtk/api/home.ts';
 import {KidsVideoItem} from 'models';
 import {useSelector} from 'react-redux';
-import {getFilterDataState, getIsChildState, getUserState, isLoggedInSelector} from 'rtk';
+import {
+  getFilterDataState,
+  getIsChildState,
+  getUserState,
+  isLoggedInSelector,
+  useGetMyVideoLockQuery,
+} from 'rtk';
 import {t} from 'i18next';
 import { isTablet, thumbHeight } from 'utils';
 import { CategoriesFilter } from 'app-constants/shared.ts';
@@ -46,6 +53,15 @@ const Home: FC<HomeProps> = ({navigation}) => {
   const filter = useSelector(getFilterDataState);
   const user = useSelector(getUserState);
   const {color} = useContext(ThemeContext);
+
+  // Блокировку спрашиваем отдельно, а не выводим из ошибки ленты: закрытый Дом
+  // должен нарисоваться сразу, а не после неудачного запроса за видео. Родителя
+  // это не касается — блокировка принадлежит ребёнку.
+  const {data: videoLock, refetch: refetchLock} = useGetMyVideoLockQuery(undefined, {
+    skip: !isChild || !isLoggedIn,
+    refetchOnMountOrArgChange: true,
+  });
+  const lockState = videoLock?.data;
 
   const [cursor, setCursor] = useState<string>('');
   const [chipCategory, setChipCategory] = useState<number | null>(null);
@@ -113,6 +129,14 @@ const Home: FC<HomeProps> = ({navigation}) => {
 
         const response: any = await videosGet(data);
 
+        // Родитель мог закрыть видео, пока ребёнок листал. Сервер отвечает 403 —
+        // перечитываем состояние, и экран сам сменится на закрытый Дом. Иначе
+        // ребёнок остался бы со старым списком, который уже не открывается.
+        if (response?.error?.data?.code === 'video_locked') {
+          refetchLock();
+          return;
+        }
+
         if (response?.data?.success) {
           const newItems: KidsVideoItem[] = response.data.items || [];
 
@@ -153,7 +177,7 @@ const Home: FC<HomeProps> = ({navigation}) => {
         }
       }
     },
-    [videosGet, isLoggedIn, filter, chipCategory],
+    [videosGet, isLoggedIn, filter, chipCategory, refetchLock],
   );
 
   useEffect(() => {
@@ -249,6 +273,12 @@ const Home: FC<HomeProps> = ({navigation}) => {
     }
   }).current;
 
+  // Лента даже не запрашивается: сервер всё равно ответит 403, а ребёнку нужен
+  // не пустой список, а цена и путь к ней.
+  if (lockState?.locked) {
+    return <VideoLocked state={lockState} navigation={navigation} />;
+  }
+
   return (
     <BackgroundWrapper
       backgroundColor="bg_primary"
@@ -276,6 +306,10 @@ const Home: FC<HomeProps> = ({navigation}) => {
         </Typography>
         <Typography type="titleL">{t('home_picked_today')}</Typography>
       </View>
+
+      {!!lockState?.enabled && !!lockState?.unlockedUntil && (
+        <VideoOpenBanner until={lockState.unlockedUntil} />
+      )}
 
       {isChild ? (
         <Pressable

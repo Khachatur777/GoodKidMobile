@@ -1,10 +1,15 @@
 import { NavigationProp } from '@react-navigation/native';
-import { BackgroundWrapper, Button, KidAvatar, Spacing, Typography } from 'molecules';
+import { BackgroundWrapper, Button, Icon, KidAvatar, Spacing, Typography } from 'molecules';
 import { FC, useContext, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { getChildrenState, setChildren, useGetChildrenQuery } from 'rtk';
+import {
+  getChildrenState,
+  setChildren,
+  useGetChildrenQuery,
+  useGetPendingTasksCountQuery,
+} from 'rtk';
 import { BaseSkeleton } from 'organisms';
 import { ThemeContext } from 'theme';
 import { childrenStyles } from './children-styles';
@@ -16,6 +21,12 @@ export interface ChildrenProps {
 // The parent's list of children. Opened from the profile after the parental gate.
 const Children: FC<ChildrenProps> = ({ navigation }) => {
   const { t } = useTranslation();
+
+  // Пушей в приложении нет: этот счётчик — единственный способ узнать, что
+  // ребёнок отметил задачу выполненной.
+  const { data: pending } = useGetPendingTasksCountQuery(undefined, {
+    refetchOnMountOrArgChange: true,
+  });
   const { color } = useContext(ThemeContext);
   const styles = useMemo(() => childrenStyles(color), [color]);
   const dispatch = useDispatch();
@@ -140,6 +151,32 @@ const Children: FC<ChildrenProps> = ({ navigation }) => {
                 <Button
                   variant="secondary"
                   size="small"
+                  title={
+                    pending?.data?.byChild?.[child.id]
+                      ? `${t('tasks_parent_title')} · ${pending.data.byChild[child.id]}`
+                      : t('tasks_parent_title')
+                  }
+                  onPress={() =>
+                    navigation.navigate('ChildTasksScreen', { childId: child.id })
+                  }
+                />
+              </View>
+
+              <View style={styles.cardAction}>
+                <Button
+                  variant="secondary"
+                  size="small"
+                  title={t('video_lock_title')}
+                  onPress={() =>
+                    navigation.navigate('ChildVideoLockScreen', { childId: child.id })
+                  }
+                />
+              </View>
+
+              <View style={styles.cardAction}>
+                <Button
+                  variant="secondary"
+                  size="small"
                   title={t('children_math')}
                   onPress={() =>
                     navigation.navigate('ChildMathScreen', {
@@ -162,6 +199,40 @@ const Children: FC<ChildrenProps> = ({ navigation }) => {
                     })
                   }
                 />
+              </View>
+            </View>
+
+            {/* Что происходит у ребёнка прямо сейчас: сколько звёзд и открыто ли
+                видео. Оба числа приезжают вместе со списком, отдельных запросов
+                нет. */}
+            <View style={styles.statusRow}>
+              <Icon
+                name="LockIcon"
+                width={18}
+                height={18}
+                color={child.videoLock?.locked ? 'icon_secondary' : 'text_positive'}
+              />
+
+              <View style={styles.statusText}>
+                <Typography type="bodyS" textColor="text_secondary">
+                  {child.videoLock?.locked
+                    ? t('children_video_closed', { cost: child.videoLock.unlockCost })
+                    : child.videoLock?.unlockedUntil
+                      ? t('video_open_until', {
+                          time: new Date(child.videoLock.unlockedUntil).toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          }),
+                        })
+                      : t('children_video_open')}
+                </Typography>
+              </View>
+
+              <View style={styles.statusStars}>
+                <Icon name="StarIcon" width={16} height={16} color="accent_active" />
+                <Typography type="bodySBold">
+                  {String(child.stars?.balance ?? 0)}
+                </Typography>
               </View>
             </View>
           </Pressable>

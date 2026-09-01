@@ -14,6 +14,17 @@ export interface IChild {
     accent?: string | null;
     themeMode?: 'light' | 'dark' | 'system';
   };
+  // Едут вместе со списком детей, чтобы карточка рисовалась без запроса на
+  // каждого: три ребёнка — это три запроса, а список показывается раньше, чем
+  // хоть один успеет ответить.
+  stars?: { total: number; balance: number };
+  videoLock?: {
+    enabled: boolean;
+    unlockCost: number;
+    unlockedUntil: string | null;
+    // Закрыто прямо сейчас: включено И оплаченное окно не идёт.
+    locked: boolean;
+  };
   // Inherited from the parent — a child has no subscription of their own
   subscription?: string;
 }

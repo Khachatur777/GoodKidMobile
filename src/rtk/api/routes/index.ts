@@ -5,3 +5,5 @@ export * from './sharedRoutes';
 export * from './supportRoutes';
 export * from './childrenRoutes';
 export * from './learningRoutes';
+export * from './tasksRoutes';
+export * from './videoLockRoutes';

@@ -5,3 +5,5 @@ export * from './SupportRequestModels';
 export * from './SharedRequestModels.ts';
 export * from './ChildrenRequestModels';
 export * from './LearningRequestModels';
+export * from './TasksRequestModels';
+export * from './VideoLockRequestModels';

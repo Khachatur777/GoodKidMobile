@@ -40,4 +40,16 @@ export const tabBarStyles = ({color}: {color?: IGetColor}) =>
       borderColor: color?.('controls_tab_bar_bg'),
       borderRadius: 100,
     },
+    badge: {
+      position: 'absolute',
+      top: -5,
+      right: -9,
+      minWidth: 18,
+      height: 18,
+      paddingHorizontal: 5,
+      borderRadius: 999,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: color?.('accent_active'),
+    },
   });

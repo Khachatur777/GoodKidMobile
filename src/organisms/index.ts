@@ -15,3 +15,4 @@ export * from './change-accent-modal';
 export * from './video-row';
 export * from './child-selector';
 export * from './stars-card';
+export * from './video-locked';
