@@ -22,6 +22,9 @@ export type INavigationHeaderProps = StackHeaderProps & {
     icon?: IconProps;
     leftIcon?: IconProps;
     showBackIcon?: boolean;
+    // Вторая строка под заголовком. До экрана «Дети» никому не требовалась,
+    // поэтому её просто не было.
+    subtitle?: string;
     defaultHeader?: boolean;
     renderRightSection?: (navigation: NavigationProp<any>) => ReactNode;
     renderLeftSection?: (navigation: NavigationProp<any>) => ReactNode;

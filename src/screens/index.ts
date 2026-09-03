@@ -27,3 +27,4 @@ export * from './child-tasks';
 export * from './task-form';
 export * from './task-templates';
 export * from './child-video-lock';
+export * from './child';

@@ -215,6 +215,10 @@ export interface ILearningReport {
     stars: { total: number; balance: number };
   };
   categories: IReportCategory[];
+  // Едут вместе с отчётом, чтобы страница ребёнка собиралась одним запросом:
+  // без общего числа категорий «12 пройдено» не с чем сравнить.
+  totals?: { cardCategories: number };
+  lastActivityAt?: string | null;
 }
 
 export interface ILearningReportResponseModel extends IDefaultResponseModel {

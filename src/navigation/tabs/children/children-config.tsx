@@ -1,5 +1,6 @@
 import {
   AddChild,
+  Child,
   AddFirstChild,
   ChildActivity,
   ChildMathSettings,
@@ -37,6 +38,31 @@ export const childrenScreens: IScreens[] = [
       type: 'title',
       showBackIcon: true,
       showIconInTabScreen: false,
+    }),
+  },
+  {
+    // Страница ребёнка: карточка в списке ведёт сюда, а разделы стали строками
+    // со значением справа. Правка профиля — карандаш в шапке, как в макете.
+    name: 'ChildScreen',
+    component: Child,
+    options: ({route}: {route: RouteProp<ParamListBase, string>}) => ({
+      title: (route.params as {childName?: string})?.childName || i18n.t('children_title'),
+      type: 'title',
+      showBackIcon: true,
+      showIconInTabScreen: false,
+      renderRightSection: (navigation: NavigationProp<any>) => (
+        <Pressable
+          hitSlop={8}
+          style={headerActionStyle}
+          onPress={() =>
+            navigation.navigate('EditChildScreen', {
+              childId: (route.params as {childId?: string})?.childId,
+            })
+          }
+        >
+          <Icon name="Edit02Icon" width={22} height={22} color="icon_secondary" />
+        </Pressable>
+      ),
     }),
   },
   {

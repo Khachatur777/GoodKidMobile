@@ -8,6 +8,7 @@ const Title: FC<INavigationHeaderProps> = ({options, navigation}) => {
 
   const {
     title,
+    subtitle,
     titleProps,
     leftIcon,
     renderRightSection,
@@ -49,6 +50,12 @@ const Title: FC<INavigationHeaderProps> = ({options, navigation}) => {
           <Typography type="title1" {...titleProps}>
             {title}
           </Typography>
+
+          {!!subtitle && (
+            <Typography type="bodyS" textColor="text_tertiary">
+              {subtitle}
+            </Typography>
+          )}
         </View>
       )}
 
