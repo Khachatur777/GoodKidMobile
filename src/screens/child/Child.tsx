@@ -3,7 +3,7 @@ import { BackgroundWrapper, Icon, KidAvatar, Typography } from 'molecules';
 import { timeLeft } from 'organisms';
 import { FC, useContext, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pressable, ScrollView, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { useSelector } from 'react-redux';
 import { IIcons } from 'assets';
 import {
@@ -98,6 +98,7 @@ const Child: FC<ChildProps> = ({ navigation, route }) => {
   const row = (
     {
       icon,
+      glyph,
       tone,
       title,
       subtitle,
@@ -106,8 +107,11 @@ const Child: FC<ChildProps> = ({ navigation, route }) => {
       onPress,
       last,
     }: {
-      icon: IIcons;
-      tone?: 'alert' | 'ok';
+      // У «Математики» в макете не иконка, а знаки «+−» — набор приложения
+      // такого глифа не содержит, да и рисовать его иконкой незачем.
+      icon?: IIcons;
+      glyph?: string;
+      tone?: 'alert' | 'ok' | 'muted';
       title: string;
       subtitle?: string | null;
       value?: string | null;
@@ -124,14 +128,24 @@ const Child: FC<ChildProps> = ({ navigation, route }) => {
           tone === 'ok' && styles.tileOk,
         ]}
       >
-        <Icon
-          name={icon}
-          width={20}
-          height={20}
-          color={
-            tone === 'alert' ? 'text_negative' : tone === 'ok' ? 'text_positive' : 'accent_active'
-          }
-        />
+        {glyph ? (
+          <Text style={styles.glyph}>{glyph}</Text>
+        ) : (
+          <Icon
+            name={icon as IIcons}
+            width={20}
+            height={20}
+            color={
+              tone === 'alert'
+                ? 'text_negative'
+                : tone === 'ok'
+                  ? 'text_positive'
+                  : tone === 'muted'
+                    ? 'icon_secondary'
+                    : 'accent_active'
+            }
+          />
+        )}
       </View>
 
       <View style={styles.rowText}>
@@ -212,7 +226,9 @@ const Child: FC<ChildProps> = ({ navigation, route }) => {
 
             {row({
               icon: lock?.locked ? 'LockIcon' : 'LockOpenIcon',
-              tone: lock?.locked ? undefined : 'ok',
+              // Закрытое видео — не повод для акцента: родитель сам его закрыл.
+              // Тот же нейтральный тон, что у плашки в списке.
+              tone: lock?.locked ? 'muted' : 'ok',
               title: t('video_lock_title'),
               subtitle: videoSubtitle(),
               onPress: () => navigation.navigate('ChildVideoLockScreen', { childId }),
@@ -228,14 +244,14 @@ const Child: FC<ChildProps> = ({ navigation, route }) => {
 
           <View style={styles.groupCard}>
             {row({
-              icon: 'LineChartUp03Icon',
+              icon: 'TimelineIcon',
               title: t('children_activity'),
               value: activityValue(),
               onPress: () => navigation.navigate('ChildActivityScreen', { childId }),
             })}
 
             {row({
-              icon: 'DotsGridIcon',
+              glyph: '+−',
               title: t('children_math'),
               value: learning.mathRate === null ? '—' : `${learning.mathRate}%`,
               onPress: () =>
@@ -262,7 +278,8 @@ const Child: FC<ChildProps> = ({ navigation, route }) => {
 
           <View style={styles.groupCard}>
             {row({
-              icon: 'User02Icon',
+              icon: 'ManageAccountsIcon',
+              tone: 'muted',
               title: t('child_profile_and_password'),
               onPress: () => navigation.navigate('EditChildScreen', { childId }),
               last: true,

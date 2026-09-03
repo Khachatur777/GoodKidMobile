@@ -62,6 +62,12 @@ export const childStyles = (color?: IGetColor) =>
       justifyContent: 'center',
       backgroundColor: color?.('surface_secondary'),
     },
+    // «+−» вместо иконки: 17px, вес 900 — как в макете.
+    glyph: {
+      fontSize: 17,
+      fontWeight: '900',
+      color: color?.('accent_active'),
+    },
     tileAlert: {
       backgroundColor: color?.('accent_negative', 0.12),
     },
