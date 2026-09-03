@@ -57,11 +57,21 @@ const Home: FC<HomeProps> = ({navigation}) => {
   // Блокировку спрашиваем отдельно, а не выводим из ошибки ленты: закрытый Дом
   // должен нарисоваться сразу, а не после неудачного запроса за видео. Родителя
   // это не касается — блокировка принадлежит ребёнку.
-  const {data: videoLock, refetch: refetchLock} = useGetMyVideoLockQuery(undefined, {
+  const {
+    data: videoLock,
+    refetch: refetchLock,
+    isLoading: lockLoading,
+  } = useGetMyVideoLockQuery(undefined, {
     skip: !isChild || !isLoggedIn,
     refetchOnMountOrArgChange: true,
   });
   const lockState = videoLock?.data;
+
+  // Пока состояние блокировки не пришло, за лентой не ходим вовсе. Иначе на
+  // первом рендере `locked` ещё undefined, проверка ниже его пропускает, и
+  // закрытый ребёнок успевает отправить запрос, на который сервер честно
+  // отвечает 403. Ошибка безобидная, но запрос заведомо обречён.
+  const lockPending = isChild && isLoggedIn && lockLoading;
 
   const [cursor, setCursor] = useState<string>('');
   const [chipCategory, setChipCategory] = useState<number | null>(null);
@@ -186,13 +196,13 @@ const Home: FC<HomeProps> = ({navigation}) => {
     // За лентой не ходим, пока видео закрыто: сервер всё равно ответит 403. Зато
     // как только ребёнок оплатил, флаг снимается — и это же условие приводит
     // ленту. Без него после оплаты открывался пустой экран.
-    if (isVideoLocked) return;
+    if (lockPending || isVideoLocked) return;
 
     // videos are kept so the screen does not flash empty
     setCursor('');
     setHasMore(false);
     getVideos();
-  }, [isLoggedIn, filter.categories, filter.age, filter.language, getVideos, isVideoLocked]);
+  }, [isLoggedIn, filter.categories, filter.age, filter.language, getVideos, isVideoLocked, lockPending]);
 
   useEffect(() => {
     return () => {
