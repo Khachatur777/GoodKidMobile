@@ -104,7 +104,10 @@ const EditChild: FC<EditChildProps> = ({ navigation, route }) => {
 
     if (response?.data?.success) {
       setDeleteModal(false);
-      navigation.goBack();
+      // Не goBack: под нами страница только что удалённого ребёнка, и родитель
+      // попадал на пустой экран. Переход на экран, лежащий ниже в стеке, снимает
+      // всё, что над ним, — список детей и есть корень этой вкладки.
+      navigation.navigate('ChildrenScreen');
     }
   }, [child, deleteChild, navigation]);
 

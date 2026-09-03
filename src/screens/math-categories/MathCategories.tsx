@@ -1,5 +1,5 @@
 import { FC, useCallback, useContext, useEffect, useMemo } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, useWindowDimensions, View } from 'react-native';
 import { NavigationProp } from '@react-navigation/native';
 import { BackgroundWrapper, Icon, Loader, Typography } from 'molecules';
 import { ThemeContext } from 'theme';
@@ -44,6 +44,11 @@ const MathCategories: FC<MathCategoriesProps> = ({ navigation }) => {
   const { color } = useContext(ThemeContext);
   const { t } = useTranslation();
   const styles = useMemo(() => mathCategoriesStyles(color), [color]);
+
+  // Три в ряд при любой ширине экрана: 20 отступа с каждой стороны и два зазора
+  // по 8 между плитками.
+  const { width } = useWindowDimensions();
+  const tileWidth = Math.floor((width - 20 * 2 - 8 * 2) / 3);
 
   const isChild = useSelector(getIsChildState);
   const user = useSelector(getUserState);
@@ -130,7 +135,7 @@ const MathCategories: FC<MathCategoriesProps> = ({ navigation }) => {
     (tile: Tile, muted?: boolean) => (
       <Pressable
         key={tile.key}
-        style={[styles.tile, muted && styles.tileMuted]}
+        style={[styles.tile, {width: tileWidth}, muted && styles.tileMuted]}
         onPress={tile.onPress}
       >
         <Text
@@ -164,7 +169,7 @@ const MathCategories: FC<MathCategoriesProps> = ({ navigation }) => {
         </View>
       </Pressable>
     ),
-    [styles],
+    [styles, tileWidth],
   );
 
   const group = (title: string, items: Tile[], muted?: boolean) =>
