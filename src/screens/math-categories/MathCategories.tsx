@@ -1,13 +1,15 @@
-import { FC, useCallback, useContext, useMemo } from 'react';
-import { FlatList, Pressable, View } from 'react-native';
+import { FC, useCallback, useContext, useEffect, useMemo } from 'react';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { NavigationProp } from '@react-navigation/native';
 import { BackgroundWrapper, Icon, Loader, Typography } from 'molecules';
 import { ThemeContext } from 'theme';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import { IMathCategory, MathOperation } from 'models';
+import { ICardCategory, IMathCategory, MathOperation } from 'models';
 import {
   getIsChildState,
+  getUserState,
+  useGetCardCategoriesQuery,
   useGetLearningProgressQuery,
   useGetMathCategoriesQuery,
 } from 'rtk';
@@ -20,6 +22,20 @@ const OPERATION_SIGNS: Record<MathOperation, string> = {
   division: '÷',
 };
 
+// Одна плитка описывает и бесконечный генератор арифметики, и обычную категорию
+// карточек: на экране они стоят вперемешку, и различать их ребёнку незачем.
+interface Tile {
+  key: string;
+  sign: string;
+  name: string;
+  // Бесконечные примеры вместо «сколько пройдено»: у генератора нет дна.
+  endless: boolean;
+  progress: string | null;
+  ageFrom: number;
+  ageTo: number;
+  onPress: () => void;
+}
+
 export interface MathCategoriesProps {
   navigation: NavigationProp<any>;
 }
@@ -30,7 +46,13 @@ const MathCategories: FC<MathCategoriesProps> = ({ navigation }) => {
   const styles = useMemo(() => mathCategoriesStyles(color), [color]);
 
   const isChild = useSelector(getIsChildState);
+  const user = useSelector(getUserState);
+
   const { data, isLoading } = useGetMathCategoriesQuery({ showModal: true });
+
+  // Карточные категории раздела «математика» стоят в той же сетке, что и
+  // арифметика: для ребёнка это один раздел, а не два источника.
+  const { data: cards } = useGetCardCategoriesQuery({ section: 'math' });
 
   // Общий счёт ребёнка, тот же, что на разделах и в профиле. Складывать здесь
   // только математические категории значило бы показывать в том же углу той же
@@ -40,99 +62,153 @@ const MathCategories: FC<MathCategoriesProps> = ({ navigation }) => {
     { skip: !isChild },
   );
 
-  const categories = data?.data || [];
-  // Сервер уже отдаёт подходящие возрасту первыми; здесь только разделение на
-  // две группы с разными заголовками.
-  const forNow = categories.filter(item => item.suitsAge);
-  const ahead = categories.filter(item => !item.suitsAge);
-
   const totalStars = progress?.data?.stars?.total ?? 0;
 
-  const openCategory = useCallback(
-    (category: IMathCategory) => {
-      navigation.navigate('MathCard', { category });
-    },
-    [navigation],
+  // Счёт стоит в одной строке с заголовком, а рисует шапку общий компонент —
+  // поэтому плашка уезжает туда, а не занимает отдельную строку под ним.
+  useEffect(() => {
+    if (!isChild) return;
+
+    navigation.setOptions({
+      renderRightSection: () => (
+        <View style={styles.starPill}>
+          <Icon name="StarIcon" width={17} height={17} color="accent_star" />
+          <Typography type="bodySBold" textColor="text_star">
+            {String(totalStars)}
+          </Typography>
+        </View>
+      ),
+    });
+  }, [isChild, navigation, styles, totalStars]);
+
+  const tiles = useMemo<Tile[]>(() => {
+    const math: Tile[] = (data?.data || []).map((item: IMathCategory) => ({
+      key: item.categoryKey,
+      sign: OPERATION_SIGNS[item.operation],
+      name: t(`math_${item.operation}`),
+      endless: true,
+      progress: null,
+      ageFrom: item.ageFrom,
+      ageTo: item.ageTo,
+      onPress: () => navigation.navigate('MathCard', { category: item }),
+    }));
+
+    const answeredByKey = new Map(
+      (progress?.data?.categories || []).map(row => [row.categoryKey, row.answered]),
+    );
+
+    const cardTiles: Tile[] = (cards?.data || []).map((item: ICardCategory) => ({
+      key: item.categoryKey,
+      sign: item.image || '#',
+      name: item.name,
+      endless: false,
+      progress: item.cardsTotal
+        ? t('math_cards_progress', {
+            done: answeredByKey.get(item.categoryKey) ?? 0,
+            total: item.cardsTotal,
+          })
+        : null,
+      ageFrom: item.ageFrom,
+      ageTo: item.ageTo,
+      onPress: () => navigation.navigate('CardSession', { category: item }),
+    }));
+
+    return [...math, ...cardTiles];
+  }, [cards, data, navigation, progress, t]);
+
+  // Три группы, а не две: «не по возрасту» значит и «перерос», и «ещё рано», и
+  // ребёнку это совершенно разные вещи. Каждая показывается, только если в ней
+  // что-то есть.
+  const age = typeof user?.age === 'number' ? user.age : null;
+  const outgrown = age === null ? [] : tiles.filter(tile => tile.ageTo < age);
+  const ahead = age === null ? [] : tiles.filter(tile => tile.ageFrom > age);
+  const current = tiles.filter(
+    tile => !outgrown.includes(tile) && !ahead.includes(tile),
   );
 
-  const renderItem = useCallback(
-    ({ item }: { item: IMathCategory }) => (
+  const renderTile = useCallback(
+    (tile: Tile, muted?: boolean) => (
       <Pressable
-        style={[styles.item, !item.suitsAge && styles.itemAhead]}
-        onPress={() => openCategory(item)}
+        key={tile.key}
+        style={[styles.tile, muted && styles.tileMuted]}
+        onPress={tile.onPress}
       >
-        <View style={[styles.sign, !item.suitsAge && styles.signAhead]}>
-          <Typography
-            type="titleXL"
-            textColor={item.suitsAge ? 'accent_active' : 'text_tertiary'}
-            textStyles={styles.signText}
-          >
-            {OPERATION_SIGNS[item.operation]}
-          </Typography>
-        </View>
+        <Text
+          style={[
+            styles.sign,
+            muted && styles.signMuted,
+            tile.sign.length > 1 && styles.signSmall,
+          ]}
+        >
+          {tile.sign}
+        </Text>
 
-        <View style={styles.itemText}>
-          <Typography type="title3">{t(`math_${item.operation}`)}</Typography>
-          <Typography type="bodyS" textColor="text_tertiary">
-            {item.suitsAge
-              ? t('math_up_to', { value: item.maxResult })
-              : t('math_for_later')}
-          </Typography>
-        </View>
+        <View style={styles.tileBottom}>
+          <View style={styles.nameRow}>
+            <Typography
+              type="bodySBold"
+              textColor={muted ? 'text_secondary' : 'text_primary'}
+              numberOfLines={2}
+            >
+              {tile.name}
+            </Typography>
 
-        {isChild && item.starsEarned > 0 && (
-          <View style={styles.starsBadge}>
-            <Icon name={'StarIcon'} width={18} height={18} color={'accent_active'} />
-            <Typography type="bodySBold">{String(item.starsEarned)}</Typography>
+            {tile.endless && !muted && <Text style={styles.infinity}>∞</Text>}
           </View>
-        )}
+
+          {!!tile.progress && (
+            <Typography type="caption" textColor="text_tertiary">
+              {tile.progress}
+            </Typography>
+          )}
+        </View>
       </Pressable>
     ),
-    [styles, t, openCategory, isChild],
+    [styles],
   );
 
-  const renderGroup = (title: string, items: IMathCategory[]) =>
-    items.length > 0 ? (
+  const group = (title: string, items: Tile[], muted?: boolean) =>
+    items.length > 0 && (
       <>
-        <Typography
-          type="bodySBold"
-          textColor="text_tertiary"
-          textStyles={styles.groupTitle}
-        >
-          {title}
-        </Typography>
-        {items.map(item => (
-          <View key={item.categoryKey}>{renderItem({ item })}</View>
-        ))}
+        <View style={styles.groupTitle}>
+          <Typography type="captionBold" textColor="text_secondary">
+            {title.toUpperCase()}
+          </Typography>
+        </View>
+
+        <View style={styles.grid}>{items.map(tile => renderTile(tile, muted))}</View>
       </>
-    ) : null;
+    );
+
+  if (isLoading) {
+    return (
+      <BackgroundWrapper>
+        <View style={styles.loader}>
+          <Loader isLoading />
+        </View>
+      </BackgroundWrapper>
+    );
+  }
 
   return (
     <BackgroundWrapper>
       <View style={styles.container}>
-        {isLoading ? (
-          <Loader isLoading />
-        ) : (
-          <FlatList
-            data={[0]}
-            keyExtractor={() => 'math-groups'}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.listContent}
-            renderItem={() => (
-              <>
-                {isChild && (
-                  <View style={styles.starsBadge}>
-                    <Icon name={'StarIcon'} width={20} height={20} color={'accent_active'} />
-                    <Typography type="bodyBold">{String(totalStars)}</Typography>
-                  </View>
-                )}
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.content}>
+          {group(t('math_for_you_now'), current)}
+          {group(t('math_try_when_ready'), ahead)}
+          {group(t('math_already_know'), outgrown, true)}
 
-                {renderGroup(t('math_for_you_now'), forNow)}
-                {renderGroup(t('math_try_when_ready'), ahead)}
-              </>
-            )}
-          />
-        )}
+          {tiles.some(tile => tile.endless) && (
+            <View style={styles.note}>
+              <Text style={styles.infinity}>∞</Text>
+              <View style={styles.noteText}>
+                <Typography type="bodyS" textColor="text_secondary">
+                  {t('math_endless_note')}
+                </Typography>
+              </View>
+            </View>
+          )}
+        </ScrollView>
       </View>
     </BackgroundWrapper>
   );

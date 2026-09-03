@@ -306,6 +306,9 @@ export const localTranslations = {
     children_video_closed_short: 'Closed · {{cost}} ★',
     children_limit_reached: '{{count}} of {{max}} added — no more',
     children_count_subtitle: '{{count}} of {{max}}',
+    math_already_know: 'You already know',
+    math_endless_note: 'These categories never run out of questions.',
+    math_cards_progress: '{{done}} of {{total}}',
 },
   ru: {
     theme_system: 'Системная',
@@ -612,6 +615,9 @@ export const localTranslations = {
     children_video_closed_short: 'Закрыто · {{cost}} ★',
     children_limit_reached: 'Добавлено {{count}} из {{max}} — больше нельзя',
     children_count_subtitle: '{{count}} из {{max}}',
+    math_already_know: 'Уже умеешь',
+    math_endless_note: 'Примеры в этих категориях не кончаются.',
+    math_cards_progress: '{{done}} из {{total}}',
 },
   hy: {
     theme_system: 'Համակարգային',
@@ -918,6 +924,9 @@ export const localTranslations = {
     children_video_closed_short: 'Փակ է · {{cost}} ★',
     children_limit_reached: 'Ավելացված է {{count}} {{max}}-ից — ավելին չի կարելի',
     children_count_subtitle: '{{count}} {{max}}-ից',
+    math_already_know: 'Արդեն գիտես',
+    math_endless_note: 'Այս բաժիններում օրինակները չեն վերջանում։',
+    math_cards_progress: '{{done}} {{total}}-ից',
 },
 };
 

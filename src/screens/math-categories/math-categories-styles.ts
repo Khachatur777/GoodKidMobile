@@ -7,66 +7,99 @@ export const mathCategoriesStyles = (color?: IGetColor) =>
       flex: 1,
       paddingHorizontal: 20,
     },
-    starsBadge: {
+    header: {
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 6,
-      alignSelf: 'flex-end',
+      gap: 12,
+      paddingBottom: 10,
+    },
+    headerTitle: {
+      flex: 1,
+    },
+    starPill: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 5,
       paddingVertical: 8,
-      paddingHorizontal: 14,
+      paddingHorizontal: 12,
       borderRadius: 999,
-      backgroundColor: color?.('surface_secondary'),
-      marginBottom: 8,
+      backgroundColor: color?.('accent_star', 0.16),
+    },
+    content: {
+      paddingBottom: 130,
+      gap: 8,
     },
     groupTitle: {
-      marginTop: 18,
-      marginBottom: 10,
+      paddingTop: 4,
     },
-    // Зона нажатия — вся плитка целиком: у четырёхлетки палец крупнее и менее
-    // точный, чем у взрослого.
-    item: {
-      minHeight: 96,
+    // Плитками, а не строками: у ребёнка на экране умещается весь раздел сразу,
+    // и выбор идёт по знаку, а не по чтению названий.
+    grid: {
       flexDirection: 'row',
-      alignItems: 'center',
-      gap: 16,
-      padding: 18,
-      marginBottom: 12,
-      borderRadius: 28,
-      backgroundColor: color?.('surface_primary'),
-      shadowColor: '#191634',
-      shadowOpacity: 0.06,
-      shadowRadius: 12,
-      shadowOffset: { width: 0, height: 3 },
-      elevation: 3,
+      flexWrap: 'wrap',
+      gap: 8,
     },
-    // Категория не по возрасту не прячется и не блокируется: она спокойнее по
-    // виду, но открыта. Ребёнок, который готов раньше, должен до неё дотянуться.
-    itemAhead: {
-      backgroundColor: color?.('surface_secondary'),
-      shadowOpacity: 0,
-      elevation: 0,
+    tile: {
+      // Три в ряд с зазором 8: (100% - 2 зазора) / 3.
+      width: '31.8%',
+      height: 86,
+      borderRadius: 20,
+      padding: 11,
+      justifyContent: 'space-between',
+      backgroundColor: color?.('surface_primary'),
+      borderWidth: 2,
+      borderColor: color?.('accent_active'),
+    },
+    // Пройденное — без рамки и приглушённое: это уже не выбор, а память о том,
+    // что ребёнок умеет.
+    tileMuted: {
+      height: 76,
+      borderWidth: 0,
+      borderColor: 'transparent',
     },
     sign: {
-      width: 64,
-      height: 64,
-      borderRadius: 22,
+      fontSize: 24,
+      fontWeight: '900',
+      lineHeight: 26,
+      color: color?.('accent_active'),
+    },
+    signMuted: {
+      fontSize: 22,
+      color: color?.('text_tertiary'),
+    },
+    signSmall: {
+      fontSize: 19,
+    },
+    tileBottom: {
+      gap: 2,
+    },
+    nameRow: {
+      flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'center',
+      gap: 4,
+    },
+    infinity: {
+      fontSize: 13,
+      fontWeight: '800',
+      color: color?.('accent_active'),
+    },
+    // Подсказка про бесконечные категории прижата к низу экрана, как в макете.
+    note: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+      marginTop: 14,
+      paddingVertical: 14,
+      paddingHorizontal: 16,
+      borderRadius: 18,
       backgroundColor: color?.('surface_secondary'),
     },
-    signAhead: {
-      backgroundColor: color?.('surface_primary'),
-    },
-    signText: {
-      fontSize: 34,
-      fontWeight: '900',
-      lineHeight: 40,
-    },
-    itemText: {
+    noteText: {
       flex: 1,
-      gap: 3,
     },
-    listContent: {
-      paddingBottom: 120,
+    loader: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
     },
   });
