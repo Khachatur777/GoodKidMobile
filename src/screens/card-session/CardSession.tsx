@@ -19,6 +19,7 @@ import {
 } from 'rtk';
 import { getFileUri } from 'utils';
 import { useAudioPlayer } from 'hooks/useAudioPlayer';
+import { useAnswerSounds } from 'hooks';
 import { cardSessionStyles } from './card-session-styles.ts';
 
 type Lang = 'ru' | 'en' | 'hy';
@@ -50,6 +51,7 @@ const CardSession: FC<CardSessionProps> = ({ navigation, route }) => {
   const lang = useMemo(resolveLang, []);
 
   const { play, playing } = useAudioPlayer();
+  const { playCorrect, playWrong } = useAnswerSounds();
   const [startSession] = useStartCardSessionMutation();
   const [finishSession] = useFinishSessionMutation();
   const [completeCategory] = useCompleteCategoryMutation();
@@ -174,11 +176,18 @@ const CardSession: FC<CardSessionProps> = ({ navigation, route }) => {
 
       // Верный ответ уводит дальше сам; неверный оставляет карточку на месте,
       // чтобы попробовать ещё раз на том же вопросе.
+      // Карточки отвечают тем же звуком, что и арифметика: для ребёнка это одно
+      // и то же занятие, и разная реакция на верный ответ читалась бы как
+      // разная оценка.
       if (answer.isCorrect) {
+        playCorrect();
         setTimeout(goNext, 700);
+        return;
       }
+
+      playWrong();
     },
-    [card, goNext],
+    [card, goNext, playCorrect, playWrong],
   );
 
   const onSkip = useCallback(() => {

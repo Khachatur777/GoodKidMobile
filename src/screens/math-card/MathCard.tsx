@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { IMathCategory, IMathQuestion, ISubmittedAnswer } from 'models';
 import { useFinishSessionMutation, useStartMathSessionMutation } from 'rtk';
 import { mathCardStyles } from './math-card-styles.ts';
+import { useAnswerSounds } from 'hooks';
 
 const KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', 'backspace'];
 
@@ -105,6 +106,8 @@ const MathCard: FC<MathCardProps> = ({ navigation, route }) => {
     [formulaScale],
   );
 
+  const { playCorrect, playWrong } = useAnswerSounds();
+
   const recordAttempt = useCallback(
     (answered: number | null) => {
       if (!question) return 0;
@@ -157,12 +160,17 @@ const MathCard: FC<MathCardProps> = ({ navigation, route }) => {
 
     if (answered === question.correctValue) {
       setFeedback('correct');
+      // Звук идёт вместе с цветом, а не вместо него: ребёнок, который занимается
+      // с выключенным звуком, и ребёнок, который не смотрит на экран, узнают
+      // об ответе одинаково.
+      playCorrect();
       // Короткая пауза, чтобы ребёнок увидел, что ответ принят, и переход сам.
       setTimeout(goNext, 700);
       return;
     }
 
     setFeedback('wrong');
+    playWrong();
     setValue('');
 
     // Пример остаётся тем же: «попробовать ещё раз» только тогда и имеет смысл.
@@ -171,7 +179,7 @@ const MathCard: FC<MathCardProps> = ({ navigation, route }) => {
       Animated.timing(shake, { toValue: -1, duration: 60, useNativeDriver: true }),
       Animated.timing(shake, { toValue: 0, duration: 60, useNativeDriver: true }),
     ]).start();
-  }, [question, value, recordAttempt, goNext, shake]);
+  }, [question, value, recordAttempt, goNext, shake, playCorrect, playWrong]);
 
   const onSkip = useCallback(() => {
     // Уйти можно всегда, даже не решив. Пропуск отличается от ошибки: он
