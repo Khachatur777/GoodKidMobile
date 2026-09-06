@@ -75,6 +75,11 @@ export const homeStyles = ({
       shadowOffset: {width: 0, height: 2},
       elevation: 2,
     },
+    // Обёртка, которой управляет анимация: содержимое не должно вылезать,
+    // пока высота едет к нулю.
+    greeting: {
+      overflow: 'hidden',
+    },
     greetingContainer: {
       paddingHorizontal: 22,
       paddingBottom: 14,

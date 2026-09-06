@@ -1,7 +1,13 @@
 import {FC, useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import Animated, {
+  interpolate,
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 import {
   ActivityIndicator,
-  FlatList,
   Image,
   Pressable,
   RefreshControl,
@@ -290,6 +296,44 @@ const Home: FC<HomeProps> = ({navigation}) => {
     }
   }).current;
 
+  // Приветствие уезжает при скролле вниз и возвращается при скролле вверх.
+  // Ребёнок читает его один раз за заход, а место под ленту на маленьком экране
+  // дороже. Возврат по направлению, а не по возврату к самому верху: иначе,
+  // чтобы увидеть, чей это профиль, пришлось бы промотать весь список назад.
+  const greetingHidden = useSharedValue(0);
+  const lastOffset = useSharedValue(0);
+  const [greetingHeight, setGreetingHeight] = useState(0);
+
+  const onScroll = useAnimatedScrollHandler({
+    onScroll: event => {
+      const y = event.contentOffset.y;
+      const delta = y - lastOffset.value;
+      lastOffset.value = y;
+
+      // У самого верха приветствие всегда открыто: там оно и есть шапка экрана.
+      if (y <= 0) {
+        greetingHidden.value = withTiming(0, { duration: 220 });
+        return;
+      }
+
+      // Порог в четыре точки: без него блок дёргается от дрожания пальца и от
+      // отдачи резинового скролла.
+      if (delta > 4) {
+        greetingHidden.value = withTiming(1, { duration: 220 });
+      } else if (delta < -4) {
+        greetingHidden.value = withTiming(0, { duration: 220 });
+      }
+    },
+  });
+
+  const greetingStyle = useAnimatedStyle(() => ({
+    // Пока высота не измерена, блок живёт своей: анимировать нечего.
+    height: greetingHeight
+      ? interpolate(greetingHidden.value, [0, 1], [greetingHeight, 0])
+      : undefined,
+    opacity: 1 - greetingHidden.value,
+  }));
+
   // Лента даже не запрашивается: сервер всё равно ответит 403, а ребёнку нужен
   // не пустой список, а цена и путь к ней.
   if (isVideoLocked) {
@@ -317,12 +361,22 @@ const Home: FC<HomeProps> = ({navigation}) => {
         )}
       </View>
 
-      <View style={styles.greetingContainer}>
-        <Typography type="bodyM" textColor="text_secondary">
-          {greetingName}
-        </Typography>
-        <Typography type="titleL">{t('home_picked_today')}</Typography>
-      </View>
+      <Animated.View style={[styles.greeting, greetingStyle]}>
+        <View
+          style={styles.greetingContainer}
+          onLayout={event => {
+            const measured = event.nativeEvent.layout.height;
+            // Меряем один раз: дальше высоту задаёт анимация, и обновление
+            // отсюда завело бы измерение по кругу.
+            if (measured > 0 && !greetingHeight) setGreetingHeight(measured);
+          }}
+        >
+          <Typography type="bodyM" textColor="text_secondary">
+            {greetingName}
+          </Typography>
+          <Typography type="titleL">{t('home_picked_today')}</Typography>
+        </View>
+      </Animated.View>
 
       {!!lockState?.enabled && !!lockState?.unlockedUntil && (
         <VideoOpenBanner until={lockState.unlockedUntil} />
@@ -380,8 +434,10 @@ const Home: FC<HomeProps> = ({navigation}) => {
       )}
 
       {isInitialLoading && !videos.length ? null : videos.length ? (
-        <FlatList
+        <Animated.FlatList
           data={videos}
+          onScroll={onScroll}
+          scrollEventThrottle={16}
           renderItem={renderVideItem}
           keyExtractor={item => `${item.keyExtractor}`}
           showsVerticalScrollIndicator={false}
