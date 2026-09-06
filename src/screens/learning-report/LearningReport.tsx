@@ -1,5 +1,5 @@
-import { FC, useContext, useMemo, useState } from 'react';
-import { Pressable, ScrollView, View } from 'react-native';
+import { FC, useCallback, useContext, useMemo, useState } from 'react';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { RouteProp } from '@react-navigation/native';
 import { BackgroundWrapper, Icon, Loader, Modal, Typography } from 'molecules';
 import { ThemeContext } from 'theme';
@@ -7,6 +7,15 @@ import { useTranslation } from 'react-i18next';
 import { IReportCategory, IReportQuestion } from 'models';
 import { useGetLearningReportQuery, useGetReportQuestionsQuery } from 'rtk';
 import { learningReportStyles } from './learning-report-styles.ts';
+
+// Знак операции в шапке модала — та же плитка, что на экране настроек
+// математики: родитель узнаёт раздел раньше, чем прочтёт заголовок.
+const SIGNS: Record<string, string> = {
+  addition: '+',
+  subtraction: '−',
+  multiplication: '×',
+  division: '÷',
+};
 
 const MATH_LABELS: Record<string, string> = {
   'math.addition': 'math_addition',
@@ -37,8 +46,62 @@ const LearningReport: FC<LearningReportProps> = ({ route }) => {
     { skip: !operation, refetchOnMountOrArgChange: true },
   );
 
-  const questions = questionsData?.data?.questions ?? [];
+  const questions = useMemo(
+    () => questionsData?.data?.questions ?? [],
+    [questionsData],
+  );
   const questionDays = questionsData?.data?.days ?? 0;
+
+  // Три числа вместо десяти одинаковых строк: главное — сколько пропущено, и
+  // это должно читаться сразу, а не пересчитываться глазами.
+  const tally = useMemo(() => {
+    const first = questions.filter(item => item.status === 'correct' && item.firstTry).length;
+    const retry = questions.filter(item => item.status === 'correct' && !item.firstTry).length;
+
+    return { first, retry, missed: questions.length - first - retry };
+  }, [questions]);
+
+  // Совет появляется, только когда есть о чём советовать: половина задач мимо —
+  // это уже не «бывает», а «слишком сложно».
+  const tooHard = questions.length > 0 && tally.missed * 2 >= questions.length;
+
+  // Дни считаются в местном времени родителя, как и на странице ребёнка.
+  const dayLabel = useCallback(
+    (iso: string) => {
+      const startOfDay = (date: Date) =>
+        new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+      const days = Math.round((startOfDay(new Date()) - startOfDay(new Date(iso))) / 86400000);
+
+      if (days === 0) return t('child_activity_today');
+      if (days === 1) return t('child_activity_yesterday');
+
+      return new Date(iso).toLocaleDateString([], { day: 'numeric', month: 'long' });
+    },
+    [t],
+  );
+
+  // Задачи одного дня идут одной группой: «сегодня пропустил половину» — это
+  // другой разговор, чем «пропустил пять раз за неделю».
+  const grouped = useMemo(() => {
+    const rows: (
+      | { kind: 'day'; key: string; label: string }
+      | { kind: 'row'; key: string; question: IReportQuestion }
+    )[] = [];
+    let current: string | null = null;
+
+    questions.forEach((question, index) => {
+      const label = dayLabel(question.at);
+
+      if (label !== current) {
+        rows.push({ kind: 'day', key: `day-${index}`, label });
+        current = label;
+      }
+
+      rows.push({ kind: 'row', key: `question-${index}`, question });
+    });
+
+    return rows;
+  }, [questions, dayLabel]);
 
   const report = data?.data;
   const categories = report?.categories || [];
@@ -190,16 +253,66 @@ const LearningReport: FC<LearningReportProps> = ({ route }) => {
         showCloseButton
       >
         <View style={styles.sheet}>
-          <Typography type="title3">
-            {operation ? t(`math_${operation}`) : ''}
-          </Typography>
+          <View style={styles.sheetHead}>
+            <View style={styles.sheetGlyph}>
+              <Text style={styles.sheetGlyphText}>{operation ? SIGNS[operation] : ''}</Text>
+            </View>
 
-          {/* Период называем прямо: цифры в карточках выше — за всё время, а
-              здесь последние задачи за те же дни, что показывает «Активность».
-              Без этой строки родитель решит, что счётчики врут. */}
-          <Typography type="bodyS" textColor="text_tertiary">
-            {t('report_questions_period', { count: questions.length, days: questionDays })}
-          </Typography>
+            <View style={styles.sheetTitle}>
+              <Typography type="title3">{operation ? t(`math_${operation}`) : ''}</Typography>
+
+              {/* Период называем прямо: числа на карточке — за всё время, а
+                  здесь последние задачи за те же дни, что показывает
+                  «Активность». Без этой строки родитель решит, что счётчики
+                  врут. */}
+              <Typography type="bodyS" textColor="text_tertiary">
+                {t('report_questions_period', {
+                  count: questions.length,
+                  days: questionDays,
+                })}
+              </Typography>
+            </View>
+          </View>
+
+          {questions.length > 0 && (
+            <View style={styles.tally}>
+              <View style={[styles.tallyCell, styles.tallyGood]}>
+                <Typography type="title3" textColor="text_positive">
+                  {String(tally.first)}
+                </Typography>
+                <Typography type="captionBold" textColor="text_positive">
+                  {t('report_question_first_try')}
+                </Typography>
+              </View>
+
+              <View style={[styles.tallyCell, styles.tallyRetry]}>
+                <Typography type="title3" textColor="accent_warning">
+                  {String(tally.retry)}
+                </Typography>
+                <Typography type="captionBold" textColor="accent_warning">
+                  {t('report_question_second_try')}
+                </Typography>
+              </View>
+
+              <View style={[styles.tallyCell, styles.tallyMissed]}>
+                <Typography type="title3" textColor="accent_active">
+                  {String(tally.missed)}
+                </Typography>
+                <Typography type="captionBold" textColor="accent_active">
+                  {t('report_question_skipped')}
+                </Typography>
+              </View>
+            </View>
+          )}
+
+          {tooHard && (
+            <View style={styles.sheetHint}>
+              <Icon name={'LightbulbIcon'} width={20} height={20} color={'accent_active'} />
+              <Typography type="bodyS" textColor="text_secondary" textStyles={styles.cardTitle}>
+                {t('report_questions_hint_hard')}
+              </Typography>
+            </View>
+          )}
 
           {questionsLoading && questions.length === 0 ? (
             <View style={styles.sheetLoader}>
@@ -215,44 +328,79 @@ const LearningReport: FC<LearningReportProps> = ({ route }) => {
               showsVerticalScrollIndicator={false}
               contentContainerStyle={styles.sheetListContent}
             >
-              {questions.map((question: IReportQuestion, index: number) => {
+              {grouped.map((item, index) => {
+                if (item.kind === 'day') {
+                  return (
+                    <View key={item.key}>
+                      {index > 0 && <View style={styles.questionDivider} />}
+                      <Typography
+                        type="captionBold"
+                        textColor="text_tertiary"
+                        textStyles={styles.dayLabel}
+                      >
+                        {item.label.toUpperCase()}
+                      </Typography>
+                    </View>
+                  );
+                }
+
+                const question = item.question;
                 const solved = question.status === 'correct';
-                // Пропущенный — не ошибка: ребёнок его не решал. Поэтому
-                // приглушённый, а не красный, но в списке стоит на своём месте.
+                // Пропущенный — не ошибка: ребёнок его не решал. Своя метка, не
+                // красная, но в списке стоит на своём месте.
                 const untouched = question.status === 'unanswered';
 
                 return (
-                  <View key={`${question.expression}-${index}`} style={styles.question}>
-                    <Typography
-                      type="bodyBold"
-                      textStyles={styles.questionText}
-                      textColor={
-                        solved ? 'text_primary' : untouched ? 'text_tertiary' : 'text_secondary'
-                      }
-                    >
-                      {question.expression} = {question.correctValue}
-                    </Typography>
+                  <View key={item.key}>
+                    {index > 0 && <View style={styles.questionDivider} />}
 
-                    {/* Решённое с первой попытки — только галочка: родитель
-                        открыл этот список ради того, что пошло не так, и
-                        двадцать одинаковых подписей это прячут. */}
-                    {solved && question.firstTry ? (
-                      <Icon name={'CheckMark'} width={18} height={18} color={'text_positive'} />
-                    ) : solved ? (
-                      <Typography type="caption" textColor="text_tertiary">
-                        {t('report_question_attempts', { count: question.attempts })}
+                    <View style={styles.question}>
+                      {solved && question.firstTry ? (
+                        <View style={[styles.questionBadge, styles.badgeGood]}>
+                          <Icon name={'CheckMark'} width={18} height={18} color={'text_positive'} />
+                        </View>
+                      ) : solved ? (
+                        // В метке само число попыток: столбик цифр слева читается
+                        // быстрее, чем подписи справа.
+                        <View style={[styles.questionBadge, styles.badgeRetry]}>
+                          <Typography type="captionBold" textColor="accent_warning">
+                            {String(question.attempts)}
+                          </Typography>
+                        </View>
+                      ) : (
+                        <View style={[styles.questionBadge, styles.badgeMissed]}>
+                          <Icon name={'RefreshIcon'} width={17} height={17} color={'accent_active'} />
+                        </View>
+                      )}
+
+                      <Typography
+                        type="bodyBold"
+                        textStyles={styles.questionText}
+                        textColor={solved ? 'text_primary' : 'text_secondary'}
+                      >
+                        {question.expression} = {question.correctValue}
                       </Typography>
-                    ) : untouched ? (
-                      <Typography type="caption" textColor="text_tertiary">
-                        {t('report_question_skipped')}
-                      </Typography>
-                    ) : (
-                      <Typography type="caption" textColor="text_negative">
-                        {question.value === null
-                          ? t('report_question_unsolved')
-                          : t('report_question_answered', { value: question.value })}
-                      </Typography>
-                    )}
+
+                      {solved && question.firstTry ? (
+                        <Typography type="captionBold" textColor="text_positive">
+                          {t('report_question_first_try')}
+                        </Typography>
+                      ) : solved ? (
+                        <Typography type="captionBold" textColor="accent_warning">
+                          {question.attempts === 2
+                            ? t('report_question_second_try')
+                            : t('report_question_attempts', { count: question.attempts })}
+                        </Typography>
+                      ) : (
+                        <Typography type="captionBold" textColor="accent_active">
+                          {untouched
+                            ? t('report_question_skipped')
+                            : question.value === null
+                              ? t('report_question_unsolved')
+                              : t('report_question_answered', { value: question.value })}
+                        </Typography>
+                      )}
+                    </View>
                   </View>
                 );
               })}
