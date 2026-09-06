@@ -1,11 +1,11 @@
-import { FC, useContext, useMemo } from 'react';
-import { ScrollView, View } from 'react-native';
+import { FC, useContext, useMemo, useState } from 'react';
+import { Pressable, ScrollView, View } from 'react-native';
 import { RouteProp } from '@react-navigation/native';
-import { BackgroundWrapper, Icon, Loader, Typography } from 'molecules';
+import { BackgroundWrapper, Icon, Loader, Modal, Typography } from 'molecules';
 import { ThemeContext } from 'theme';
 import { useTranslation } from 'react-i18next';
-import { IReportCategory } from 'models';
-import { useGetLearningReportQuery } from 'rtk';
+import { IReportCategory, IReportQuestion } from 'models';
+import { useGetLearningReportQuery, useGetReportQuestionsQuery } from 'rtk';
 import { learningReportStyles } from './learning-report-styles.ts';
 
 const MATH_LABELS: Record<string, string> = {
@@ -25,7 +25,20 @@ const LearningReport: FC<LearningReportProps> = ({ route }) => {
   const styles = useMemo(() => learningReportStyles(color), [color]);
   const { childId } = route.params;
 
+  // Какая категория открыта в модале. Ключ операции, а не строка «math.x»:
+  // именно его ждёт сервер.
+  const [operation, setOperation] = useState<string | null>(null);
+
   const { data, isFetching } = useGetLearningReportQuery({ childId, showModal: true });
+
+  // Ходим за задачами только когда модал открыт: на самом отчёте они не нужны.
+  const { data: questionsData, isFetching: questionsLoading } = useGetReportQuestionsQuery(
+    { childId, operation: operation ?? undefined, showModal: false },
+    { skip: !operation, refetchOnMountOrArgChange: true },
+  );
+
+  const questions = questionsData?.data?.questions ?? [];
+  const questionDays = questionsData?.data?.days ?? 0;
 
   const report = data?.data;
   const categories = report?.categories || [];
@@ -92,9 +105,19 @@ const LearningReport: FC<LearningReportProps> = ({ route }) => {
         ) : (
           categories.map(row => {
             const ratio = row.answered > 0 ? row.correctFirstTry / row.answered : 0;
+            // Разбор по задачам есть только у арифметики: у карточек из админки
+            // «правильный ответ» — это вариант, а не число, и разговор про них
+            // другой.
+            const mathOperation =
+              row.source === 'math' ? row.categoryKey.replace('math.', '') : null;
 
             return (
-              <View key={row.categoryKey} style={styles.card}>
+              <Pressable
+                key={row.categoryKey}
+                style={styles.card}
+                disabled={!mathOperation || row.answered === 0}
+                onPress={() => setOperation(mathOperation)}
+              >
                 <View style={styles.cardHead}>
                   <Typography type="bodyBold" textStyles={styles.cardTitle}>
                     {categoryName(row)}
@@ -104,6 +127,10 @@ const LearningReport: FC<LearningReportProps> = ({ route }) => {
                     <Typography type="bodySBold" textColor="text_tertiary">
                       {String(row.starsEarned)}
                     </Typography>
+
+                    {!!mathOperation && row.answered > 0 && (
+                      <Icon name={'ChevronRight'} width={18} height={18} color={'icon_tertiary'} />
+                    )}
                   </View>
                 </View>
 
@@ -141,7 +168,7 @@ const LearningReport: FC<LearningReportProps> = ({ route }) => {
                     </Typography>
                   </View>
                 )}
-              </View>
+              </Pressable>
             );
           })
         )}
@@ -155,6 +182,75 @@ const LearningReport: FC<LearningReportProps> = ({ route }) => {
           </View>
         )}
       </ScrollView>
+
+      <Modal
+        isVisible={!!operation}
+        setIsVisible={() => setOperation(null)}
+        type="bottom-sheet"
+        showCloseButton
+      >
+        <View style={styles.sheet}>
+          <Typography type="title3">
+            {operation ? t(`math_${operation}`) : ''}
+          </Typography>
+
+          {/* Период называем прямо: цифры в карточках выше — за всё время, а
+              здесь последние задачи за те же дни, что показывает «Активность».
+              Без этой строки родитель решит, что счётчики врут. */}
+          <Typography type="bodyS" textColor="text_tertiary">
+            {t('report_questions_period', { count: questions.length, days: questionDays })}
+          </Typography>
+
+          {questionsLoading && questions.length === 0 ? (
+            <View style={styles.sheetLoader}>
+              <Loader isLoading />
+            </View>
+          ) : questions.length === 0 ? (
+            <Typography type="bodyS" textColor="text_secondary">
+              {t('report_questions_empty', { days: questionDays })}
+            </Typography>
+          ) : (
+            <ScrollView
+              style={styles.sheetList}
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={styles.sheetListContent}
+            >
+              {questions.map((question: IReportQuestion, index: number) => {
+                const solved = question.status === 'correct';
+
+                return (
+                  <View key={`${question.expression}-${index}`} style={styles.question}>
+                    <Typography
+                      type="bodyBold"
+                      textStyles={styles.questionText}
+                      textColor={solved ? 'text_primary' : 'text_secondary'}
+                    >
+                      {question.expression} = {question.correctValue}
+                    </Typography>
+
+                    {/* Решённое с первой попытки — только галочка: родитель
+                        открыл этот список ради того, что пошло не так, и
+                        двадцать одинаковых подписей это прячут. */}
+                    {solved && question.firstTry ? (
+                      <Icon name={'CheckMark'} width={18} height={18} color={'text_positive'} />
+                    ) : solved ? (
+                      <Typography type="caption" textColor="text_tertiary">
+                        {t('report_question_attempts', { count: question.attempts })}
+                      </Typography>
+                    ) : (
+                      <Typography type="caption" textColor="text_negative">
+                        {question.value === null
+                          ? t('report_question_unsolved')
+                          : t('report_question_answered', { value: question.value })}
+                      </Typography>
+                    )}
+                  </View>
+                );
+              })}
+            </ScrollView>
+          )}
+        </View>
+      </Modal>
     </BackgroundWrapper>
   );
 };

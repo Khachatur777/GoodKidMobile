@@ -20,6 +20,8 @@ import {
   IChildMathResponseModel,
   IChildMathUpdateRequestModel,
   IChildMathPreviewResponseModel,
+  IReportQuestionsRequestModel,
+  IReportQuestionsResponseModel,
 } from 'models';
 import { baseApi } from './base';
 import { learningRoutes } from './routes';
@@ -114,6 +116,18 @@ export const learningApi = baseApi
         method: 'GET',
       }),
     }),
+    // Последние задачи одной категории. Отдельным запросом, а не вместе с
+    // отчётом: список нужен, только когда родитель открыл модал.
+    getReportQuestions: builder.query<
+      IReportQuestionsResponseModel,
+      IReportQuestionsRequestModel
+    >({
+      query: ({ childId, operation, limit }) => ({
+        url: learningRoutes().reportQuestions(childId),
+        method: 'GET',
+        params: { ...(operation ? { operation } : {}), ...(limit ? { limit } : {}) },
+      }),
+    }),
     getChildMath: builder.query<IChildMathResponseModel, IChildMathRequestModel>({
       query: ({ childId }) => ({
         url: learningRoutes().childMath(childId),
@@ -177,6 +191,7 @@ export const {
   useStartCardSessionMutation,
   useCompleteCategoryMutation,
   useGetLearningReportQuery,
+  useGetReportQuestionsQuery,
   useGetChildMathQuery,
   useUpdateChildMathMutation,
   useResetChildMathMutation,

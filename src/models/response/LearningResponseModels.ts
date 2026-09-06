@@ -211,6 +211,30 @@ export interface IReportCategory {
   lastPlayedAt: string;
 }
 
+// Одна задача из последних, что решал ребёнок. Промежуточных попыток нет —
+// сохраняется только последний ответ и их число.
+export interface IReportQuestion {
+  operation: MathOperation;
+  // Готовая строка примера: «7 × 5».
+  expression: string;
+  correctValue: number;
+  // Что ребёнок оставил в поле; null у тех, кого он не решил и не тронул.
+  value: number | null;
+  attempts: number;
+  // 'correct' — решил, 'skipped' — пробовал и ушёл, не решив.
+  status: 'correct' | 'skipped';
+  firstTry: boolean;
+  at: string;
+}
+
+export interface IReportQuestionsResponseModel extends IDefaultResponseModel {
+  data: {
+    questions: IReportQuestion[];
+    // За сколько дней собран список — столько же, сколько показывает «Активность».
+    days: number;
+  };
+}
+
 export interface ILearningReport {
   child: {
     id: string;

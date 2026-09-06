@@ -46,6 +46,14 @@ export interface ILearningReportRequestModel extends IBaseRequestModel {
   childId: string;
 }
 
+export interface IReportQuestionsRequestModel extends IBaseRequestModel {
+  childId: string;
+  // Без операции пришли бы задачи всех четырёх — модал открывается из карточки
+  // одной категории, поэтому она всегда есть.
+  operation?: string;
+  limit?: number;
+}
+
 export interface IChildMathRequestModel extends IBaseRequestModel {
   childId: string;
 }

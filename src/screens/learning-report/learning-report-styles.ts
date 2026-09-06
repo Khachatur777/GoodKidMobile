@@ -77,6 +77,34 @@ export const learningReportStyles = (color?: IGetColor) =>
       borderRadius: 999,
       backgroundColor: color?.('surface_secondary'),
     },
+    // Модал с последними задачами. Высота ограничена, а не по содержимому:
+    // двадцать строк иначе занимают весь экран и лист некуда тянуть.
+    sheet: {
+      gap: 6,
+      paddingBottom: 8,
+    },
+    sheetList: {
+      marginTop: 8,
+      maxHeight: 420,
+    },
+    sheetListContent: {
+      gap: 2,
+    },
+    sheetLoader: {
+      paddingVertical: 40,
+    },
+    question: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 10,
+      paddingVertical: 10,
+      paddingHorizontal: 14,
+      borderRadius: 14,
+      backgroundColor: color?.('surface_secondary'),
+    },
+    questionText: {
+      flex: 1,
+    },
     hint: {
       marginTop: 4,
       padding: 16,
