@@ -19,6 +19,10 @@ export interface IMathCategory {
   // Возраст задаёт порядок, а не доступ: категория не по возрасту остаётся
   // открытой, просто уходит ниже.
   suitsAge: boolean;
+  // Родитель закрыл эту операцию этому ребёнку. Плитка остаётся на экране с
+  // замком: исчезнувшая плитка выглядит как поломка, а замок — как решение,
+  // о котором можно спросить.
+  locked: boolean;
   starsEarned: number;
   sessionsPlayed: number;
 }
@@ -227,6 +231,8 @@ export interface ILearningReportResponseModel extends IDefaultResponseModel {
 
 export interface IChildMathRule {
   operation: MathOperation;
+  // Переключатель родителя: открыта ли операция этому ребёнку. Выключенные в
+  // консоли операции сюда вообще не приходят.
   enabled: boolean;
   minOperand: number;
   maxOperand: number;

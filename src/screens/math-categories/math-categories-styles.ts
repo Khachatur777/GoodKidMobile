@@ -51,6 +51,17 @@ export const mathCategoriesStyles = (color?: IGetColor) =>
       borderWidth: 2,
       borderColor: color?.('accent_active'),
     },
+    // Закрытая родителем плитка: рамки нет, но высота та же, что у открытых —
+    // она стоит в общем ряду, а не в списке пройденного.
+    tileLocked: {
+      borderColor: 'transparent',
+      backgroundColor: color?.('surface_secondary'),
+    },
+    tileTop: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
     // Пройденное — без рамки и приглушённое: это уже не выбор, а память о том,
     // что ребёнок умеет.
     tileMuted: {

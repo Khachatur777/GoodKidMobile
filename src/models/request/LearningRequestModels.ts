@@ -51,6 +51,9 @@ export interface IChildMathRequestModel extends IBaseRequestModel {
 }
 
 export interface IChildMathValues {
+  // Открыта ли операция ребёнку. Отправляется одна, без чисел: закрытие раздела
+  // не трогает диапазоны, и после включения ребёнок возвращается к своим числам.
+  enabled?: boolean;
   minOperand?: number;
   maxOperand?: number;
   maxResult?: number;

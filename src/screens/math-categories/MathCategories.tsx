@@ -1,7 +1,7 @@
-import { FC, useCallback, useContext, useEffect, useMemo } from 'react';
+import { FC, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { Pressable, ScrollView, Text, useWindowDimensions, View } from 'react-native';
 import { NavigationProp } from '@react-navigation/native';
-import { BackgroundWrapper, Icon, Loader, Typography } from 'molecules';
+import { AlertModal, BackgroundWrapper, Icon, Loader, Typography } from 'molecules';
 import { ThemeContext } from 'theme';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -30,6 +30,9 @@ interface Tile {
   name: string;
   // Бесконечные примеры вместо «сколько пройдено»: у генератора нет дна.
   endless: boolean;
+  // Родитель закрыл раздел. Плитка остаётся на месте с замком — ребёнок видит,
+  // что раздел существует, и знает, у кого спросить.
+  locked?: boolean;
   progress: string | null;
   ageFrom: number;
   ageTo: number;
@@ -52,6 +55,8 @@ const MathCategories: FC<MathCategoriesProps> = ({ navigation }) => {
 
   const isChild = useSelector(getIsChildState);
   const user = useSelector(getUserState);
+
+  const [lockedShown, setLockedShown] = useState(false);
 
   const { data, isLoading } = useGetMathCategoriesQuery({ showModal: true });
 
@@ -93,9 +98,15 @@ const MathCategories: FC<MathCategoriesProps> = ({ navigation }) => {
       name: t(`math_${item.operation}`),
       endless: true,
       progress: null,
+      locked: item.locked,
       ageFrom: item.ageFrom,
       ageTo: item.ageTo,
-      onPress: () => navigation.navigate('MathCard', { category: item }),
+      // Нажатие на закрытую плитку не молчит: без ответа ребёнок решит, что
+      // приложение сломалось, и будет жать снова.
+      onPress: () =>
+        item.locked
+          ? setLockedShown(true)
+          : navigation.navigate('MathCard', { category: item }),
     }));
 
     const answeredByKey = new Map(
@@ -135,30 +146,43 @@ const MathCategories: FC<MathCategoriesProps> = ({ navigation }) => {
     (tile: Tile, muted?: boolean) => (
       <Pressable
         key={tile.key}
-        style={[styles.tile, {width: tileWidth}, muted && styles.tileMuted]}
+        style={[
+          styles.tile,
+          {width: tileWidth},
+          muted && styles.tileMuted,
+          tile.locked && styles.tileLocked,
+        ]}
         onPress={tile.onPress}
       >
-        <Text
-          style={[
-            styles.sign,
-            muted && styles.signMuted,
-            tile.sign.length > 1 && styles.signSmall,
-          ]}
-        >
-          {tile.sign}
-        </Text>
+        <View style={styles.tileTop}>
+          <Text
+            style={[
+              styles.sign,
+              (muted || tile.locked) && styles.signMuted,
+              tile.sign.length > 1 && styles.signSmall,
+            ]}
+          >
+            {tile.sign}
+          </Text>
+
+          {tile.locked && (
+            <Icon name="LockIcon" width={16} height={16} color="icon_tertiary" />
+          )}
+        </View>
 
         <View style={styles.tileBottom}>
           <View style={styles.nameRow}>
             <Typography
               type="bodySBold"
-              textColor={muted ? 'text_secondary' : 'text_primary'}
+              textColor={muted || tile.locked ? 'text_secondary' : 'text_primary'}
               numberOfLines={2}
             >
               {tile.name}
             </Typography>
 
-            {tile.endless && !muted && <Text style={styles.infinity}>∞</Text>}
+            {tile.endless && !muted && !tile.locked && (
+              <Text style={styles.infinity}>∞</Text>
+            )}
           </View>
 
           {!!tile.progress && (
@@ -215,6 +239,15 @@ const MathCategories: FC<MathCategoriesProps> = ({ navigation }) => {
           )}
         </ScrollView>
       </View>
+
+      <AlertModal
+        isVisible={lockedShown}
+        setIsVisible={setLockedShown}
+        iconName="LockIcon"
+        title={t('math_locked_title')}
+        description={t('math_locked_description')}
+        buttons={[{ title: t('close'), onPress: () => setLockedShown(false) }]}
+      />
     </BackgroundWrapper>
   );
 };

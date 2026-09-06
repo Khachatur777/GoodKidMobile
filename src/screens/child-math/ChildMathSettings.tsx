@@ -1,7 +1,7 @@
 import { FC, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { RouteProp } from '@react-navigation/native';
-import { BackgroundWrapper, Button, Icon, Loader, TextField, Typography } from 'molecules';
+import { BackgroundWrapper, Button, Icon, Loader, TextField, Toggle, Typography } from 'molecules';
 import { ThemeContext } from 'theme';
 import { useTranslation } from 'react-i18next';
 import { IChildMathPreview, IChildMathRule, MathOperation } from 'models';
@@ -113,7 +113,11 @@ const ChildMathSettings: FC<ChildMathSettingsProps> = ({ route }) => {
   useEffect(() => {
     if (!rules) return;
     setDrafts(Object.fromEntries(rules.map(rule => [rule.operation, toDraft(rule)])));
-    rules.forEach(rule => loadPreview(rule.operation, toDraft(rule)));
+    // За примерами для закрытой операции идти незачем: карточка их не
+    // показывает, а запрос всё равно ушёл бы на каждый экран.
+    rules
+      .filter(rule => rule.enabled)
+      .forEach(rule => loadPreview(rule.operation, toDraft(rule)));
   }, [rules, loadPreview]);
 
   const askPreview = useCallback(
@@ -143,6 +147,13 @@ const ChildMathSettings: FC<ChildMathSettingsProps> = ({ route }) => {
       askPreview(operation, next);
       return { ...prev, [operation]: next };
     });
+  };
+
+  // Переключатель сохраняется сразу, без кнопки: это не число, которое ещё
+  // набирают, а решение из одного касания. Числа при этом не отправляются —
+  // ребёнок вернётся к своим диапазонам, когда родитель откроет операцию.
+  const toggle = (rule: IChildMathRule, enabled: boolean) => {
+    updateMath({ childId, operation: rule.operation, enabled, showLoader: false });
   };
 
   const save = async (rule: IChildMathRule) => {
@@ -193,97 +204,115 @@ const ChildMathSettings: FC<ChildMathSettingsProps> = ({ route }) => {
                 <View style={styles.headText}>
                   <Typography type="bodyBold">{t(`math_${rule.operation}`)}</Typography>
                   <Typography type="caption" textColor="text_tertiary">
-                    {rule.customised ? t('child_math_changed') : t('child_math_default')}
+                    {rule.enabled
+                      ? rule.customised
+                        ? t('child_math_changed')
+                        : t('child_math_default')
+                      : t('child_math_closed')}
                   </Typography>
                 </View>
+
+                <Toggle
+                  value={rule.enabled}
+                  onValueChange={value => toggle(rule, value)}
+                  disabled={saving}
+                />
               </View>
 
-              <View style={styles.fields}>
-                <View style={styles.field}>
-                  <TextField
-                    label={t('child_math_from')}
-                    keyboardType="number-pad"
-                    maxLength={String(LIMITS.minOperand).length}
-                    value={draft.minOperand}
-                    onChangeText={value => edit(rule.operation, 'minOperand', value)}
-                  />
+              {rule.enabled ? (
+                <>
+                <View style={styles.fields}>
+                  <View style={styles.field}>
+                    <TextField
+                      label={t('child_math_from')}
+                      keyboardType="number-pad"
+                      maxLength={String(LIMITS.minOperand).length}
+                      value={draft.minOperand}
+                      onChangeText={value => edit(rule.operation, 'minOperand', value)}
+                    />
+                  </View>
+                  <View style={styles.field}>
+                    <TextField
+                      label={t('child_math_to')}
+                      keyboardType="number-pad"
+                      maxLength={String(LIMITS.maxOperand).length}
+                      value={draft.maxOperand}
+                      onChangeText={value => edit(rule.operation, 'maxOperand', value)}
+                    />
+                  </View>
+                  <View style={styles.field}>
+                    <TextField
+                      label={t('child_math_max')}
+                      keyboardType="number-pad"
+                      maxLength={String(LIMITS.maxResult).length}
+                      value={draft.maxResult}
+                      onChangeText={value => edit(rule.operation, 'maxResult', value)}
+                    />
+                  </View>
                 </View>
-                <View style={styles.field}>
-                  <TextField
-                    label={t('child_math_to')}
-                    keyboardType="number-pad"
-                    maxLength={String(LIMITS.maxOperand).length}
-                    value={draft.maxOperand}
-                    onChangeText={value => edit(rule.operation, 'maxOperand', value)}
-                  />
-                </View>
-                <View style={styles.field}>
-                  <TextField
-                    label={t('child_math_max')}
-                    keyboardType="number-pad"
-                    maxLength={String(LIMITS.maxResult).length}
-                    value={draft.maxResult}
-                    onChangeText={value => edit(rule.operation, 'maxResult', value)}
-                  />
-                </View>
-              </View>
 
-              {/* Вычитание ограничено самим диапазоном: максимум на него не влияет */}
-              {rule.operation === 'subtraction' && (
-                <Typography type="caption" textColor="text_tertiary">
-                  {t('child_math_subtraction_note')}
-                </Typography>
-              )}
-
-              {blocked ? (
-                <View style={styles.problem}>
-                  <Icon name={'InfoIcon'} width={20} height={20} color={'accent_warning'} />
-                  <Typography type="bodyS" textColor="text_secondary" textStyles={styles.problemText}>
-                    {problem
-                      ? t(problem.key, problem.params)
-                      : t('child_math_too_few', {
-                          count: preview?.variants ?? 0,
-                          required: preview?.required ?? rule.requiredVariants,
-                        })}
+                {/* Вычитание ограничено самим диапазоном: максимум на него не влияет */}
+                {rule.operation === 'subtraction' && (
+                  <Typography type="caption" textColor="text_tertiary">
+                    {t('child_math_subtraction_note')}
                   </Typography>
-                </View>
+                )}
+
+                {blocked ? (
+                  <View style={styles.problem}>
+                    <Icon name={'InfoIcon'} width={20} height={20} color={'accent_warning'} />
+                    <Typography type="bodyS" textColor="text_secondary" textStyles={styles.problemText}>
+                      {problem
+                        ? t(problem.key, problem.params)
+                        : t('child_math_too_few', {
+                            count: preview?.variants ?? 0,
+                            required: preview?.required ?? rule.requiredVariants,
+                          })}
+                    </Typography>
+                  </View>
+                ) : (
+                  <View style={styles.examples}>
+                    {(preview?.examples?.length ? preview.examples : []).map((example, index) => (
+                      <View key={index} style={styles.example}>
+                        <Typography type="bodyBold">
+                          {example.expression} = {example.correctValue}
+                        </Typography>
+                      </View>
+                    ))}
+                  </View>
+                )}
+
+                {(changed || rule.customised) && (
+                  <View style={styles.actions}>
+                    {changed && (
+                      <View style={styles.action}>
+                        <Button
+                          title={t('child_math_save')}
+                          size="small"
+                          disabled={blocked || saving}
+                          onPress={() => save(rule)}
+                        />
+                      </View>
+                    )}
+                    {rule.customised && (
+                      <View style={styles.action}>
+                        <Button
+                          title={t('child_math_reset')}
+                          variant="secondary"
+                          size="small"
+                          onPress={() =>
+                            resetMath({ childId, operation: rule.operation, showLoader: true })
+                          }
+                        />
+                      </View>
+                    )}
+                  </View>
+                )}
+                </>
               ) : (
-                <View style={styles.examples}>
-                  {(preview?.examples?.length ? preview.examples : []).map((example, index) => (
-                    <View key={index} style={styles.example}>
-                      <Typography type="bodyBold">
-                        {example.expression} = {example.correctValue}
-                      </Typography>
-                    </View>
-                  ))}
-                </View>
-              )}
-
-              {(changed || rule.customised) && (
-                <View style={styles.actions}>
-                  {changed && (
-                    <View style={styles.action}>
-                      <Button
-                        title={t('child_math_save')}
-                        size="small"
-                        disabled={blocked || saving}
-                        onPress={() => save(rule)}
-                      />
-                    </View>
-                  )}
-                  {rule.customised && (
-                    <View style={styles.action}>
-                      <Button
-                        title={t('child_math_reset')}
-                        variant="secondary"
-                        size="small"
-                        onPress={() =>
-                          resetMath({ childId, operation: rule.operation, showLoader: true })
-                        }
-                      />
-                    </View>
-                  )}
-                </View>
+                <Typography type="bodyS" textColor="text_tertiary">
+                  {t('child_math_closed_note')}
+                </Typography>
               )}
             </View>
           );
