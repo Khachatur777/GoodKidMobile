@@ -27,7 +27,7 @@ import { baseApi } from './base';
 import { learningRoutes } from './routes';
 
 export const learningApi = baseApi
-  .enhanceEndpoints({ addTagTypes: ['LearningProgress', 'ChildMath'] })
+  .enhanceEndpoints({ addTagTypes: ['LearningProgress', 'ChildMath', 'VideoLock'] })
   .injectEndpoints({
   endpoints: builder => ({
     getMathCategories: builder.query<
@@ -63,7 +63,10 @@ export const learningApi = baseApi
         method: 'POST',
         body: { answers },
       }),
-      invalidatesTags: ['LearningProgress'],
+      // Баланс звёзд после занятия другой, а на детской «Главной» он приходит
+      // из состояния замка: без этого ребёнок возвращался с урока и видел
+      // прежнее число — заработал, а на экране ничего не поменялось.
+      invalidatesTags: ['LearningProgress', 'VideoLock'],
     }),
     getCardCategories: builder.query<
       ICardCategoriesResponseModel,
@@ -94,7 +97,7 @@ export const learningApi = baseApi
         method: 'POST',
         body: { categoryId, cardIds },
       }),
-      invalidatesTags: ['LearningProgress'],
+      invalidatesTags: ['LearningProgress', 'VideoLock'],
     }),
     unlockAppearance: builder.mutation<
       IUnlockResponseModel,
@@ -105,7 +108,8 @@ export const learningApi = baseApi
         method: 'POST',
         body: { type, id },
       }),
-      invalidatesTags: ['LearningProgress'],
+      // Покупка аватара тратит звёзды — то же самое с другой стороны.
+      invalidatesTags: ['LearningProgress', 'VideoLock'],
     }),
     getLearningReport: builder.query<
       ILearningReportResponseModel,
