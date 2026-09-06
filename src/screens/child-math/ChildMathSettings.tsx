@@ -272,7 +272,11 @@ const ChildMathSettings: FC<ChildMathSettingsProps> = ({ route }) => {
                   </View>
                 ) : (
                   <View style={styles.examples}>
-                    {(preview?.examples?.length ? preview.examples : []).map((example, index) => (
+                    {/* Один пример, а не три: родителю нужно увидеть, как
+                        выглядит пример при этих числах, а не решать их. Обрезаем
+                        и здесь — сервер отдаёт один, но старая сборка стенда
+                        присылает три, и карточка от них разъезжалась. */}
+                    {(preview?.examples || []).slice(0, 1).map((example, index) => (
                       <View key={index} style={styles.example}>
                         <Typography type="bodyBold">
                           {example.expression} = {example.correctValue}
