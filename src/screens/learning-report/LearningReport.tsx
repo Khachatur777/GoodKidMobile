@@ -217,13 +217,18 @@ const LearningReport: FC<LearningReportProps> = ({ route }) => {
             >
               {questions.map((question: IReportQuestion, index: number) => {
                 const solved = question.status === 'correct';
+                // Пропущенный — не ошибка: ребёнок его не решал. Поэтому
+                // приглушённый, а не красный, но в списке стоит на своём месте.
+                const untouched = question.status === 'unanswered';
 
                 return (
                   <View key={`${question.expression}-${index}`} style={styles.question}>
                     <Typography
                       type="bodyBold"
                       textStyles={styles.questionText}
-                      textColor={solved ? 'text_primary' : 'text_secondary'}
+                      textColor={
+                        solved ? 'text_primary' : untouched ? 'text_tertiary' : 'text_secondary'
+                      }
                     >
                       {question.expression} = {question.correctValue}
                     </Typography>
@@ -236,6 +241,10 @@ const LearningReport: FC<LearningReportProps> = ({ route }) => {
                     ) : solved ? (
                       <Typography type="caption" textColor="text_tertiary">
                         {t('report_question_attempts', { count: question.attempts })}
+                      </Typography>
+                    ) : untouched ? (
+                      <Typography type="caption" textColor="text_tertiary">
+                        {t('report_question_skipped')}
                       </Typography>
                     ) : (
                       <Typography type="caption" textColor="text_negative">

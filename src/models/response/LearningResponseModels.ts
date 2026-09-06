@@ -221,8 +221,9 @@ export interface IReportQuestion {
   // Что ребёнок оставил в поле; null у тех, кого он не решил и не тронул.
   value: number | null;
   attempts: number;
-  // 'correct' — решил, 'skipped' — пробовал и ушёл, не решив.
-  status: 'correct' | 'skipped';
+  // 'correct' — решил, 'skipped' — пробовал и не вышло, 'unanswered' —
+  // пропустил, не отвечая.
+  status: 'correct' | 'skipped' | 'unanswered';
   firstTry: boolean;
   at: string;
 }
