@@ -23,6 +23,11 @@ import { childVideoLockStyles } from './child-video-lock-styles';
 const MIN_COST = 1;
 const MAX_COST = 100;
 
+// Час — самое короткое, за что имеет смысл отдавать звёзды; двое суток — самое
+// длинное, что ещё читается как «на время», а не «открыто».
+const MIN_HOURS = 1;
+const MAX_HOURS = 48;
+
 export interface ChildVideoLockProps {
   navigation: NavigationProp<any>;
   route: RouteProp<{ params: { childId?: string } }, 'params'>;
@@ -42,6 +47,7 @@ const ChildVideoLock: FC<ChildVideoLockProps> = ({ route }) => {
 
   const [enabled, setEnabled] = useState(false);
   const [cost, setCost] = useState(10);
+  const [hours, setHours] = useState(24);
   const [dirty, setDirty] = useState(false);
 
   useEffect(() => {
@@ -66,6 +72,7 @@ const ChildVideoLock: FC<ChildVideoLockProps> = ({ route }) => {
 
     setEnabled(state.enabled);
     setCost(state.unlockCost);
+    setHours(state.unlockHours);
   }, [state, dirty]);
 
   // Переключение ребёнка с несохранёнными правками спрашивает — ровно как на
@@ -84,6 +91,7 @@ const ChildVideoLock: FC<ChildVideoLockProps> = ({ route }) => {
       id: childId,
       enabled,
       unlockCost: cost,
+      unlockHours: hours,
       showLoader: true,
     });
 
@@ -174,6 +182,56 @@ const ChildVideoLock: FC<ChildVideoLockProps> = ({ route }) => {
           )}
 
           {enabled && (
+            <View style={styles.section}>
+              <View style={styles.label}>
+                <Typography type="captionBold" textColor="text_secondary">
+                  {t('video_lock_hours').toUpperCase()}
+                </Typography>
+              </View>
+
+              <View style={styles.stepper}>
+                <Pressable
+                  style={styles.stepperButton}
+                  disabled={hours <= MIN_HOURS}
+                  onPress={() => {
+                    setHours(prev => Math.max(MIN_HOURS, prev - 1));
+                    setDirty(true);
+                  }}
+                >
+                  <Typography
+                    type="title3"
+                    textColor={hours <= MIN_HOURS ? 'text_tertiary' : 'text_primary'}
+                  >
+                    −
+                  </Typography>
+                </Pressable>
+
+                <View style={styles.stepperValue}>
+                  {/* Без иконки: у цены она означает звёзды, а часам подходящего
+                      глифа в наборе нет, и любой другой читался бы как ошибка. */}
+                  <Typography type="title3">{t('video_lock_hours_value', { hours })}</Typography>
+                </View>
+
+                <Pressable
+                  style={styles.stepperButton}
+                  disabled={hours >= MAX_HOURS}
+                  onPress={() => {
+                    setHours(prev => Math.min(MAX_HOURS, prev + 1));
+                    setDirty(true);
+                  }}
+                >
+                  <Typography
+                    type="title3"
+                    textColor={hours >= MAX_HOURS ? 'text_tertiary' : 'text_primary'}
+                  >
+                    +
+                  </Typography>
+                </Pressable>
+              </View>
+            </View>
+          )}
+
+          {enabled && (
             <View style={styles.statusRow}>
               <Icon
                 name="LockIcon"
@@ -206,7 +264,7 @@ const ChildVideoLock: FC<ChildVideoLockProps> = ({ route }) => {
             <Icon name="InfoIcon" width={20} height={20} color="icon_secondary" />
             <View style={styles.noteText}>
               <Typography type="bodyS" textColor="text_secondary">
-                {t('video_lock_hint', { hours: state?.unlockHours ?? 24 })}
+                {t('video_lock_hint', { hours })}
               </Typography>
             </View>
           </View>

@@ -21,6 +21,9 @@ export interface IChild {
   videoLock?: {
     enabled: boolean;
     unlockCost: number;
+    // На сколько часов открывается видео после оплаты. Уже с учётом умолчания
+    // консоли — родитель мог этого не менять.
+    unlockHours: number;
     unlockedUntil: string | null;
     // Закрыто прямо сейчас: включено И оплаченное окно не идёт.
     locked: boolean;

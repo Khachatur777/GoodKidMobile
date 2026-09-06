@@ -82,7 +82,8 @@ const Child: FC<ChildProps> = ({ navigation, route }) => {
   };
 
   const videoSubtitle = () => {
-    if (lock?.locked) return t('child_video_closed', { cost: lock.unlockCost });
+    if (lock?.locked)
+      return t('child_video_closed', { cost: lock.unlockCost, hours: lock.unlockHours });
 
     if (lock?.unlockedUntil) {
       const left = timeLeft(lock.unlockedUntil);
