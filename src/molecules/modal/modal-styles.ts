@@ -45,6 +45,16 @@ export const modalStyles = ({
       right: 0,
       zIndex: 200,
     },
+    // Полоса, за которую модал со списком тянут вниз. Ровно под шапкой: ниже
+    // начинается список, и там касание должно доставаться ему.
+    dragStrip: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      height: 44,
+      zIndex: 150,
+    },
     grabber: {
       position: 'absolute',
       alignSelf: 'center',

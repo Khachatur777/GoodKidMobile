@@ -251,6 +251,7 @@ const LearningReport: FC<LearningReportProps> = ({ route }) => {
         setIsVisible={() => setOperation(null)}
         type="bottom-sheet"
         showCloseButton
+        scrollable
       >
         <View style={styles.sheet}>
           <View style={styles.sheetHead}>

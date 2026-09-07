@@ -54,9 +54,27 @@ export interface ModalProps extends ReactNativeModalProps {
   containerStyles?: StyleProp<ViewStyle>;
   activateAfterLongPress?: number;
   keyboardAvoidingView?: boolean;
+  // Внутри модала свой список. Тогда жест «смахнуть, чтобы закрыть» живёт
+  // только на верхней полосе: на Android он иначе забирает касание у списка, и
+  // тот перестаёт скроллиться вовсе.
+  scrollable?: boolean;
   disableOnBackgroundPress?: boolean;
   onCloseModal?: () => void;
 }
+
+// Жест либо накрывает весь модал, либо не участвует вовсе — тогда его вешает
+// на себя полоска сверху. Обёртка нужна, чтобы не городить два почти одинаковых
+// дерева ради одного условия.
+const DragArea: FC<{
+  gesture: ReturnType<typeof Gesture.Pan>;
+  enabled: boolean;
+  children: ReactNode;
+}> = ({ gesture, enabled, children }) =>
+  enabled ? (
+    <GestureDetector gesture={gesture}>{children as ReactNode}</GestureDetector>
+  ) : (
+    <>{children}</>
+  );
 
 const Modal: FC<ModalProps> = ({
                                  isVisible,
@@ -75,6 +93,7 @@ const Modal: FC<ModalProps> = ({
                                  containerStyles = {},
                                  activateAfterLongPress = 0,
                                  keyboardAvoidingView = false,
+                                 scrollable = false,
                                  onCloseModal,
                                  ...props
                                }) => {
@@ -110,7 +129,7 @@ const Modal: FC<ModalProps> = ({
       }
     });
 
-  if (Platform.OS === 'android') {
+  if (Platform.OS === 'android' && !scrollable) {
     panGesture.activateAfterLongPress(activateAfterLongPress);
   }
 
@@ -156,7 +175,7 @@ const Modal: FC<ModalProps> = ({
         exiting={FadeOut}
         style={[modalStyles({ color, ...props }).animatedBackground]}>
         <GestureHandlerRootView style={modalStyles(props).gestureContainer}>
-          <GestureDetector gesture={panGesture}>
+          <DragArea gesture={panGesture} enabled={!scrollable}>
             <ContentWrapper
               {...(keyboardAvoidingView
                 ? {
@@ -199,11 +218,17 @@ const Modal: FC<ModalProps> = ({
                     <View style={modalStyles({ color }).grabber} />
                   ) : null}
 
+                  {scrollable && (
+                    <GestureDetector gesture={panGesture}>
+                      <View style={modalStyles(props).dragStrip} />
+                    </GestureDetector>
+                  )}
+
                   {children}
                 </CardWrapper>
               </Animated.View>
             </ContentWrapper>
-          </GestureDetector>
+          </DragArea>
         </GestureHandlerRootView>
       </Animated.View>
 
