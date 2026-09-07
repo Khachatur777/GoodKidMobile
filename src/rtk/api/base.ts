@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import {baseUrl, baseUrlDev, getItem} from 'configs';
+import {baseUrl, baseUrlDev, getItem, useDevApi} from 'configs';
 import { ReduxStore } from 'rtk/types';
 import { baseQueryWithReAuth } from '../config';
 import { Platform } from 'react-native';
@@ -14,9 +14,11 @@ import {
 import { getTokenDataState, isLoggedInSelector } from 'rtk';
 
 const baseQuery = fetchBaseQuery({
-  // Debug builds talk to the dev stand (apidev), release builds to production.
-  // Roles, children and history live only on the dev backend for now.
-  baseUrl: __DEV__ ? baseUrlDev : baseUrl,
+  // Production unless the branch says otherwise: main carries no dev flag, so a
+  // build from it goes to the live server whatever configuration it was built in.
+  // A working branch sets RN_APP_USE_DEV_API=true and its debug builds go to the
+  // stand instead.
+  baseUrl: useDevApi ? baseUrlDev : baseUrl,
   prepareHeaders: async (headers, { getState }) => {
     const state = getState() as ReduxStore;
     const tokenData = await getItem('tokenData');

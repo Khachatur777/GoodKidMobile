@@ -1,5 +1,11 @@
 import Config from 'react-native-config';
 
+// Ветка решает, куда ходит сборка, а не её конфигурация. На main этой строки в
+// .env нет — значит и отладочная сборка идёт на прод, как и релизная. В рабочей
+// ветке ставят RN_APP_USE_DEV_API=true, и тогда debug уходит на стенд; релиз всё
+// равно останется на проде, потому что дев без __DEV__ не включается.
+export const useDevApi = __DEV__ && String(Config.RN_APP_USE_DEV_API) === 'true';
+
 export const baseUrl = Config.RN_APP_BASE_URL;
 export const baseFileUrl = Config.RN_APP_BASE_FILE_URL;
 export const baseUrlDev = Config.RN_APP_BASE_URL_DEV;
@@ -11,7 +17,7 @@ const configuredFileUrl = Config.RN_APP_FILE_URL;
 // файлами — на прод: совпадало, только пока файлы были одинаковыми на обеих
 // машинах. Стоило переозвучить карточки — и звук пропал, потому что новых
 // дорожек на проде нет. Теперь окружение выбирается один раз.
-export const fileUrl = __DEV__
+export const fileUrl = useDevApi
   ? (baseUrlDev || '').replace(/\/api\/?$/, '') || configuredFileUrl
   : configuredFileUrl;
 
