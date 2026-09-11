@@ -1,3 +1,4 @@
+import ChildLanguage from 'screens/language/ChildLanguage';
 import {
   AddChild,
   Child,
@@ -180,4 +181,5 @@ export const childrenScreens: IScreens[] = [
       showIconInTabScreen: false,
     }),
   },
+  {name: 'ChildLanguageScreen', component: ChildLanguage, options: () => ({title: i18n.t('section_language'), type: 'title', showBackIcon: true, showIconInTabScreen: false})},
 ];

@@ -1,3 +1,4 @@
+import LanguageSession from 'screens/language/LanguageSession';
 import {IScreens} from 'navigation';
 import { CardCategories, CardSession, MathCard, MathCategories, MathResult, Sections } from 'screens';
 import i18n from 'i18next';
@@ -60,4 +61,5 @@ export const learnScreens: IScreens[] = [
       gestureEnabled: false,
     }),
   },
+  {name: 'LanguageSession', component: LanguageSession, options: () => ({headerShown: false, gestureEnabled: false, tabBarStyle: {display: 'none'}})},
 ];

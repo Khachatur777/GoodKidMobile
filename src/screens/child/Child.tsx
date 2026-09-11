@@ -252,6 +252,13 @@ const Child: FC<ChildProps> = ({ navigation, route }) => {
             })}
 
             {row({
+              icon: 'MessageChatSquareIcon',
+              title: t('section_language'),
+              value: '',
+              onPress: () => navigation.navigate('ChildLanguageScreen', {childId}),
+            })}
+
+            {row({
               glyph: '+−',
               title: t('children_math'),
               value: learning.mathRate === null ? '—' : `${learning.mathRate}%`,

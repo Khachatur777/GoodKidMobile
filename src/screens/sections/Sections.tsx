@@ -22,7 +22,7 @@ interface SectionTile {
 const SECTIONS: SectionTile[] = [
   { key: 'world', icon: 'GlobeIcon', route: 'CardCategories' },
   { key: 'math', icon: 'DotsGridIcon', route: 'MathCategories' },
-  { key: 'language', icon: 'MessageChatSquareIcon' },
+  { key: 'language', icon: 'MessageChatSquareIcon', route: 'LanguageSession' },
   { key: 'logic', icon: 'PuzzleIcon' },
 ];
 
