@@ -48,6 +48,7 @@ export default function LanguageSession({
     [error, setError] = useState(''),
     [wrong, setWrong] = useState(false);
   const [imageFailed, setImageFailed] = useState(false);
+  const [empty, setEmpty] = useState(false);
   const inFlight = useRef(false);
   const failedAction = useRef<'load' | 'answer' | 'finish'>('load');
   // Keep the exact request when a response is lost; replay cannot count a second attempt.
@@ -64,12 +65,15 @@ export default function LanguageSession({
     inFlight.current = true;
     setBusy(true);
     setError('');
+    setEmpty(false);
+    failedAction.current = 'load';
     try {
       const r = await start().unwrap();
       setSession(r.data);
       const next = r.data.questions.findIndex(q => q.status === 'unanswered');
       setIndex(next < 0 ? r.data.questions.length - 1 : next);
     } catch (e: any) {
+      setEmpty(e?.data?.message === 'language.empty');
       setError(
         e?.data?.message === 'language.empty'
           ? copy.empty
@@ -149,7 +153,7 @@ export default function LanguageSession({
         ])
       : navigation.goBack();
   return (
-    <BackgroundWrapper>
+    <BackgroundWrapper includesSafeArea>
       <View style={styles.screen}>
         <View style={styles.top}>
           <Pressable
@@ -161,18 +165,22 @@ export default function LanguageSession({
           >
             <Text style={styles.title}>×</Text>
           </Pressable>
-          <View style={styles.track}>
-            <View
-              style={[
-                styles.progress,
-                {
-                  width: `${
-                    session ? ((index + 1) / session.questions.length) * 100 : 0
-                  }%`,
-                },
-              ]}
-            />
-          </View>
+          {session && (
+            <View style={styles.track}>
+              <View
+                style={[
+                  styles.progress,
+                  {
+                    width: `${
+                      session
+                        ? ((index + 1) / session.questions.length) * 100
+                        : 0
+                    }%`,
+                  },
+                ]}
+              />
+            </View>
+          )}
           <Text style={styles.muted}>
             {session ? `${index + 1}/${session.questions.length}` : ''}
           </Text>
@@ -181,10 +189,24 @@ export default function LanguageSession({
         <ScrollView contentContainerStyle={styles.content}>
           {error ? (
             <View style={styles.card}>
-              <Text accessibilityRole="alert" style={styles.error}>
+              <Text style={styles.title}>{copy.title}</Text>
+              <Text
+                accessibilityRole={empty ? undefined : 'alert'}
+                style={styles.error}
+              >
                 {error}
               </Text>
+              {empty && (
+                <Pressable
+                  accessibilityRole="button"
+                  style={styles.button}
+                  onPress={() => navigation.goBack()}
+                >
+                  <Text style={styles.buttonText}>{copy.back}</Text>
+                </Pressable>
+              )}
               <Pressable
+                accessibilityRole="button"
                 style={styles.secondary}
                 disabled={busy}
                 onPress={() =>

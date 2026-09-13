@@ -78,7 +78,11 @@ export const rtkQueryErrorLogger: Middleware =
 
 
       // Error Response Log Description
-      if (__DEV__) {
+      const emptyLanguageLesson =
+        action?.meta?.arg?.endpointName === 'startWords' &&
+        action?.payload?.status === 409 &&
+        action?.payload?.data?.message === 'language.empty';
+      if (__DEV__ && !emptyLanguageLesson) {
         console.error(
           'log-error//',
           `${action?.meta?.baseQueryMeta?.request?.method || ''} ${
