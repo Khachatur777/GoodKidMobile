@@ -30,7 +30,7 @@ const copy = {
     save: 'Save',
     saved: 'Saved',
     invalid:
-      'Choose a range from 2 to 12 letters. “From” must not exceed “To”.',
+      'Choose a range from 2 to 20 letters. “From” must not exceed “To”.',
     available: 'Words available',
     history: 'Words in the last 3 days',
     noHistory: 'No words attempted in the last 3 days.',
@@ -74,7 +74,7 @@ const copy = {
     save: 'Сохранить',
     saved: 'Сохранено',
     invalid:
-      'Выберите от 2 до 12 букв. Значение «От» не должно превышать «До».',
+      'Выберите от 2 до 20 букв. Значение «От» не должно превышать «До».',
     available: 'Доступно слов',
     history: 'Слова за последние 3 дня',
     noHistory: 'За последние 3 дня ребёнок ещё не собирал слова.',
@@ -117,7 +117,7 @@ const copy = {
     to: 'Մինչև',
     save: 'Պահպանել',
     saved: 'Պահպանված է',
-    invalid: 'Ընտրեք 2-ից 12 տառ։ Սկիզբը չպետք է գերազանցի ավարտը։',
+    invalid: 'Ընտրեք 2-ից 20 տառ։ Սկիզբը չպետք է գերազանցի ավարտը։',
     available: 'Հասանելի բառեր',
     history: 'Վերջին 3 օրվա բառերը',
     noHistory: 'Վերջին 3 օրում երեխան դեռ բառեր չի հավաքել։',

@@ -73,7 +73,7 @@ export default function ChildLanguage({
   const submit = async () => {
     const a = Number(min),
       b = Number(max);
-    if (!/^\d+$/.test(min) || !/^\d+$/.test(max) || a < 2 || b > 12 || a > b) {
+    if (!/^\d+$/.test(min) || !/^\d+$/.test(max) || a < 2 || b > 20 || a > b) {
       setMessage(copy.invalid);
       return;
     }
