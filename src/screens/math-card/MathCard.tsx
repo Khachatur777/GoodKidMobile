@@ -11,14 +11,17 @@ import { useAnswerSounds } from 'hooks';
 
 const KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '', '0', 'backspace'];
 
-// Базовые кегли формулы — те же, что в стилях; здесь они нужны, чтобы посчитать,
-// во сколько раз строку надо ужать.
+// Base font sizes of the formula, the same as in the styles; they are needed
+// here to work out how much the line has to shrink.
 const FORMULA = { operand: 72, operator: 58, equals: 54 };
 
 type Feedback = 'idle' | 'correct' | 'wrong';
 
 export interface MathCardProps {
-  navigation: NavigationProp<any>;
+  // replace comes from the stack navigator; the base type does not know it.
+  navigation: NavigationProp<any> & {
+    replace: (name: string, params?: object) => void;
+  };
   route: RouteProp<{ params: { category: IMathCategory } }, 'params'>;
 }
 
@@ -39,8 +42,9 @@ const MathCard: FC<MathCardProps> = ({ navigation, route }) => {
   const [value, setValue] = useState('');
   const [feedback, setFeedback] = useState<Feedback>('idle');
 
-  // Ответы копятся здесь, а не на сервере: сессия уходит одним запросом в
-  // конце, поэтому обрыв связи посреди неё не стоит ребёнку заработанного.
+  // Answers pile up here, not on the server: the session is sent in one request
+  // at the end, so a dropped connection midway does not cost the child what
+  // they earned.
   const answers = useRef<Map<string, ISubmittedAnswer>>(new Map());
   const shake = useRef(new Animated.Value(0)).current;
 
@@ -53,17 +57,18 @@ const MathCard: FC<MathCardProps> = ({ navigation, route }) => {
         if (cancelled) return;
         setSessionId(response.data.sessionId);
         setQuestions(response.data.questions);
-        // Нижняя граница на стороне приложения: сколько бы цифр ни назвал
-        // сервер, их должно хватать на самый большой ответ этой категории.
-        // Иначе ребёнок получает «898 + 417» и три места под ответ — правильный
-        // ответ не набирается вообще, и никакие попытки не помогают.
+        // A lower bound on the app's side: however many digits the server
+        // names, they must fit the largest answer in this category. Otherwise
+        // the child gets "898 + 417" with three places for the answer, the
+        // right answer cannot be typed at all, and no attempt helps.
         const needed = String(Math.max(1, category.maxResult || 0)).length;
         setMaxDigits(Math.max(response.data.answerMaxDigits || 1, needed));
       })
       .catch(error => {
         if (cancelled) return;
-        // Сессии принадлежат ребёнку: звёзды и прогресс — его. Родителю,
-        // открывшему раздел, надо это сказать, а не оставить пустой экран.
+        // Sessions belong to the child: the stars and progress are theirs. A
+        // parent who opens the section should be told so, not left with an
+        // empty screen.
         const message =
           error?.data?.message === 'child_only'
             ? t('learning_child_only')
@@ -82,16 +87,16 @@ const MathCard: FC<MathCardProps> = ({ navigation, route }) => {
   const question = questions[index];
   const [left, operator, right] = (question?.expression || '').split(' ');
 
-  // «120 + 345 = 465» должно читаться так же, как «2 + 3 = 5», — в одну строку.
-  // Размер считается по числу знаков, а не подбирается на глаз, и множитель
-  // один на все части, поэтому цифры и знак сохраняют свои пропорции.
+  // "120 + 345 = 465" must read like "2 + 3 = 5", on one line. The size is
+  // computed from the number of characters rather than picked by eye, and one
+  // factor applies to every part, so digits and signs keep their proportions.
   const answerText = feedback === 'correct' ? String(question?.correctValue ?? '') : '?';
   const formulaScale = useMemo(() => {
     const digits = `${left || ''}${right || ''}${answerText}`.length;
     if (!digits) return 1;
 
-    // 0.62 — ширина цифры этого начертания относительно кегля; 48 — четыре
-    // просвета между пятью частями, 40 — поля экрана, 32 — поля карточки.
+    // 0.62 is this typeface's digit width relative to its size; 48 is the four
+    // gaps between five parts, 40 the screen margins, 32 the card padding.
     const needed = 0.62 * (FORMULA.operand * digits + FORMULA.operator + FORMULA.equals);
     const budget = screenWidth - 40 - 48 - 32;
 
@@ -133,7 +138,7 @@ const MathCard: FC<MathCardProps> = ({ navigation, route }) => {
       return;
     }
 
-    // Просмотр родителя: сессии нет, засчитывать и награждать нечего.
+    // A parent's preview: there is no session, nothing to count or reward.
     if (!sessionId) {
       navigation.goBack();
       return;
@@ -146,9 +151,13 @@ const MathCard: FC<MathCardProps> = ({ navigation, route }) => {
         showLoader: true,
       }).unwrap();
 
-      navigation.navigate('MathResult', { result: result.data, category });
+      // The result takes the session's place, as it does after cards: left
+      // underneath, the finished session was where "again" and every way back
+      // from the result ended up.
+      navigation.replace('MathResult', { result: result.data, category });
     } catch {
-      // Итог не ушёл — сессию не теряем: экран остаётся, кнопка сработает снова.
+      // The result did not go through, so the session is kept: the screen stays
+      // and the button will work again.
     }
   }, [index, questions.length, sessionId, finishSession, navigation, category]);
 
@@ -160,11 +169,12 @@ const MathCard: FC<MathCardProps> = ({ navigation, route }) => {
 
     if (answered === question.correctValue) {
       setFeedback('correct');
-      // Звук идёт вместе с цветом, а не вместо него: ребёнок, который занимается
-      // с выключенным звуком, и ребёнок, который не смотрит на экран, узнают
-      // об ответе одинаково.
+      // Sound comes with the colour, not instead of it: a child playing with the
+      // sound off and a child not looking at the screen learn about the answer
+      // the same way.
       playCorrect();
-      // Короткая пауза, чтобы ребёнок увидел, что ответ принят, и переход сам.
+      // A short pause so the child sees the answer was accepted, then it moves
+      // on by itself.
       setTimeout(goNext, 700);
       return;
     }
@@ -173,7 +183,7 @@ const MathCard: FC<MathCardProps> = ({ navigation, route }) => {
     playWrong();
     setValue('');
 
-    // Пример остаётся тем же: «попробовать ещё раз» только тогда и имеет смысл.
+    // The problem stays the same: only then does "try again" make sense.
     Animated.sequence([
       Animated.timing(shake, { toValue: 1, duration: 60, useNativeDriver: true }),
       Animated.timing(shake, { toValue: -1, duration: 60, useNativeDriver: true }),
@@ -182,8 +192,8 @@ const MathCard: FC<MathCardProps> = ({ navigation, route }) => {
   }, [question, value, recordAttempt, goNext, shake, playCorrect, playWrong]);
 
   const onSkip = useCallback(() => {
-    // Уйти можно всегда, даже не решив. Пропуск отличается от ошибки: он
-    // говорит родителю «слишком сложно», а не «не знает».
+    // Leaving is always possible, even without solving. A skip differs from a
+    // mistake: it tells the parent "too hard", not "does not know".
     if (question && !answers.current.has(question.questionId)) {
       answers.current.set(question.questionId, {
         questionId: question.questionId,

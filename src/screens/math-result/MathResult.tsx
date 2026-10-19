@@ -10,8 +10,9 @@ import { mathResultStyles } from './math-result-styles.ts';
 const MAX_STARS = 5;
 
 export interface MathResultProps {
-  // replace даёт стек, базовый тип о нём не знает: экран результата и конец
-  // сессии заменяют текущий экран, а не кладут поверх.
+  // replace comes from the stack, the base type does not know about it: the
+  // result screen and the end of a session replace the current screen rather
+  // than pushing on top of it.
   navigation: NavigationProp<any> & {
     replace: (name: string, params?: object) => void;
   };
@@ -28,10 +29,10 @@ const MathResult: FC<MathResultProps> = ({ navigation, route }) => {
 
   const { result, category } = route.params;
 
-  // Ни одного «ты проиграл». Даже нулевой результат — приглашение попробовать
-  // ещё раз: у ребёнка 4–6 лет проигрыш это причина закрыть приложение.
-  // Просмотренную категорию не хвалят за «первую попытку»: там ничего не
-  // отвечали, и цифра означала бы не то, что написано рядом.
+  // Never a "you lost". Even a zero result is an invitation to try again: for a
+  // child of 4–6 losing is a reason to close the app.
+  // A viewed category is not praised for "first try": nothing was answered
+  // there, and the number would mean something other than its label.
   const message = result.viewOnly
     ? result.stars > 0
       ? t('cards_done_reward', { count: result.totalQuestions })
@@ -67,16 +68,16 @@ const MathResult: FC<MathResultProps> = ({ navigation, route }) => {
               name={'StarIcon'}
               width={38}
               height={38}
-              // Пустые звёзды остаются на месте: ребёнок видит, сколько ещё
-              // можно получить, а не только то, что не получил.
+              // Empty stars stay in place: the child sees how many more can be
+              // earned, not only what was missed.
               color={starIndex < result.stars ? 'accent_active' : 'controls_inactive'}
             />
           ))}
         </View>
 
-        {/* Со своим потолком: рядом стоит «10 из 10» решённых, и голая пятёрка
-            читалась как продолжение того же счёта. У каждого числа свой
-            знаменатель — спутать нечего. */}
+        {/* With its own ceiling: "10 of 10" solved sits next to it, and a bare
+            five read as part of the same count. Each number has its own
+            denominator, so there is nothing to mix up. */}
         <Typography type="titleL" textStyles={styles.starsCount}>
           {t('math_result_stars_of', { count: result.stars, max: MAX_STARS })}
         </Typography>
@@ -112,8 +113,8 @@ const MathResult: FC<MathResultProps> = ({ navigation, route }) => {
         </View>
 
         <View style={styles.buttons}>
-          {/* Пройденная просмотровая категория повторно звёзд не даёт, поэтому
-              и звать «ещё раз» первой кнопкой незачем. */}
+          {/* A finished view-only category gives no stars a second time, so
+              there is no reason to make "again" the primary button. */}
           <Pressable
             style={result.viewOnly ? styles.secondary : styles.primary}
             onPress={() =>
@@ -127,7 +128,12 @@ const MathResult: FC<MathResultProps> = ({ navigation, route }) => {
             </Typography>
           </Pressable>
 
-          <Pressable style={styles.secondary} onPress={() => navigation.navigate('MathCategories')}>
+          {/* The result replaces the session, so the screen underneath is the
+              list the child came from: maths categories after a maths session,
+              card categories after cards. Going back returns to it; navigating
+              by name pushed a second maths list on top of this result, and its
+              back button landed here again. */}
+          <Pressable style={styles.secondary} onPress={() => navigation.goBack()}>
             <Typography type="titleL" textStyles={styles.buttonText}>
               {t('math_result_to_categories')}
             </Typography>
