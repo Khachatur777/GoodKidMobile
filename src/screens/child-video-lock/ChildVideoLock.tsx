@@ -8,7 +8,7 @@ import {
   Typography,
 } from 'molecules';
 import { ChildSelector, timeLeft } from 'organisms';
-import { FC, useContext, useEffect, useMemo, useState } from 'react';
+import { FC, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, View } from 'react-native';
 import { useSelector } from 'react-redux';
@@ -23,8 +23,8 @@ import { childVideoLockStyles } from './child-video-lock-styles';
 const MIN_COST = 1;
 const MAX_COST = 100;
 
-// Час — самое короткое, за что имеет смысл отдавать звёзды; двое суток — самое
-// длинное, что ещё читается как «на время», а не «открыто».
+// An hour is the shortest window worth paying stars for; two days is the
+// longest that still reads as "for a while" rather than "open".
 const MIN_HOURS = 1;
 const MAX_HOURS = 48;
 
@@ -33,9 +33,9 @@ export interface ChildVideoLockProps {
   route: RouteProp<{ params: { childId?: string } }, 'params'>;
 }
 
-// Настройка принадлежит одному ребёнку, как и фильтр: старшему видео можно
-// закрыть, младшему оставить открытым, и цена у каждого своя. Поэтому сверху
-// селектор детей, а всё ниже относится к выбранному.
+// The setting belongs to one child, like the filter: video can be closed for the
+// older one and left open for the younger, each with their own price. So the
+// child selector sits on top and everything below is for the selected child.
 const ChildVideoLock: FC<ChildVideoLockProps> = ({ route }) => {
   const { t } = useTranslation();
   const { color } = useContext(ThemeContext);
@@ -49,6 +49,8 @@ const ChildVideoLock: FC<ChildVideoLockProps> = ({ route }) => {
   const [cost, setCost] = useState(10);
   const [hours, setHours] = useState(24);
   const [dirty, setDirty] = useState(false);
+  const dirtyRef = useRef(dirty);
+  dirtyRef.current = dirty;
 
   useEffect(() => {
     if (!childId && children.length) setChildId(children[0].id);
@@ -64,19 +66,24 @@ const ChildVideoLock: FC<ChildVideoLockProps> = ({ route }) => {
 
   const state = data?.data;
 
-  // Форма встаёт на серверное состояние — но только пока родитель ничего не
-  // трогал. Без этой оговорки любой фоновый перезапрос затирал бы правку прямо
-  // под пальцем: переключатель возвращался бы в исходное сразу после нажатия.
+  // The form takes the server state, but only while the parent has not touched
+  // anything. Without that, any background refetch would wipe an edit right
+  // under the finger: the switch would flip back straight after the tap.
+  //
+  // It follows new server data only, not the end of an edit. Saving clears
+  // `dirty` while the cached state still holds the old values until the
+  // refetch lands; reacting to that put the previous price and hours back on
+  // screen for a moment.
   useEffect(() => {
-    if (!state || dirty) return;
+    if (!state || dirtyRef.current) return;
 
     setEnabled(state.enabled);
     setCost(state.unlockCost);
     setHours(state.unlockHours);
-  }, [state, dirty]);
+  }, [state]);
 
-  // Переключение ребёнка с несохранёнными правками спрашивает — ровно как на
-  // экране фильтра.
+  // Switching child with unsaved edits asks first, exactly as on the filter
+  // screen.
   const onSelectChild = (id: string) => {
     if (id === childId) return;
     if (dirty) return setPendingChildId(id);
@@ -207,8 +214,8 @@ const ChildVideoLock: FC<ChildVideoLockProps> = ({ route }) => {
                 </Pressable>
 
                 <View style={styles.stepperValue}>
-                  {/* Без иконки: у цены она означает звёзды, а часам подходящего
-                      глифа в наборе нет, и любой другой читался бы как ошибка. */}
+                  {/* No icon: on the price it means stars, the set has no fitting
+                      glyph for hours, and any other would read as a mistake. */}
                   <Typography type="title3">{t('video_lock_hours_value', { hours })}</Typography>
                 </View>
 
@@ -250,8 +257,8 @@ const ChildVideoLock: FC<ChildVideoLockProps> = ({ route }) => {
                 </Typography>
 
                 {openNow && (
-                  // Досрочно закрыть нельзя: сутки уже куплены звёздами, и
-                  // отнять их — то же самое, что отнять звёзды.
+                  // It cannot be closed early: the window was bought with
+                  // stars, and taking it away is the same as taking the stars.
                   <Typography type="bodyS" textColor="text_secondary">
                     {t('video_lock_paid_note')}
                   </Typography>
