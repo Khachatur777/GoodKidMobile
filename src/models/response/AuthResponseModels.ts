@@ -40,6 +40,8 @@ export interface IConfigFeatures {
   maxChildrenFree?: number;
   activityDays?: number;
   activityDaysFree?: number;
+  // Which Learn sections a child can open; set per section in the console
+  learningSections?: Partial<Record<'world' | 'math' | 'language' | 'logic', boolean>>;
 }
 
 export interface IConfigAppearance {
