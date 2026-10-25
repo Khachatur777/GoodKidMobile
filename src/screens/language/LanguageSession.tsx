@@ -30,6 +30,9 @@ import {
 import { languageStyles } from './language-styles';
 import { useLanguageCopy } from './language-copy';
 
+// The fewest letters a child can check; matches the server's lower bound.
+const MIN_CHECK_LETTERS = 2;
+
 export default function LanguageSession({
   navigation,
 }: {
@@ -145,6 +148,12 @@ export default function LanguageSession({
       setBusy(false);
     }
   };
+  // Checking opens from two letters, not only once the word is complete: a
+  // child who has started can ask whether they are on the right track. The
+  // server takes an unfinished word as a wrong attempt.
+  const cannotCheck =
+    question?.status === 'unanswered' &&
+    selected.length < Math.min(MIN_CHECK_LETTERS, question.length);
   const askExit = () =>
     session?.status === 'active'
       ? Alert.alert(copy.exit, copy.exitNote, [
@@ -336,17 +345,10 @@ export default function LanguageSession({
                   </>
                 )}
                 <Pressable
-                  disabled={
-                    busy ||
-                    (question.status === 'unanswered' &&
-                      selected.length !== question.length)
-                  }
+                  disabled={busy || cannotCheck}
                   style={[
                     styles.button,
-                    (busy ||
-                      (question.status === 'unanswered' &&
-                        selected.length !== question.length)) &&
-                      styles.disabled,
+                    (busy || cannotCheck) && styles.disabled,
                   ]}
                   onPress={() =>
                     question.status === 'unanswered'
