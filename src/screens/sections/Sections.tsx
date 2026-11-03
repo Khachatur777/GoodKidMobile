@@ -6,7 +6,7 @@ import { ThemeContext } from 'theme';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { IIcons } from 'assets';
-import { getIsChildState, useGetLearningProgressQuery } from 'rtk';
+import { getConfigDataState, getIsChildState, useGetLearningProgressQuery } from 'rtk';
 import { sectionsStyles } from './sections-styles.ts';
 
 type SectionKey = 'world' | 'math' | 'language' | 'logic';
@@ -17,8 +17,8 @@ interface SectionTile {
   route?: string;
 }
 
-// Разделы фиксированы в коде: под каждый нужен свой экран. Категории внутри
-// приходят с сервера и добавляются без релиза.
+// The sections are fixed in code: each needs its own screen. The categories
+// inside come from the server and are added without a release.
 const SECTIONS: SectionTile[] = [
   { key: 'world', icon: 'GlobeIcon', route: 'CardCategories' },
   { key: 'math', icon: 'DotsGridIcon', route: 'MathCategories' },
@@ -35,14 +35,21 @@ const Sections: FC<SectionsProps> = ({ navigation }) => {
   const { t } = useTranslation();
   const styles = useMemo(() => sectionsStyles(color), [color]);
 
-  // Звёзды принадлежат ребёнку. Родителю, зашедшему посмотреть содержимое,
-  // счётчик показывать нечего: «0» рядом с ним ничего не значит.
+  // Stars belong to the child. A parent looking at the content has no counter
+  // to see: a "0" next to them means nothing.
   const isChild = useSelector(getIsChildState);
   const { data } = useGetLearningProgressQuery(
     { showModal: false },
     { skip: !isChild },
   );
   const stars = data?.data?.stars?.total ?? 0;
+
+  // The console opens and closes each section. A closed one stays in the list,
+  // greyed out like a section that is still coming, so the screen keeps its
+  // shape. A config from before the flags existed says nothing, and that means
+  // open: an older server must not lock children out of what they had.
+  const config = useSelector(getConfigDataState);
+  const openSections = config?.features?.learningSections;
 
   return (
     <BackgroundWrapper>
@@ -68,7 +75,8 @@ const Sections: FC<SectionsProps> = ({ navigation }) => {
           contentContainerStyle={styles.listContent}
         >
           {SECTIONS.map(section => {
-            const available = Boolean(section.route);
+            const available =
+              Boolean(section.route) && openSections?.[section.key] !== false;
 
             return (
               <Pressable
@@ -78,7 +86,7 @@ const Sections: FC<SectionsProps> = ({ navigation }) => {
                   styles.tile,
                   available ? styles.tileActive : styles.tileSoon,
                 ]}
-                onPress={() => section.route && navigation.navigate(section.route)}
+                onPress={() => available && section.route && navigation.navigate(section.route)}
               >
                 <View style={styles.iconBox}>
                   <Icon
