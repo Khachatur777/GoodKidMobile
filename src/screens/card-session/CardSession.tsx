@@ -206,6 +206,9 @@ const CardSession: FC<CardSessionProps> = ({ navigation, route }) => {
   }
 
   const hasOptions = (card.answers || []).length > 0;
+  const cardImages = (card.images || []).filter(image => image.path?.trim()).slice(0, 2);
+  const showsCountingObjects = card.type === 'count' && Boolean(card.visual?.repeat);
+  const showsImagePair = !showsCountingObjects && cardImages.length === 2;
   const questionText = hasOptions
     ? localized(card.question, lang)
     : localized(card.title, lang);
@@ -233,16 +236,26 @@ const CardSession: FC<CardSessionProps> = ({ navigation, route }) => {
         </View>
 
         <View style={styles.stage}>
-          <View style={styles.imageBox}>
-            {card.type === 'count' && card.visual?.repeat ? (
+          <View style={[styles.imageBox, showsImagePair && styles.imagePair]}>
+            {showsCountingObjects ? (
               <View style={styles.objects}>
-                {Array.from({ length: card.visual.repeat }).map((_, i) => (
+                {Array.from({ length: card.visual?.repeat || 0 }).map((_, i) => (
                   <Text key={i} style={styles.object}>{card.visual?.emoji || '🍎'}</Text>
                 ))}
               </View>
-            ) : card.images?.[0]?.path ? (
+            ) : showsImagePair ? (
+              cardImages.map((image, imageIndex) => (
+                <View key={`${image.path}-${imageIndex}`} style={styles.imageTile}>
+                  <Image
+                    source={{ uri: getFileUri(image.path) }}
+                    style={styles.image}
+                    resizeMode="contain"
+                  />
+                </View>
+              ))
+            ) : cardImages[0] ? (
               <Image
-                source={{ uri: getFileUri(card.images[0].path) }}
+                source={{ uri: getFileUri(cardImages[0].path) }}
                 style={styles.image}
                 resizeMode="cover"
               />

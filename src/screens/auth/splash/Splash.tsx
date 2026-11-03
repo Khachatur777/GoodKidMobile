@@ -160,7 +160,7 @@ const Splash: FC<SplashProps> = ({navigation}) => {
 
   return (
     <BackgroundWrapper containerStyles={styles.container}>
-      <GoodKidLogo size={96} variant="stacked" />
+      <GoodKidLogo size={120} variant="stacked" />
     </BackgroundWrapper>
   );
 };

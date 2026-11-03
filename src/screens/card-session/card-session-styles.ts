@@ -52,6 +52,21 @@ export const cardSessionStyles = (color?: IGetColor) =>
       alignItems: 'center',
       justifyContent: 'center',
     },
+    imagePair: {
+      flex: 0,
+      minHeight: 0,
+      flexDirection: 'row',
+      gap: 12,
+      borderRadius: 0,
+      backgroundColor: 'transparent',
+    },
+    imageTile: {
+      flex: 1,
+      aspectRatio: 1,
+      borderRadius: 24,
+      overflow: 'hidden',
+      backgroundColor: color?.('surface_primary'),
+    },
     image: {
       width: '100%',
       height: '100%',
