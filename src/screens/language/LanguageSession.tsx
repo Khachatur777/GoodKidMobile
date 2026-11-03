@@ -30,6 +30,12 @@ import {
 import { languageStyles } from './language-styles';
 import { useLanguageCopy } from './language-copy';
 
+// The fewest letters a child can check; matches the server's lower bound.
+const MIN_CHECK_LETTERS = 2;
+// How long a solved word stays on screen before the next one: long enough to
+// hear the chime and see the letters accepted, short enough not to wait.
+const CORRECT_PAUSE_MS = 900;
+
 export default function LanguageSession({
   navigation,
 }: {
@@ -50,6 +56,13 @@ export default function LanguageSession({
   const [imageFailed, setImageFailed] = useState(false);
   const [empty, setEmpty] = useState(false);
   const inFlight = useRef(false);
+  const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(
+    () => () => {
+      if (advanceTimer.current) clearTimeout(advanceTimer.current);
+    },
+    [],
+  );
   const failedAction = useRef<'load' | 'answer' | 'finish'>('load');
   // Keep the exact request when a response is lost; replay cannot count a second attempt.
   const pending = useRef<{
@@ -135,8 +148,16 @@ export default function LanguageSession({
       setSession(updated);
       const q = updated.questions[index];
       setWrong(q.status === 'unanswered');
-      if (q.status === 'correct') playCorrect();
-      else if (q.status === 'unanswered') playWrong();
+      // A solved word moves on by itself, without a "Well done" card and a
+      // Next button to press: the chime is the praise.
+      if (q.status === 'correct') {
+        playCorrect();
+        advanceTimer.current = setTimeout(() => {
+          advanceTimer.current = null;
+          if (index + 1 < updated.questions.length) setIndex(index + 1);
+          else complete();
+        }, CORRECT_PAUSE_MS);
+      } else if (q.status === 'unanswered') playWrong();
     } catch {
       failedAction.current = 'answer';
       setError(copy.offline);
@@ -145,6 +166,12 @@ export default function LanguageSession({
       setBusy(false);
     }
   };
+  // Checking opens from two letters, not only once the word is complete: a
+  // child who has started can ask whether they are on the right track. The
+  // server takes an unfinished word as a wrong attempt.
+  const cannotCheck =
+    question?.status === 'unanswered' &&
+    selected.length < Math.min(MIN_CHECK_LETTERS, question.length);
   const askExit = () =>
     session?.status === 'active'
       ? Alert.alert(copy.exit, copy.exitNote, [
@@ -285,13 +312,10 @@ export default function LanguageSession({
                     </Pressable>
                   ))}
                 </View>
-                {question.status !== 'unanswered' ? (
+                {question.status === 'correct' ? null : question.status !==
+                  'unanswered' ? (
                   <View style={styles.card}>
-                    <Text style={styles.title}>
-                      {question.status === 'correct'
-                        ? copy.correct
-                        : copy.skipped}
-                    </Text>
+                    <Text style={styles.title}>{copy.skipped}</Text>
                     <Text style={styles.title}>{question.word}</Text>
                   </View>
                 ) : (
@@ -335,35 +359,30 @@ export default function LanguageSession({
                     )}
                   </>
                 )}
-                <Pressable
-                  disabled={
-                    busy ||
-                    (question.status === 'unanswered' &&
-                      selected.length !== question.length)
-                  }
-                  style={[
-                    styles.button,
-                    (busy ||
-                      (question.status === 'unanswered' &&
-                        selected.length !== question.length)) &&
-                      styles.disabled,
-                  ]}
-                  onPress={() =>
-                    question.status === 'unanswered'
-                      ? submit()
-                      : index + 1 < session.questions.length
-                      ? setIndex(index + 1)
-                      : complete()
-                  }
-                >
-                  <Text style={styles.buttonText}>
-                    {question.status === 'unanswered'
-                      ? copy.done
-                      : index + 1 < session.questions.length
-                      ? copy.next
-                      : copy.finish}
-                  </Text>
-                </Pressable>
+                {question.status !== 'correct' && (
+                  <Pressable
+                    disabled={busy || cannotCheck}
+                    style={[
+                      styles.button,
+                      (busy || cannotCheck) && styles.disabled,
+                    ]}
+                    onPress={() =>
+                      question.status === 'unanswered'
+                        ? submit()
+                        : index + 1 < session.questions.length
+                        ? setIndex(index + 1)
+                        : complete()
+                    }
+                  >
+                    <Text style={styles.buttonText}>
+                      {question.status === 'unanswered'
+                        ? copy.done
+                        : index + 1 < session.questions.length
+                        ? copy.next
+                        : copy.finish}
+                    </Text>
+                  </Pressable>
+                )}
                 {question.status === 'unanswered' && (
                   <Pressable
                     disabled={busy || !!pending.current}
